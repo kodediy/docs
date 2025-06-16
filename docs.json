@@ -1,21 +1,22 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Kode Docs",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#FF7F1F",
+    "light": "#FF7F1F",
+    "dark": "#FF7F1F"
   },
-  "favicon": "/favicon.svg",
+  "font": "Inter",
+  "favicon": "/logo/favicon.svg",
   "navigation": {
     "languages": [
       {
         "language": "en",
         "groups": [
           {
-            "group": "Getting Started",
-            "pages": ["en/overview", "en/quickstart", "en/development"]
+            "group": "Main",
+            "pages": ["en/index"]
           }
         ]
       },
@@ -23,8 +24,8 @@
         "language": "es",
         "groups": [
           {
-            "group": "Getting Started",
-            "pages": ["es/overview", "es/quickstart", "es/development"]
+            "group": "Principal",
+            "pages": ["es/index"]
           }
         ]
       }
@@ -38,20 +39,20 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:placeholder@kode.diy"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://kode.diy"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://placeholder-x.com/kode",
+      "github": "https://placeholder-github.com/kode",
+      "linkedin": "https://placeholder-linkedin.com/company/kode"
     }
   }
 }
