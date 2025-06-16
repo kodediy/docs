@@ -38,21 +38,28 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:placeholder@kode.diy"
+        "label": "Downloads",
+        "href": "https://drive.google.com/drive/folders/1BQBPkt8wl_JruheSebFWsSGsblAOU-Mr?usp=sharing"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://kode.diy"
+      "label": "Store",
+      "href": "https://kode.diy/en/store"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://placeholder-x.com/kode",
-      "github": "https://placeholder-github.com/kode",
-      "linkedin": "https://placeholder-linkedin.com/company/kode"
+      "x": "https://x.com/kodediy",
+      "github": "https://github.com/kodediy",
+      "linkedin": "https://www.linkedin.com/company/kodediy",
+      "reddit": "https://www.reddit.com/r/kodediy"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/en"
+    }
+  ]
 }
