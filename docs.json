@@ -1,22 +1,44 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Kode Docs",
+  "theme": "maple",
+  "name": "kode.",
   "colors": {
     "primary": "#FF7F1F",
     "light": "#FF7F1F",
     "dark": "#FF7F1F"
   },
-  "font": "Inter",
-  "favicon": "/logo/favicon.svg",
+  "description": "kode. is a platform for creating and sharing code snippets.",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.svg",
+  "font": {
+    "family": "Inter",
+    "source": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  },
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/en/kode-dot/getting-started"
+    }
+  ],
   "navigation": {
     "languages": [
       {
         "language": "en",
         "groups": [
           {
-            "group": "Main",
-            "pages": ["en/index"]
+            "group": "kode dot",
+            "pages": ["en/kode-dot/getting-started", "en/kode-dot/display", "en/kode-dot/addresable-led", "en/kode-dot/buttons", "en/kode-dot/microSD"]
+          },
+          {
+            "group": "kodeOS",
+            "pages": ["en/kodeOS/architecture"]
+          },
+          {
+            "group": "External Modules",
+            "pages": ["en/external-modules/maker", "en/external-modules/inventor", "en/external-modules/camera", "en/external-modules/radio"]
           }
         ]
       },
@@ -30,10 +52,6 @@
         ]
       }
     ]
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
   },
   "navbar": {
     "links": [
@@ -55,11 +73,5 @@
       "linkedin": "https://www.linkedin.com/company/kodediy",
       "reddit": "https://www.reddit.com/r/kodediy"
     }
-  },
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/en"
-    }
-  ]
+  }
 }
