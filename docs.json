@@ -9,10 +9,10 @@
   },
   "description": "kode. is a platform for creating and sharing code snippets.",
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.png",
   "font": {
     "family": "Inter",
     "source": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
@@ -74,13 +74,14 @@
         "language": "es",
         "groups": [
           {
-            "group": "Introduction",
+            "group": "Introducción",
             "pages": ["es/introduction", "es/faq"]
           },
           {
             "group": "kode dot",
             "pages": [
               "es/kode-dot/quickstart", 
+              "es/kode-dot/esp32s3",
               "es/kode-dot/display", 
               "es/kode-dot/addresable-led", 
               "es/kode-dot/buttons", 
@@ -108,7 +109,7 @@
             ]
           },
           {
-            "group": "Módulos externos",
+            "group": "Módulos Externos",
             "pages": 
             [
               "es/external-modules/maker", 

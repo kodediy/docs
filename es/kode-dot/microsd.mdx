@@ -4,6 +4,23 @@ description: "MicroSD"
 icon: "sd-card"
 ---
 
-# Welcome
+# Características
 
-This is the main entry point for your documentation in English.
+La tarjeta microSD es uno de los núcleos de funcionamiento del kode dot. En ella se guardan las aplicaciones, los datos de configuración y los archivos de usuario.
+
+## Esquema de conexión
+La microSD se conecta al ESP32-S3 mediante SDIO, en modo 1-bit. Así, se puede usar el periférico dedicado de la ESP32-S3 para leer y escribir en la microSD, usando los siguientes pines:
+
+- GPIO13: CLK (SDIO_CLK)
+- GPIO12: CMD (SDIO_CMD)
+- GPIO11: DATA0 (SDIO_DATA0)
+
+## Librerías recomendadas
+### Arduino
+TBD
+### ESP-IDF
+TBD
+
+## Código de ejemplo
+
+## Descarga del código
