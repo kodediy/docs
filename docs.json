@@ -20,7 +20,7 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "/en/kode-dot/getting-started"
+      "destination": "/en"
     }
   ],
   "navigation": {
@@ -29,8 +29,30 @@
         "language": "en",
         "groups": [
           {
+            "group": "Introduction",
+            "pages": ["en/introduction", "en/faq"]
+          },
+          {
             "group": "kode dot",
-            "pages": ["en/kode-dot/getting-started", "en/kode-dot/display", "en/kode-dot/addresable-led", "en/kode-dot/buttons", "en/kode-dot/microSD"]
+            "pages": [
+              "en/kode-dot/quickstart", 
+              "en/kode-dot/display", 
+              "en/kode-dot/addresable-led", 
+              "en/kode-dot/buttons", 
+              "en/kode-dot/microsd",
+              {
+                "group": "Audio",	
+                "icon": "play",
+                "pages": 
+                [
+                  "en/kode-dot/audio/overview",
+                  "en/kode-dot/audio/microphone", 
+                  "en/kode-dot/audio/speaker"
+                ]	
+              },
+              "en/kode-dot/imu",
+              "en/kode-dot/power"
+            ]
           },
           {
             "group": "kodeOS",
@@ -38,7 +60,13 @@
           },
           {
             "group": "External Modules",
-            "pages": ["en/external-modules/maker", "en/external-modules/inventor", "en/external-modules/camera", "en/external-modules/radio"]
+            "pages": 
+            [
+              "en/external-modules/maker", 
+              "en/external-modules/inventor", 
+              "en/external-modules/camera", 
+              "en/external-modules/radio"
+            ]
           }
         ]
       },
@@ -46,8 +74,48 @@
         "language": "es",
         "groups": [
           {
-            "group": "Principal",
-            "pages": ["es/index"]
+            "group": "Introduction",
+            "pages": ["es/introduction", "es/faq"]
+          },
+          {
+            "group": "kode dot",
+            "pages": [
+              "es/kode-dot/quickstart", 
+              "es/kode-dot/display", 
+              "es/kode-dot/addresable-led", 
+              "es/kode-dot/buttons", 
+              "es/kode-dot/microsd",
+              {
+                "group": "Audio",	
+                "icon": "play",
+                "pages": 
+                [
+                  "es/kode-dot/audio/overview",
+                  "es/kode-dot/audio/microphone", 
+                  "es/kode-dot/audio/speaker"
+                ]	
+              },
+              "es/kode-dot/imu",
+              "es/kode-dot/power"
+            ]
+          },
+          {
+            "group": "kodeOS",
+            "pages": 
+            [
+              "es/kodeOS/apps",
+              "es/kodeOS/firmware"	
+            ]
+          },
+          {
+            "group": "Módulos externos",
+            "pages": 
+            [
+              "es/external-modules/maker", 
+              "es/external-modules/inventor", 
+              "es/external-modules/camera", 
+              "es/external-modules/radio"
+            ]
           }
         ]
       }
