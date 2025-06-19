@@ -1,22 +1,69 @@
 ---
 title: "Pantalla"
-description: "Pantalla"
+description: "La mejor pantalla AMOLED en el mejor dispositivo maker"
 icon: "display"
 ---
 
 # Características
 
-Pantalla AMOLED de 2.1 pulgadas y una resolución de 410x502 píxeles. Driver de la pantalla es el CO5300 y el driver del controlador táctil es el cst820.
+El kode dot integra la mejor pantalla en el mercado para dispositivos maker. Se trata de una pantalla táctil AMOLED de 2.13 pulgadas con las siguientes características:
+
+| Característica    | Descripción |
+| ----------------  | ----------- |
+| Tamaño            | 2.13 pulgadas | 
+| Resolución        | 410x502 píxeles |
+| Profundidad de colors | 16.7 M colors (24 bits) |
+| Driver            | CO5300 - QSPI |
+| Driver táctil     | CST820 - I2C |
+
 
 ## Esquema de conexión
-Driver funcionando por QSPI y conectada a estos pines del ESP32-S3.
+### Driver de la pantalla
+El driver de la pantalla es el CO5300 y funciona mediante Quad SPI. Está conectado al ESP32-S3 de la siguiente manera:
+
+| CO5300       | ESP32-S3 |
+| ------------ | -------- |
+| Chip Select  | GPIO9    |
+| Clock        | GPIO17   |
+| Data 0       | GPIO15   |
+| Data 1       | GPIO14   |
+| Data 2       | GPIO16   |
+| Data 3       | GPIO10   |
+| Reset        | GPIO8    |
+
+
+### Driver del táctil
+El driver del táctil es el CST820 y funciona mediante I2C. Está conectado al ESP32-S3 de la siguiente manera:
+
+| CST820       | ESP32-S3 |
+| ------------ | -------- |
+| SDA          | GPIO48   |
+| SCL          | GPIO47   |
+| Interrupt    | P17      |
+| Reset        | GPIO8    |
+
+<Warning>El pin de Interrupt está conectado al pin 17 del expansor de pines. Ve a TBD para más información.</Warning>
+<Warning>El pin de Reset está conectado al mismo pin que el de Reset de la pantalla.</Warning>
+
 
 ## Librerías recomendadas
 ### Arduino
-TBD
+- [Arduino_GFX](https://github.com/moononournation/Arduino_GFX)
+- [TouchLib](https://github.com/mmMicky/TouchLib)
+
 ### ESP-IDF
+- [esp_lcd_co5300](https://components.espressif.com/components/kodediy/esp_lcd_co5300)
+- [esp_lcd_touch_cst820](https://components.espressif.com/components/kodediy/esp_lcd_touch_cst820)
+
+
+## Códigos de ejemplo
+### Ejemplo sencillo
+TBD
+### Ejemplo con LVGL
 TBD
 
-## Código de ejemplo
 
 ## Descarga del código
+Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
+
+- TBD

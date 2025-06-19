@@ -1,18 +1,52 @@
 ---
 title: "ESP32-S3"
-description: "ESP32-S3"
+description:  "El microprocesador que le da vida al kode dot"
 icon: "microchip"
 ---
 
 # Características
 
-El corazón del kode dot es el microprocesador ESP32-S3 de Espressif. Tiene una flash de 32MB y una PSRAM de 8MB.
+El ESP32-S3 es uno de los mejores microprocesadores de Espressif que incorpora un doble núcleo XTensa LX7, capaz de correr a 240MHz.
 
-## Control de estados: BOOT y RESET
-El control de los estados de BOOT y RESET se realiza mediante la combinación de los botones del kode dot.
+Además, integra conectividad de 2.4GHz con soporte Wi-Fi y Bluetooth LE. En la siguiente imagen se puede ver el diagrama funcional del ESP32-S3 y todos los periféricos que incorpora:
 
-Para resetear el ESP32-S3, se debe pulsar el botón izquierdo del pad a la vez que se pulsa el botón de abajo.
+![Diagrama de bloques del ESP32-S3](/images/kode-dot/esp32s3/funtionalblock.png)
 
-Para entrar en modo BOOT, mientras se mantiene el botón de arriba, se debe resetear el kode dot pulsando el botón izquiedo del pad a la vez que se pulsa el botón de abajo.
+Hemos conseguido aumentar la potencia del kode dot gracias a añadirle 32MB de flash y usar 8MB de PSRAM. Así, el kode dot puede ejecutar programas mucho más grandes y complejos.
+
+| Característica    | Descripción |
+| ---------------- | ----------- |
+| Flash | Memoria externa de 32MB usando Octalbus |
+| PSRAM | Memoria interna de 8MB usando Octalbus |
+
+## Antena
+El kode dot incorpora una antena de 2.4GHz integrada en la PCB. Con esta antena vas a poder usar el Wi-Fi y el Bluetooth LE del ESP32-S3, además de ESP-NOW y otros protocolos de comunicación que funcionen
+en esta banda de frecuencia.
+
+
+## Programación
+
+Para programar tu kode dot, puedes conectarlo diréctamente a tu ordenador mediante el conector USB-C. Internamente, está conectado a los pines GPIO19 y GPIO20, usando el protocolo de programación USB-Serial.
+
+Para los más avanzados, también usando el conector USB-C, se puede usar el controlador JTAG interno que incorpora el ESP32-S3 para flashear el kode dot.
+
+Para los un más avanzados, se pueden usar los pines GPIO39, GPIO40, GPIO41 y GPIO42 para debuggear un programa usando una interfaz JTAG.
+
+
+## Control de estados
+El control de los estados de BOOT y RESET del ESP32-S3 se realiza mediante unas sencillas combinaciones con los botones del kode dot.
+
+### RESET
+Para resetear el kode dot, se debe pulsar el botón izquierdo del pad a la vez que se pulsa el botón de abajo. Esto es útil para estos casos:
+
+- Cuando se ha flasheado un programa y se queda bloqueado el kode dot.
+- Cuando se quiere salir de una aplicación y volver al kodeOS.
+
+### BOOT
+Para que el kode dot entre en modo BOOT, mientras se mantiene el botón de arriba, se debe resetear el kode dot siguiendo la combinación del RESET. 
+
+Este proceso es muy útil cuando después de subirle un programa al kode dot, se queda bloqueado y reiniciandose constantemente.
+
+<Tip>No es probable que tengas que usar este proceso ya que si el código que subes al kode dot se bloquea o hace reiniciar al ESP32-S3, el kode dot se reiniciará automáticamente y entrará en el kodeOS.</Tip>
 
 ## Corre tu primer programa: ¡Hola Mundo!

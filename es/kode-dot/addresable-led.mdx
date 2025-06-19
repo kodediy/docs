@@ -1,22 +1,46 @@
 ---
 title: "LED direccionable"
-description: "LED"
+description: "Descubre cómo darle color a tu kode dot"
 icon: "lightbulb"
 ---
 
 # Características
 
-El led del kode dot es un led direccionable WS2812B. Esto es que dentro del led hay un controlador que puede manejar el color de los leds RGB y el brillo de cada uno de ellos.
+El kode dot integra un led direccionable que podrás programar para que cambie de color y brillo. 
+
+No es un led normal, sino que es un led direccionable WS2812B. Esto es que dentro del led hay un controlador que puede manejar el color de los leds RGB y el brillo de cada uno de ellos.
+
+| Característica    | Descripción |
+| ----------------  | ----------- |
+| Driver            | WS2812B - 1-Wire |
+| Tamaño            | 2mm x 2mm |
+| Color             | RGB |
+| Número de colores | 16.7 M colors (24 bits) |
+
 
 ## Esquema de conexión
 El led direccionable funciona mediante un sólo pin conectado al ESP32-S3.
 
+| WS2812B       | ESP32-S3 |
+| ------------  | -------- |
+| Data          | GPIO4   |
+
 ## Librerías recomendadas
 ### Arduino
-TBD
+- [FastLED](https://github.com/FastLED/FastLED)
+- [Adafruit_NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
+
 ### ESP-IDF
-TBD
+- [led_indicator](https://components.espressif.com/components/espressif/led_indicator)
+- [led_strip](https://components.espressif.com/components/espressif/led_strip)
 
 ## Código de ejemplo
+### Ejemplo sencillo
+TBD
+### Ejemplo con LVGL
+TBD
 
 ## Descarga del código
+Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
+
+- TBD
