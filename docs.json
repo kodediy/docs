@@ -97,7 +97,8 @@
                 ]	
               },
               "es/kode-dot/imu",
-              "es/kode-dot/power"
+              "es/kode-dot/power",
+              "es/kode-dot/io-expander"
             ]
           },
           {

@@ -1,24 +1,41 @@
 ---
 title: "Botones"
-description: "Botones"
+description: "Aprende a controlar los botones del kode dot"
 icon: "circle-dot"
 ---
 
 # Características
 
-EL kode dot dispone de un pad direcinal de 4 botones más dos botones independientes.
+EL kode dot dispone de un pad direcinal de 4 botones más dos botones independientes. Mediante estos botones se puede navegar por el kodeOS, controlar el estado del ESP32-S3 y apagar/encender el dispositivo.
 
 ## Esquema de conexión
-Todos los botones están conectados a un expansor de pines, exceptuando el botón de arriba a la derecha que está conectado directamente al ESP32-S3. 
+Todos los botones tienen una resistencia de pull-up y están conectados al expansor de pines I2C, exceptuando el botón de arriba que está conectado directamente al ESP32-S3.
 
-Así, el expansor de pines está conectado al ESP32-S3 por I2C, con la dirección 0x20. El botón que está conectado directamente al ESP32-S3 está conectado al pin GPIO0.
+<Info>Ve a TBD para más información sobre el expansor de pines.</Info>
+
+
+El botón de arriba está conectado al pin GPIO0, para controlar el BOOT del ESP32-S3. Los demás botones están conectados al expansor de pines de esta manera:
+
+| Botón         | Expansor de pines |
+| ------------  | ----------------- |
+| Pad Izquierdo | P7                |
+| Pad Arriba    | P6                |
+| Pad Derecha   | P13               |
+| Pad Abajo     | P10               |
+| Botón Abajo   | P11               |
+
 
 ## Librerías recomendadas
 ### Arduino
-TBD
+- [ESP32_IO_Expander](https://github.com/esp-arduino-libs/ESP32_IO_Expander)
 ### ESP-IDF
-TBD
+- [button](https://components.espressif.com/components/espressif/button)
+- [esp_io_expander_tca95xx_16bit](https://components.espressif.com/components/espressif/esp_io_expander_tca95xx_16bit)
 
 ## Código de ejemplo
+TBD
 
 ## Descarga del código
+Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
+
+- TBD
