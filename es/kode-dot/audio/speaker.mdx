@@ -1,9 +1,111 @@
 ---
 title: "Altavoz"
-description: "Altavoz"
+# description: "Altavoz"
 icon: "volume-high"
 ---
 
-# Welcome
+# Características
 
-This is the main entry point for your documentation in English.
+El kode dot integra un altavoz de 1W conectado a un amplificador. Así, solo te tienes que preocupar de darle sonido a tus proyectos a través del bus I2S.
+
+## Esquema de conexión
+
+El micrófono está conectado al ESP32-S3 de la siguiente manera:
+
+| Micrófono | ESP32-S3 |
+| --------- | -------- |
+| SCK       | GPIO38   |
+| WS        | GPIO45   |
+| DOUT      | GPIO46   |
+| SD        | P3       |
+
+<Note>
+  El amplificador por defecto está apagado para no gastar energía. Para
+  encenderlo pon el pin P3 del amplificador en HIGH
+</Note>
+
+## Librerías recomendadas
+
+### Arduino
+
+- [ESP_I2S](https://github.com/espressif/arduino-esp32/blob/master/libraries/ESP_I2S)
+- [ESP32_IO_Expander](https://github.com/esp-arduino-libs/ESP32_IO_Expander)
+
+### ESP-IDF
+
+- [ESP-ADF](https://github.com/espressif/esp-adf)
+- [esp_io_expander_tca95xx_16bit](https://components.espressif.com/components/espressif/esp_io_expander_tca95xx_16bit)
+
+<Warning>
+  El uso de ESP-ADF es para usuarios avanzados. Si no tienes experiencia en este
+  framework, te recomendamos usar la librería de Arduino.
+</Warning>
+
+## Códigos de ejemplo
+
+```cpp record_to_wav.ino lines icon="microchip"
+#include <Arduino.h>
+#include <ESP_I2S.h>
+#include <esp_io_expander.hpp>
+
+#define EXAMPLE_CHIP_NAME       TCA95XX_16BIT
+#define EXAMPLE_I2C_SDA_PIN     (48)
+#define EXAMPLE_I2C_SCL_PIN     (47)
+#define EXAMPLE_I2C_ADDR        (0x20)
+#define _EXAMPLE_CHIP_CLASS(name, ...)   esp_expander::name(__VA_ARGS__)
+#define EXAMPLE_CHIP_CLASS(name, ...)    _EXAMPLE_CHIP_CLASS(name, ##__VA_ARGS__)
+
+const uint8_t I2S_SCK = 38;
+const uint8_t I2S_WS = 45;
+const uint8_t I2S_DOUT = 46;
+
+const int frequency = 440;    // frequency of square wave in Hz
+const int amplitude = 500;    // amplitude of square wave
+const int sampleRate = 16000;  // sample rate in Hz
+
+i2s_data_bit_width_t bps = I2S_DATA_BIT_WIDTH_32BIT;
+i2s_mode_t mode = I2S_MODE_STD;
+i2s_slot_mode_t slot = I2S_SLOT_MODE_MONO;
+
+const int halfWavelength = (sampleRate / frequency);  // half wavelength of square wave
+
+int32_t sample = amplitude;  // current sample value
+int count = 0;
+
+I2SClass i2s;
+esp_expander::Base *expander = nullptr;
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("I2S simple tone");
+
+    // Set up the pins used for audio input
+  i2s.setPins(I2S_SCK, I2S_WS, I2S_DOUT, -1);
+
+  // start I2S at the sample rate with 16-bits per sample
+  if (!i2s.begin(mode, sampleRate, bps, slot, I2S_STD_SLOT_LEFT)) {
+    Serial.println("Failed to initialize I2S!");
+    while (1);  // do nothing
+  }
+  Serial.println("I2S bus initialized.");
+
+  expander = new EXAMPLE_CHIP_CLASS(EXAMPLE_CHIP_NAME, EXAMPLE_I2C_SCL_PIN, EXAMPLE_I2C_SDA_PIN, EXAMPLE_I2C_ADDR);
+  expander->init();
+  expander->begin();
+  expander->pinMode(3, OUTPUT);
+  expander->digitalWrite(3, HIGH);
+}
+
+void loop() {
+  if (count % halfWavelength == 0) {
+    // invert the sample every half wavelength count multiple to generate square wave
+    sample = -1 * sample;
+  }
+
+  i2s.write(sample);  // Right channel
+  i2s.write(sample);  // Left channel
+
+  // increment the counter for the next sample
+  count++;
+}
+```
