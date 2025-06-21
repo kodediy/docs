@@ -5,21 +5,47 @@ icon: "expand"
 ---
 
 # Características
+Como todas las señales no caben en los pines del ESP32-S3, hemos decidido integrar en el kode dot un expansor de pines. A este expansor están conectadas todas las señales 
+que son de baja velocidad o que no son muy relevantes.
 
+Este expansor se comunica con el ESP32-S3 mediante el bus I2C interno, teniendo una dirección 0x20. Además, tiene un pin de interruptor que está conectado al ESP32-S3 
+para saber cuándo ha habido un cambio en uno de sus pines y leer este cambio.
 
 ## Esquema de conexión
+El expansor de pines está conectado al ESP32-S3 de esta manera:
 
+| Expansor     | ESP32-S3 |
+| ------------ | -------- |
+| SDA          | GPIO48   |
+| SCL          | GPIO47   |
+| Interrupt    | GPIO18   |
+
+Estas son las señales de los distintos componenetes del kode dot que están conectadas al expansor:
+
+| Señal                           | Expansor |
+| --------------------------------| -------- |
+| Magnetómetro - INT              | EXP0   |
+| RTC - INTB                      | EXP1   |
+| RTC - INTA                      | EXP2   |
+| Amplificador - SD               | EXP3   |
+| Alimentación - 3V3 periféricos  | EXP4   |
+| Indicador batería - PG          | EXP5   |
+| Pad - Arriba                    | EXP6   |
+| Pad - Izquierda                 | EXP7   |
+| Pad - Abajo                     | EXP8   |
+| Botón - Abajo                   | EXP9   |
+| PMIC - INT                      | EXP10  |
+| Pad - Derecha                   | EXP11  |
+| IMU - INT2                      | EXP12  |
+| IMU - INT1                      | EXP13  |
+| microSD - CD                    | EXP14  |
+| Pantalla - TP INT               | EXP15  |
+
+La mayoría de señales son de interrupción de los distintos integrados o de los botones. Os dejámos las librería que os recomendamos para leer y escribir estos pines
+aunque en los siguientes apartados irémos viendo cómo leer estas señales.
 
 ## Librerías recomendadas
 ### Arduino
 - [ESP32_IO_Expander](https://github.com/esp-arduino-libs/ESP32_IO_Expander)
 ### ESP-IDF
 - [esp_io_expander_tca95xx_16bit](https://components.espressif.com/components/espressif/esp_io_expander_tca95xx_16bit)
-
-## Código de ejemplo
-TBD
-
-## Descarga del código
-Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
-
-- TBD

@@ -1,9 +1,70 @@
 ---
 title: "IMU"
-description: "IMU"
+description: "Conoce la posición de tu kode dot"
 icon: "compass"
 ---
 
-# Welcome
+# Características
 
-This is the main entry point for your documentation in English.
+En el interior de tu kode dot tienes integrado un giroscópio de 3 ejes, un acelerómetro de 3 ejes y un magnetómetro de 3 ejes. Así, puedes conocer la posición relativa a si 
+mismo y su posición absoluta respecto La Tierra.
+
+El giroscópio y el acelerómetro están en un mismo integrado y tienen las siguientes características:
+
+| Característica                        | Descripción                                                                                                              |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Acelerómetro + giroscopio “always-on” | Consumo total de **0,55 mA** en modo de alto rendimiento para operación continua.                                        |
+| Rangos de medida                      | Acelerómetro **±2/4/8/16 g**  •  Giroscopio **±125/250/500/1000/2000 dps**.                                              |
+| FIFO inteligente                      | Búfer de datos de hasta **9 KB** con compresión y batching dinámico.                                                     |
+| Motor de IA embebido                  | **16 máquinas de estados (FSM)** programables + **núcleo MLC** (hasta 8 flujos / 256 nodos).                             |
+| Reconocimiento de eventos             | Podómetro, contador de pasos, significant motion, inclinación, free-fall, wake-up, orientación 6D/4D, clic y doble clic. |
+| Sensor de temperatura                 | Termómetro interno para monitorizar la temperatura del chip.                                                             |
+
+El magnetómetro tiene las siguientes características:
+
+| Característica                        | Detalle                                                    |
+| ------------------------------------- | ---------------------------------------------------------- |
+| Rango dinámico                        | ±50 gauss (tres ejes)                                      |
+| Resolución de salida                  | 16 bits                                                    |
+| Consumo típico                        | 200 µA @ 20 Hz (modo alta resolución) / 50 µA (low-power)  |
+
+
+## Esquema de conexión
+### IMU de 6 ejes
+La IMU está conectado al ESP32-S3 a través del bus I2C con la dirección 0x6A y usando estas conexiones:
+
+| Expansor     | ESP32-S3 |
+| ------------ | -------- |
+| SDA          | GPIO48   |
+| SCL          | GPIO47   |
+| INT1         | EXP13    |
+| INT2         | EXP12    |
+
+### Magnetómetro de 3 ejes
+El magnetómetro está conectado de la misma manera el bus I2C con la dirección 0x1E y usa estas conexiones:
+| Expansor     | ESP32-S3 |
+| ------------ | -------- |
+| SDA          | GPIO48   |
+| SCL          | GPIO47   |
+| INT1         | EXP0     |
+
+## Librerías recomendadas
+### Arduino
+-[Adafruit LSM6DS](https://github.com/adafruit/Adafruit_LSM6DS)
+-[Adafruit LIS2MDL](https://github.com/adafruit/Adafruit_LIS2MDL)
+
+### ESP-IDF
+-[kode_lsm6dsox](https://components.espressif.com/components/kodediy/kode_lsm6dsox)
+-[kode_lis2mdl](TBD)
+
+## Códigos de ejemplo
+### Ejemplo sencillo
+TBD
+### Ejemplo con LVGL
+TBD
+
+
+## Descarga del código
+Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
+
+- TBD

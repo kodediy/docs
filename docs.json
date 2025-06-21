@@ -82,6 +82,7 @@
             "pages": [
               "es/kode-dot/quickstart", 
               "es/kode-dot/esp32s3",
+              "es/kode-dot/io-expander",
               "es/kode-dot/display", 
               "es/kode-dot/addresable-led", 
               "es/kode-dot/buttons", 
@@ -97,8 +98,7 @@
                 ]	
               },
               "es/kode-dot/imu",
-              "es/kode-dot/power",
-              "es/kode-dot/io-expander"
+              "es/kode-dot/power"
             ]
           },
           {
