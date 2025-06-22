@@ -99,13 +99,15 @@
               },
               "es/kode-dot/imu",
               "es/kode-dot/rtc",
-              "es/kode-dot/power"
+              "es/kode-dot/power",
+              "es/kode-dot/connectors"
             ]
           },
           {
             "group": "kodeOS",
             "pages": 
             [
+              "es/kodeOS/kody",
               "es/kodeOS/apps",
               "es/kodeOS/firmware"	
             ]

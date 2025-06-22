@@ -1,9 +1,108 @@
 ---
 title: "Inventor"
-description: "Inventor Module"
+description: "Dale movimiento a tu kode dot con motores"
 icon: "robot"
 ---
 
-# Welcome
+**Módulo:** Basic <Icon icon="seedling" iconType="solid" />
 
-This is the main entry point for your documentation in English.
+# Características
+
+Con este módulo puedes conectar motores a tu kode dot y hacer robots como un coche siguelineas. Se le pueden conectar lo siguiente:
+
+- 2x motores DC o 1x motor paso a paso
+- 1x servomotor
+- 4x GPIOs para sensores
+- 1x bus de I2C
+
+No es necesario usar una fuente externa de alimentación ya que todo se alimenta desde el kode dot.
+
+Los motores DC tienen que ser de 5V y están limitados por hardware a una corriente de 700mA por motor. Así, como el kode dot puede suministrar hasta 2A, quedan 600mA para conectar un servomotor.
+
+Los motores se controlan por PWM y se puede medir la corriente que esta consumiendo cada motor para tener una estimación de su torque.
+
+![Módulo Inventor](/images/external-modules/inventor.png)
+
+## Esquema de conexión
+
+El driver que controla los motores está conectado de la siguiente manera:
+
+| Driver  | ESP32-S3 |
+| ------- | -------- |
+| AIN1    | GPIO42   |
+| AIN2    | GPIO41   |
+| BIN1    | GPIO40   |
+| BIN2    | GPIO39   |
+| nFAULT  | GPIO38   |
+| AIPROPI | GPIO37   |
+| BIPROPI | GPIO36   |
+
+<Info> AIPROPI y BIPROPI sirven para medir la corriente que está consumiendo cada motor. Para más información consulta el Datasheet del driver.</Info>
+
+## Código de ejemplo
+```cpp Inventor_test.ino lines icon="microchip"
+// Pines
+const int PIN_AIN1 = 42;
+const int PIN_AIN2 = 41;
+const int PIN_BIN1 = 40;
+const int PIN_BIN2 = 39;
+
+// LEDC (PWM) settings
+const int PWM_FREQ       = 5000;
+const int PWM_RES_BITS   = 8;
+const int CHANNEL_A      = 0;
+const int CHANNEL_B      = 1;
+
+// Ciclo de temporización (en ms)
+const uint16_t RAMP_TIME = 3000; // subida/bajada
+const uint16_t HOLD_TIME = 2000; // velocidad máxima
+
+void setup() {
+  // Pines digitales para fast-decay
+  pinMode(PIN_AIN2, OUTPUT);
+  pinMode(PIN_BIN2, OUTPUT);
+  digitalWrite(PIN_AIN2, LOW);
+  digitalWrite(PIN_BIN2, LOW);
+
+  // Configurar canales LEDC
+  ledcSetup(CHANNEL_A, PWM_FREQ, PWM_RES_BITS);
+  ledcSetup(CHANNEL_B, PWM_FREQ, PWM_RES_BITS);
+
+  // Mapear canales a pines
+  ledcAttachPin(PIN_AIN1, CHANNEL_A);
+  ledcAttachPin(PIN_BIN1, CHANNEL_B);
+}
+
+void loop() {
+  // --- Rampa arriba de 0 a 255 en RAMP_TIME ---
+  for (int v = 0; v <= 255; v++) {
+    ledcWrite(CHANNEL_A, v);
+    ledcWrite(CHANNEL_B, v);
+    delay(RAMP_TIME / 255);
+  }
+
+  // Mantener velocidad máxima
+  ledcWrite(CHANNEL_A, 255);
+  ledcWrite(CHANNEL_B, 255);
+  delay(HOLD_TIME);
+
+  // --- Rampa abajo de 255 a 0 en RAMP_TIME ---
+  for (int v = 255; v >= 0; v--) {
+    ledcWrite(CHANNEL_A, v);
+    ledcWrite(CHANNEL_B, v);
+    delay(RAMP_TIME / 255);
+  }
+
+  // Asegurar parada
+  ledcWrite(CHANNEL_A, 0);
+  ledcWrite(CHANNEL_B, 0);
+
+  // Bucle infinito
+}
+
+```
+
+## Descarga del código
+Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
+
+- TBD

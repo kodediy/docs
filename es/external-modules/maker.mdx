@@ -1,9 +1,49 @@
 ---
 title: "Maker"
-description: "Maker Module"
+description: "Programa y prototipa tus ideas"
 icon: "microchip"
 ---
 
-# Welcome
+**Módulo:** Basic <Icon icon="seedling" iconType="solid" />
 
-This is the main entry point for your documentation in English.
+# Características
+
+Con este módulo puedes crear circuitos y prototipar tus ideas usando la breadboard integrada. Así, puedes programar el circuito con los pines disponibles del kode dot.
+
+Además, tienes disponible los dos buses de alimentación del kode dot:
+
+| Voltaje | Corriente máxima |
+| ------- | ---------------- |
+| 5V      | 2A               |
+| 3.3V    | 2A               |
+
+
+![Módulo Maker](/images/external-modules/maker.png)
+
+## Pines disponibles
+
+Puedes usar los siguientes pines:
+
+| Pin    | Descripción |
+| ------ | ----------- |
+| GPIO1  | RTC_GPIO1, ADC1_CH0, TOUCH1 |
+| GPIO2  | RTC_GPIO2, ADC1_CH1, TOUCH2 |
+| GPIO3  | RTC_GPIO3, ADC1_CH2, TOUCH3 |
+| GPIO11 | RTC_GPIO11, ADC2_CH0, TOUCH11 |
+| GPIO12 | RTC_GPIO12, ADC2_CH1, TOUCH12 |
+| GPIO13 | RTC_GPIO13, ADC2_CH2, TOUCH13 |
+| SCL    | GPIO47 |
+| SDA    | GPIO46 |
+| U0TXD  | GPIO43 |
+| U0RXD  | GPIO44 |
+| GPIO39 | JTAG-MTCK   |
+| GPIO40 | JTAG-MTCDO  |
+| GPIO41 | JTAG-MTCDI  |
+| GPIO42 | JTAG-MTMS   |
+
+<Warning>Los pines SCL y SDA son del bus I2C del kode dot. Solo se pueden usar para conectar otros componentes al bus I2C.</Warning>
+
+
+
+
+
