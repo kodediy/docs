@@ -98,6 +98,7 @@
                 ]	
               },
               "es/kode-dot/imu",
+              "es/kode-dot/rtc",
               "es/kode-dot/power"
             ]
           },

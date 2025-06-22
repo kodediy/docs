@@ -1,0 +1,97 @@
+---
+title: "Reloj de tiempo real"
+# description: "El kode dot integra un reloj de tiempo real para que puedas obtener la hora y la fecha."
+icon: "clock"
+---
+
+# Características
+
+El kode dot integra dos relojes de tiempo real, el interno del ESP32-S3 y uno externo.
+
+## Esquema de conexión
+
+El reloj inteno del ESP32-S3 se puede usar directamente usando la documentación de Espressif.
+
+El reloj externo está conectado al I2C del ESP32-S3, usando la dirección 0XD0, y está conectado de la siguiente manera:
+
+| RTC externo | ESP32-S3 |
+| ----------- | -------- |
+| SDA         | GPIO48   |
+| SCL         | GPIO47   |
+| INTA        | EXP2     |
+| INTB        | EXP1     |
+
+## Librerías recomendadas
+### Arduino
+- [AnalogRTCLibrary](https://github.com/analogdevicesinc/AnalogRTCLibrary)
+
+### ESP-IDF
+- TBD
+
+## Código de ejemplo
+```cpp RTC_test.ino lines icon="microchip"
+#include <AnalogRTCLibrary.h>
+#include <Wire.h>
+
+#define I2C_SDA 48
+#define I2C_SCL 47
+#define I2C_FREQ 400000L
+
+Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+
+MAX31329 rtc(&Wire, MAX31329_I2C_ADDRESS);
+
+struct tm rtc_ctime;
+    
+void print_time(void) {
+    char buf[40];
+
+    int ret = rtc.get_time(&rtc_ctime);
+    if (ret) {
+        Serial.println("get_time failed!");
+        return;
+    }
+    
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &rtc_ctime);
+    Serial.println(buf);
+}
+
+void setup() {
+    int ret;
+
+    Serial.begin(115200);
+    Serial.println("---------------------");
+    Serial.println("RTC use case example:");
+    Serial.println("RTC will be set to specific value then it will be read every second");
+    Serial.println(" ");
+
+    rtc.begin();
+    //24-11-2024 15:10:00
+    rtc_ctime.tm_year = 124; // years since 1900
+    rtc_ctime.tm_mon  = 10;  // 0-11
+    rtc_ctime.tm_mday = 24;  // 1-31
+    rtc_ctime.tm_hour = 15;  // 0-23
+    rtc_ctime.tm_min  = 10;  // 0-59
+    rtc_ctime.tm_sec  = 0;   // 0-61
+    //
+    rtc_ctime.tm_yday  = 0;  // 0-365
+    rtc_ctime.tm_wday  = 0;  // 0-6
+    rtc_ctime.tm_isdst = 0;  // Daylight saving flag
+    
+    ret = rtc.set_time(&rtc_ctime);
+    if (ret) {
+        Serial.println("Set time failed!");
+    }
+}
+
+void loop()  {
+    delay(1000); // wait a little
+    print_time();
+}
+```
+
+
+## Descarga del código
+Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
+
+- TBD

@@ -1,9 +1,211 @@
 ---
 title: "Alimentación"
-description: "Alimentación"
+description: "En electrónica, la arquitectura de alimentación de un dispositivo es la parte más importante, ya que sobre ella se basa el funcionamiento de los componentes."
 icon: "power-off"
 ---
 
-# Welcome
+<Warning>
+Lee detenidamente esta sección para no dañar el kode dot.
+</Warning>
 
-This is the main entry point for your documentation in English.
+## Características
+
+El kode dot integra un sistema de alimentación complejo y sofisticado, pero a la vez robusto, modular y fácil de usar. El kode dot se puede alimentar de tres maneras: de la batería de 500mAh, del USB-C o de los conectores externos.
+
+El sistema está formado por estos componentes:
+
+- Power Management Integrated Circuit (PMIC)
+- Indicador de combustible (Fuel Gauge, en español no tiene mucho sentido la traducción)
+- Regulador de 3V3 para los integrados internos
+- Regulador de 3V3 para los periféricos
+- Regulador para el RTC interno del ESP32-S3
+
+### Power Management Integrated Circuit (PMIC)
+La parte centrar del sistema de alimentación es un PMIC (Power Management Integrated Circuit) que se encarga de gestionar de dónde se obtiene la energía, si de la batería, del USB-C o de los conectores externos.
+
+Además, el PMIC se encarga la seguridad y la protección de los componentes, como por ejemplo la protección contra sobrecargas, cortocircuitos, sobrecorrientes y nos permite obtener datos de la batería o de la alimentación.
+
+También permite generar desde la batería un bus de 5V y hasta 2A de corriente que se puede usar para alimentar periféricos externos.
+
+### Fuel Gauge
+El fuel gauge es un componente que se encarga de medir varios datos de la batería y darnos un análisis y estado de su estado. Así podemos conocer los siguientes datos de la batería:
+
+- Capacidad restante
+- Estado de carga
+- Tiempo restante de uso
+- Voltaje de la batería
+- Temperatura de la batería
+- Salud
+- Corriente de salida o entrada
+
+Además, nos avisa ante posibles problemas como sobrecargas, cortocircuitos, sobrecorrientes, etc.
+
+### Regulador de 3V3 para los integrados internos
+Este es el principal regulador de tensión del kode dot y soporta hasta 1A de corriente. Se encarga de estabilizar la tensión a 3V3 y alimenta estos integrados:
+
+- ESP32-S3
+- Expansor de pines
+- Reloj de tiempo real
+- Amplificador de audio
+- Micrófono
+- IMU de 6 ejes
+- Magnetómetro de 3 ejes
+
+Así, cuando el kode dot entre en estado de suspensión, este regulador se encarga de mantener la tensión en el ESP32-S3 y a los integrados internos.
+
+### Regulador de 3V3 para los periféricos
+Este regulador, que soporta hasta 2A de corriente, se puede activar o desactivar para darle alimentación a los siguientes periféricos del kode dot:
+
+- Pantalla
+- microSD
+- Bus 3V3 del conector superior
+
+Cuando el kode dot está en modo suspensión, este regulador se desactiva y se desconecta la alimentación de los periféricos.
+
+### Regulador para el RTC interno del ESP32-S3
+Este regulador se encarga de darle alimentación al RTC interno del ESP32-S3.
+
+
+## Esquema de conexión
+### Power Management Integrated Circuit (PMIC)
+El PMIC está conectado al bus I2C, usando la dirección 0x6B, y está conectado de la siguiente manera:
+
+
+| PMIC       | ESP32-S3 |
+| ---------- | -------- |
+| SDA        | GPIO48   |
+| SCL        | GPIO47   |
+| INT        | EXP10    |
+
+El bus de 5V y 2A está conectado al conector superior y al trasero del kode dot. Si el USB-C está conectado, la potencia del bus de 5V proviene de este. Si no está conectado, la potencia del bus de 5V 
+proviene de la batería.
+
+Además se puede conectar por uno de los conectores externos una fuente externa de alimentación de 5V para cargar el kode dot.
+
+<Warning>
+**No conectes una fuente de 5V a la vez que está conectado el USB-C.**
+</Warning>
+
+### Fuel Gauge
+El fuel gauge está conectado al bus I2C, usando la dirección 0x75, y está conectado de la siguiente manera:
+
+| Fuel Gauge | ESP32-S3 |
+| ---------- | -------- |
+| SDA        | GPIO48   |
+| SCL        | GPIO47   |
+| GPOUT      | EXP5     |
+
+### Regulador de 3V3 para los periféricos
+El regulador de 3V3 se puede activar o desactivar para darle alimentación a los siguientes periféricos del kode dot. Por defecto está activado, para desactivarlo pon el siguiente pin en LOW:
+
+| Regulador 3V3 | ESP32-S3 |
+| ------------- | -------- |
+| EN            | EXP4     |
+
+
+## Librerías recomendadas
+### Arduino
+#### Power Management Integrated Circuit (PMIC)
+- [PMIC_BQ25896](https://github.com/sqmsmu/PMIC_BQ25896)
+
+#### Fuel Gauge
+- TBD pero workaround [SparkFun_BQ27441_Arduino_Library](https://github.com/sparkfun/SparkFun_BQ27441_Arduino_Library)
+
+### ESP-IDF
+#### Power Management Integrated Circuit (PMIC)
+- [kode_bq25896](https://components.espressif.com/components/kodediy/kode_bq25896)
+
+#### Fuel Gauge
+- TBD
+
+## Códigos de ejemplo
+
+#### Power Management Integrated Circuit (PMIC)
+```cpp BQ25896_test.ino lines icon="microchip"
+#include "PMIC_BQ25896.h"
+#include <Wire.h>
+
+#define I2C_SDA 48
+#define I2C_SCL 47
+#define I2C_FREQ 400000L
+
+PMIC_BQ25896 bq25896;
+TwoWire I2CBus = TwoWire(0);
+
+void setup(){
+  Serial.begin(115200);
+  while (!Serial);
+
+  I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+
+  Serial.println("BQ25896 Power Management and Battery Charger Example");
+
+  bq25896.begin(&I2CBus);
+  delay(500);
+  if(!bq25896.isConnected()){
+      Serial.println("BQ25896 not found! Check connection and power");
+      while(1);
+  }else{
+      Serial.println("BQ25896 found successfully.");
+  }
+  Serial.println("Resetting BQ25896");
+  bq25896.reset(); //reset all registers to default
+  delay(1000);
+  bq25896.setEN_ILIM(false); //disable hardware ilim pin
+  //bq25896.setCONV_RATE(true); //set continous adc 1s read
+  bq25896.setCONV_START(true); //read adc in one shot (default)
+  bq25896.setWATCHDOG(0); //disable watchdog
+  //bq25896.setBATFET_DIS(true); //Shipping Mode
+  bq25896.setICHG(2000); //set charging current to 2000mA
+
+}
+
+void loop(){
+    Serial.println("BQ25896 System Parameters");
+    Serial.print("ILIM PIN : "); Serial.println(String(bq25896.getILIM_reg().en_ilim));
+    Serial.print("IINLIM : "); Serial.println(String(bq25896.getIINLIM()) + "mA");
+    Serial.print("VINDPM_OS : "); Serial.println(String(bq25896.getVINDPM_OS()) + "mV");
+    Serial.print("SYS_MIN : "); Serial.println(String(bq25896.getSYS_MIN()) + "mV");
+    Serial.print("ICHG : "); Serial.println(String(bq25896.getICHG()) + "mA");
+    Serial.print("IPRE : "); Serial.println(String(bq25896.getIPRECHG()) + "mA");
+    Serial.print("ITERM : "); Serial.println(String(bq25896.getITERM()) + "mA");
+    Serial.print("VREG : "); Serial.println(String(bq25896.getVREG()) + "mV");
+    Serial.print("BAT_COMP : "); Serial.println(String(bq25896.getBAT_COMP()) + "mΩ");
+    Serial.print("VCLAMP : "); Serial.println(String(bq25896.getVCLAMP()) + "mV");
+    Serial.print("BOOSTV : "); Serial.println(String(bq25896.getBOOSTV()) + "mV");
+    Serial.print("BOOST_LIM : "); Serial.println(String(bq25896.getBOOST_LIM()) + "mA");
+    Serial.print("VINDPM : "); Serial.println(String(bq25896.getVINDPM()) + "mV");
+    Serial.print("BATV : "); Serial.println(String(bq25896.getBATV()) + "mV");
+    Serial.print("SYSV : "); Serial.println(String(bq25896.getSYSV()) + "mV");
+    Serial.print("TSPCT : "); Serial.println(String(bq25896.getTSPCT()) + "%");
+    Serial.print("VBUSV : "); Serial.println(String(bq25896.getVBUSV()) + "mV");
+    Serial.print("ICHGR : "); Serial.println(String(bq25896.getICHGR()) + "mA");
+    
+    Serial.print("Fault -> "); 
+    Serial.print("NTC:" + String(bq25896.getFAULT_reg().ntc_fault));
+    Serial.print(" ,BAT:" + String(bq25896.getFAULT_reg().bat_fault));
+    Serial.print(" ,CHGR:" + String(bq25896.getFAULT_reg().chrg_fault));
+    Serial.print(" ,BOOST:" + String(bq25896.getFAULT_reg().boost_fault));
+    Serial.println(" ,WATCHDOG:" + String(bq25896.getFAULT_reg().watchdog_fault));
+
+    Serial.print("Charging Status -> "); 
+    Serial.print("CHG_EN:" + String(bq25896.getSYS_CTRL_reg().chg_config));
+    Serial.print(" ,BATFET DIS:" + String(bq25896.getCTRL1_reg().batfet_dis));
+    Serial.print(" ,BATLOAD_EN:" + String(bq25896.getSYS_CTRL_reg().bat_loaden));
+    Serial.print(" ,PG STAT:" + String(bq25896.get_VBUS_STAT_reg().pg_stat));
+    Serial.print(" ,VBUS STAT:" + String(bq25896.get_VBUS_STAT_reg().vbus_stat));
+    Serial.print(" ,CHRG STAT:" + String(bq25896.get_VBUS_STAT_reg().chrg_stat));
+    Serial.println(",VSYS STAT:" + String(bq25896.get_VBUS_STAT_reg().vsys_stat));
+
+    bq25896.setCONV_START(true);
+    delay(1000);
+}
+```
+
+#### Fuel Gauge
+TBD
+
+## Descarga del código
+Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
+
+- TBD
