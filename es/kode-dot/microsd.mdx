@@ -17,11 +17,10 @@ La microSD se conecta al ESP32-S3 mediante SDIO, en modo 1-bit. Así, se puede u
 | Command       | GPIO5    |
 | Clock         | GPIO6    |
 | Data          | GPIO7    |
-| Card Detected | P16      |
+| Card Detected | P14      |
 
 <Info>
-  El pin de Card Detected está conectado al pin 16 del expansor de pines. Ve a
-  TBD para más información.
+  El pin de Card Detected está conectado al pin 14 del expansor de pines. Ve a [Expansor de pines](/es/kode-dot/io-expander) para más información.
 </Info>
 
 ## Librerías recomendadas
@@ -35,18 +34,35 @@ La microSD se conecta al ESP32-S3 mediante SDIO, en modo 1-bit. Así, se puede u
 No requiere librerías adicionales.
 
 ## Código de ejemplo
+Este código hará un test de la microSD en este orden:
 
-```cpp SDMMC_test.ino lines icon="microchip"
+1. Listar directorios
+2. Crear un directorio
+3. Listar directorios
+4. Eliminar un directorio
+5. Listar directorios
+6. Escribir un archivo
+7. Añadir un mensaje al final de un archivo
+8. Leer un archivo
+9. Eliminar un archivo
+10. Renombrar un archivo
+11. Leer un archivo
+12. Test de rendimiento de lectura y escritura
+
+```cpp
 #include "FS.h"
 #include "SD_MMC.h"
 
-int clk = 6;
-int cmd = 5;
-int d0 = 7;
+/* Pines personalizados para SD_MMC (SD en modo 1-bit) */
+int clk = 6;    /* Pin de reloj (CLK) */
+int cmd = 5;    /* Pin de comando (CMD) */
+int d0  = 7;    /* Pin de dato 0 (D0) */
 
+/* Función recursiva para listar directorios */
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
   Serial.printf("Listing directory: %s\n", dirname);
 
+  /* Abrimos el directorio */
   File root = fs.open(dirname);
   if (!root) {
     Serial.println("Failed to open directory");
@@ -57,15 +73,18 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
     return;
   }
 
+  /* Recorremos todos los archivos y subdirectorios */
   File file = root.openNextFile();
   while (file) {
     if (file.isDirectory()) {
       Serial.print("  DIR : ");
       Serial.println(file.name());
+      /* Si quedan niveles, entramos recursivamente */
       if (levels) {
         listDir(fs, file.path(), levels - 1);
       }
     } else {
+      /* Es un archivo: mostramos nombre y tamaño */
       Serial.print("  FILE: ");
       Serial.print(file.name());
       Serial.print("  SIZE: ");
@@ -75,6 +94,7 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
   }
 }
 
+/* Función para crear un directorio */
 void createDir(fs::FS &fs, const char *path) {
   Serial.printf("Creating Dir: %s\n", path);
   if (fs.mkdir(path)) {
@@ -84,6 +104,7 @@ void createDir(fs::FS &fs, const char *path) {
   }
 }
 
+/* Función para eliminar un directorio */
 void removeDir(fs::FS &fs, const char *path) {
   Serial.printf("Removing Dir: %s\n", path);
   if (fs.rmdir(path)) {
@@ -93,6 +114,7 @@ void removeDir(fs::FS &fs, const char *path) {
   }
 }
 
+/* Función para leer y mostrar el contenido de un archivo */
 void readFile(fs::FS &fs, const char *path) {
   Serial.printf("Reading file: %s\n", path);
 
@@ -103,11 +125,13 @@ void readFile(fs::FS &fs, const char *path) {
   }
 
   Serial.print("Read from file: ");
+  /* Leemos byte a byte y escribimos por Serial */
   while (file.available()) {
     Serial.write(file.read());
   }
 }
 
+/* Función para escribir un mensaje en un archivo (sobrescribe) */
 void writeFile(fs::FS &fs, const char *path, const char *message) {
   Serial.printf("Writing file: %s\n", path);
 
@@ -116,6 +140,7 @@ void writeFile(fs::FS &fs, const char *path, const char *message) {
     Serial.println("Failed to open file for writing");
     return;
   }
+  /* Escribimos el mensaje y verificamos resultado */
   if (file.print(message)) {
     Serial.println("File written");
   } else {
@@ -123,6 +148,7 @@ void writeFile(fs::FS &fs, const char *path, const char *message) {
   }
 }
 
+/* Función para añadir un mensaje al final de un archivo */
 void appendFile(fs::FS &fs, const char *path, const char *message) {
   Serial.printf("Appending to file: %s\n", path);
 
@@ -138,6 +164,7 @@ void appendFile(fs::FS &fs, const char *path, const char *message) {
   }
 }
 
+/* Función para renombrar un archivo */
 void renameFile(fs::FS &fs, const char *path1, const char *path2) {
   Serial.printf("Renaming file %s to %s\n", path1, path2);
   if (fs.rename(path1, path2)) {
@@ -147,6 +174,7 @@ void renameFile(fs::FS &fs, const char *path1, const char *path2) {
   }
 }
 
+/* Función para borrar un archivo */
 void deleteFile(fs::FS &fs, const char *path) {
   Serial.printf("Deleting file: %s\n", path);
   if (fs.remove(path)) {
@@ -156,80 +184,80 @@ void deleteFile(fs::FS &fs, const char *path) {
   }
 }
 
+/* Prueba de E/S sobre un archivo grande para medir rendimiento */
 void testFileIO(fs::FS &fs, const char *path) {
   File file = fs.open(path);
-  static uint8_t buf[512];
+  static uint8_t buf[512];  /* Buffer de 512 bytes */
   size_t len = 0;
   uint32_t start = millis();
-  uint32_t end = start;
+  uint32_t elapsed;
+
   if (file) {
+    /* Obtenemos tamaño del archivo */
     len = file.size();
-    size_t flen = len;
+    size_t originalLen = len;
     start = millis();
+    /* Leemos el archivo en bloques */
     while (len) {
-      size_t toRead = len;
-      if (toRead > 512) {
-        toRead = 512;
-      }
+      size_t toRead = (len > sizeof(buf)) ? sizeof(buf) : len;
       file.read(buf, toRead);
       len -= toRead;
     }
-    end = millis() - start;
-    Serial.printf("%u bytes read for %lu ms\n", flen, end);
+    elapsed = millis() - start;
+    Serial.printf("%u bytes read in %lu ms\n", originalLen, elapsed);
     file.close();
   } else {
     Serial.println("Failed to open file for reading");
   }
 
+  /* Medición de escritura */
   file = fs.open(path, FILE_WRITE);
   if (!file) {
     Serial.println("Failed to open file for writing");
     return;
   }
-
-  size_t i;
   start = millis();
-  for (i = 0; i < 2048; i++) {
-    file.write(buf, 512);
+  /* Escribimos 2048 bloques de 512 bytes */
+  for (size_t i = 0; i < 2048; i++) {
+    file.write(buf, sizeof(buf));
   }
-  end = millis() - start;
-  Serial.printf("%u bytes written for %lu ms\n", 2048 * 512, end);
+  elapsed = millis() - start;
+  Serial.printf("%u bytes written in %lu ms\n", 2048 * sizeof(buf), elapsed);
   file.close();
 }
 
 void setup() {
   Serial.begin(115200);
 
-  if(!SD_MMC.setPins(clk, cmd, d0)){
-     Serial.println("Pin change failed!");
-     return;
+  /* Asignación de pines para SD_MMC en modo 1-bit */
+  if (!SD_MMC.setPins(clk, cmd, d0)) {
+    Serial.println("Pin change failed!");
+    return;
   }
 
+  /* Inicia la tarjeta SD mediante SD_MMC */
   if (!SD_MMC.begin()) {
     Serial.println("Card Mount Failed");
     return;
   }
-  uint8_t cardType = SD_MMC.cardType();
 
+  /* Comprobación del tipo de tarjeta */
+  uint8_t cardType = SD_MMC.cardType();
   if (cardType == CARD_NONE) {
     Serial.println("No SD_MMC card attached");
     return;
   }
-
   Serial.print("SD_MMC Card Type: ");
-  if (cardType == CARD_MMC) {
-    Serial.println("MMC");
-  } else if (cardType == CARD_SD) {
-    Serial.println("SDSC");
-  } else if (cardType == CARD_SDHC) {
-    Serial.println("SDHC");
-  } else {
-    Serial.println("UNKNOWN");
-  }
+  if (cardType == CARD_MMC) Serial.println("MMC");
+  else if (cardType == CARD_SD) Serial.println("SDSC");
+  else if (cardType == CARD_SDHC) Serial.println("SDHC");
+  else Serial.println("UNKNOWN");
 
+  /* Tamaño de la tarjeta en MB */
   uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
   Serial.printf("SD_MMC Card Size: %lluMB\n", cardSize);
 
+  /* Ejemplos de uso de funciones de archivos y directorios */
   listDir(SD_MMC, "/", 0);
   createDir(SD_MMC, "/mydir");
   listDir(SD_MMC, "/", 0);
@@ -242,11 +270,14 @@ void setup() {
   renameFile(SD_MMC, "/hello.txt", "/foo.txt");
   readFile(SD_MMC, "/foo.txt");
   testFileIO(SD_MMC, "/test.txt");
+
+  /* Espacio total y usado en MB */
   Serial.printf("Total space: %lluMB\n", SD_MMC.totalBytes() / (1024 * 1024));
   Serial.printf("Used space: %lluMB\n", SD_MMC.usedBytes() / (1024 * 1024));
 }
 
 void loop() {
+  /* Nada que hacer en el bucle principal */
   delay(10);
 }
 ```
@@ -255,4 +286,4 @@ void loop() {
 
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
-- TBD
+[Ejemplos de microSD](https://drive.google.com/drive/folders/1fMG1BzAr6a9Gi88daPVNe0bdkRSY8TKe)

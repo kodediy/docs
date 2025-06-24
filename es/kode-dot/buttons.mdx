@@ -11,7 +11,7 @@ EL kode dot dispone de un pad direcinal de 4 botones más dos botones independie
 ## Esquema de conexión
 Todos los botones tienen una resistencia de pull-up y están conectados al expansor de pines I2C, exceptuando el botón de arriba que está conectado directamente al ESP32-S3.
 
-<Info>Ve a TBD para más información sobre el expansor de pines.</Info>
+<Info>Ve a [Expansor de pines](/es/kode-dot/io-expander)  para más información.</Info>
 
 
 El botón de arriba está conectado al pin GPIO0, para controlar el BOOT del ESP32-S3. Los demás botones están conectados al expansor de pines de esta manera:
@@ -33,9 +33,112 @@ El botón de arriba está conectado al pin GPIO0, para controlar el BOOT del ESP
 - [esp_io_expander_tca95xx_16bit](https://components.espressif.com/components/espressif/esp_io_expander_tca95xx_16bit)
 
 ## Código de ejemplo
-TBD
+```cpp buttons_check.ino lines icon="microchip"	
+#include <esp_io_expander.hpp>
+
+ /* Configuración del expansor de pines */
+#define CHIP_NAME         TCA95XX_16BIT
+#define I2C_SCL_PIN       (47)
+#define I2C_SDA_PIN       (48)
+#define EXP_INT_PIN       (18)
+#define I2C_ADDR          (0x20)
+
+ /* Conexiones de los botones al expansor */
+#define PAD_UP            6
+#define PAD_LEFT          7
+#define PAD_DOWN          8
+#define PAD_RIGHT         11
+#define BUTTON_BOTTOM     9
+
+ /* Botón conectado directamente al ESP32-S3 */
+#define BUTTON_UP_PIN     0    // GPIO0
+
+ /* Instancia del expansor */
+esp_expander::Base *expander = nullptr;
+
+ /* Flags para interrupciones pendientes */
+volatile bool expanderInterrupted    = false;
+volatile bool buttonUpInterrupted    = false;
+
+ /* ISR para la interrupción del expansor: solo marca el flag */
+void IRAM_ATTR handleExpanderIRQ() {
+  expanderInterrupted = true;
+}
+
+ /* ISR para el botón conectado a GPIO0: solo marca el flag */
+void IRAM_ATTR handleButtonUpIRQ() {
+  buttonUpInterrupted = true;
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Inicio del test de botones con interrupción");
+
+  /* Inicializa el expansor */
+  expander = new esp_expander::TCA95XX_16BIT(I2C_SCL_PIN, I2C_SDA_PIN, I2C_ADDR);
+  expander->init();
+  expander->begin();
+
+  /* Configura los pines del expansor como entradas */
+  expander->pinMode(PAD_UP,       INPUT);
+  expander->pinMode(PAD_LEFT,     INPUT);
+  expander->pinMode(PAD_DOWN,     INPUT);
+  expander->pinMode(PAD_RIGHT,    INPUT);
+  expander->pinMode(BUTTON_BOTTOM, INPUT);
+
+  /* Configura el pin de interrupción del expansor con pull-up */
+  pinMode(EXP_INT_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(EXP_INT_PIN),
+                  handleExpanderIRQ, FALLING);
+
+  /* Configura el botón ARRIBA en GPIO0 con pull-up interno */
+  pinMode(BUTTON_UP_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_UP_PIN),
+                  handleButtonUpIRQ, FALLING);
+
+  Serial.println("Configuración completa. A la espera de pulsaciones...");
+}
+
+void loop() {
+  /* Si no hay interrupciones pendienes, esperamos un poco */
+  if (!expanderInterrupted && !buttonUpInterrupted) {
+    delay(10);
+    return;
+  }
+
+  /* Procesa el botón ARRIBA conectado a GPIO0 */
+  if (buttonUpInterrupted) {
+    buttonUpInterrupted = false;  // limpia el flag
+    Serial.println("→ BUTTON_UP (GPIO0) pulsado");
+    delay(50);                    // debounce sencillo
+  }
+
+  /* Procesa los botones del expansor */
+  if (expanderInterrupted) {
+    expanderInterrupted = false;  // limpia el flag
+
+    if (expander->digitalRead(PAD_UP) == LOW) {
+      Serial.println("→ PAD_UP pulsado");
+    }
+    if (expander->digitalRead(PAD_LEFT) == LOW) {
+      Serial.println("→ PAD_LEFT pulsado");
+    }
+    if (expander->digitalRead(PAD_DOWN) == LOW) {
+      Serial.println("→ PAD_DOWN pulsado");
+    }
+    if (expander->digitalRead(BUTTON_BOTTOM) == LOW) {
+      Serial.println("→ BUTTON_BOTTOM pulsado");
+    }
+    if (expander->digitalRead(PAD_RIGHT) == LOW) {
+      Serial.println("→ PAD_RIGHT pulsado");
+    }
+
+    delay(50);  // debounce sencillo
+  }
+}
+```
 
 ## Descarga del código
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
-- TBD
+[Ejemplos de botones](https://drive.google.com/drive/folders/1-K3qP_pf7niBGDafzZQtoZ7c4Zyx9w1W)

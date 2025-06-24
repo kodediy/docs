@@ -59,163 +59,119 @@ El magnetómetro está conectado de la misma manera el bus I2C con la dirección
 
 ## Códigos de ejemplo
 ### IMU de 6 ejes
-```cpp LSM6DSOX_test.ino lines icon="microchip"
-#include <Adafruit_LSM6DSOX.h>
-#include <Wire.h>
+Este código muestra el rango de medida de los sensores y la frecuencia de muestreo. También muestra la temperatura, la aceleración y la velocidad angular.
 
-#define I2C_SDA 48
-#define I2C_SCL 47
-#define I2C_FREQ 400000L
+```cpp imu_test.ino lines icon="microchip"
+#include <Adafruit_LSM6DSOX.h>  /* Biblioteca para el sensor LSM6DSOX */
+#include <Wire.h>               /* Biblioteca para el bus I2C */
 
+/* Pines I2C configurables */
+#define I2C_SDA 48            /* Pin SDA del ESP32-S3 */
+#define I2C_SCL 47            /* Pin SCL del ESP32-S3 */
+#define I2C_FREQ 400000L      /* Frecuencia del bus I2C (400 kHz) */
+
+/* Instancia del sensor IMU y del bus I2C */
 Adafruit_LSM6DSOX imu;
 TwoWire I2CBus = TwoWire(0);
 
 void setup(void) {
+  /* Inicializa el puerto serie para depuración */
   Serial.begin(115200);
   while (!Serial);
 
+  /* Configura el bus I2C con los pines y frecuencia deseados */
   I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
 
   Serial.println("LSM6DSOX test");
 
+  /* Intento de inicialización del sensor en la dirección I2C 0x6A */
   if (!imu.begin_I2C(0x6A, &I2CBus)) {
     Serial.println("Failed to find LSM6DSOX chip");
     while (1) {
-      delay(10);
+      delay(10);  /* Bucle infinito si falla la inicialización */
     }
   }
-
   Serial.println("LSM6DSOX Found!");
 
-  // sox.setAccelRange(LSM6DS_ACCEL_RANGE_2_G);
+  /* Mostrar rango configurado del acelerómetro */
   Serial.print("Accelerometer range set to: ");
   switch (imu.getAccelRange()) {
-  case LSM6DS_ACCEL_RANGE_2_G:
-    Serial.println("+-2G");
-    break;
-  case LSM6DS_ACCEL_RANGE_4_G:
-    Serial.println("+-4G");
-    break;
-  case LSM6DS_ACCEL_RANGE_8_G:
-    Serial.println("+-8G");
-    break;
-  case LSM6DS_ACCEL_RANGE_16_G:
-    Serial.println("+-16G");
-    break;
+    case LSM6DS_ACCEL_RANGE_2_G:
+      Serial.println("+-2G"); break;
+    case LSM6DS_ACCEL_RANGE_4_G:
+      Serial.println("+-4G"); break;
+    case LSM6DS_ACCEL_RANGE_8_G:
+      Serial.println("+-8G"); break;
+    case LSM6DS_ACCEL_RANGE_16_G:
+      Serial.println("+-16G"); break;
   }
 
-  // sox.setGyroRange(LSM6DS_GYRO_RANGE_250_DPS );
+  /* Mostrar rango configurado del giroscopio */
   Serial.print("Gyro range set to: ");
   switch (imu.getGyroRange()) {
-  case LSM6DS_GYRO_RANGE_125_DPS:
-    Serial.println("125 degrees/s");
-    break;
-  case LSM6DS_GYRO_RANGE_250_DPS:
-    Serial.println("250 degrees/s");
-    break;
-  case LSM6DS_GYRO_RANGE_500_DPS:
-    Serial.println("500 degrees/s");
-    break;
-  case LSM6DS_GYRO_RANGE_1000_DPS:
-    Serial.println("1000 degrees/s");
-    break;
-  case LSM6DS_GYRO_RANGE_2000_DPS:
-    Serial.println("2000 degrees/s");
-    break;
-  case ISM330DHCX_GYRO_RANGE_4000_DPS:
-    break; // unsupported range for the DSOX
+    case LSM6DS_GYRO_RANGE_125_DPS:
+      Serial.println("125 degrees/s"); break;
+    case LSM6DS_GYRO_RANGE_250_DPS:
+      Serial.println("250 degrees/s"); break;
+    case LSM6DS_GYRO_RANGE_500_DPS:
+      Serial.println("500 degrees/s"); break;
+    case LSM6DS_GYRO_RANGE_1000_DPS:
+      Serial.println("1000 degrees/s"); break;
+    case LSM6DS_GYRO_RANGE_2000_DPS:
+      Serial.println("2000 degrees/s"); break;
+    case ISM330DHCX_GYRO_RANGE_4000_DPS:
+      /* Rango no soportado por DSOX */
+      break;
   }
 
-  // sox.setAccelDataRate(LSM6DS_RATE_12_5_HZ);
+  /* Mostrar frecuencia de muestreo del acelerómetro */
   Serial.print("Accelerometer data rate set to: ");
   switch (imu.getAccelDataRate()) {
-  case LSM6DS_RATE_SHUTDOWN:
-    Serial.println("0 Hz");
-    break;
-  case LSM6DS_RATE_12_5_HZ:
-    Serial.println("12.5 Hz");
-    break;
-  case LSM6DS_RATE_26_HZ:
-    Serial.println("26 Hz");
-    break;
-  case LSM6DS_RATE_52_HZ:
-    Serial.println("52 Hz");
-    break;
-  case LSM6DS_RATE_104_HZ:
-    Serial.println("104 Hz");
-    break;
-  case LSM6DS_RATE_208_HZ:
-    Serial.println("208 Hz");
-    break;
-  case LSM6DS_RATE_416_HZ:
-    Serial.println("416 Hz");
-    break;
-  case LSM6DS_RATE_833_HZ:
-    Serial.println("833 Hz");
-    break;
-  case LSM6DS_RATE_1_66K_HZ:
-    Serial.println("1.66 KHz");
-    break;
-  case LSM6DS_RATE_3_33K_HZ:
-    Serial.println("3.33 KHz");
-    break;
-  case LSM6DS_RATE_6_66K_HZ:
-    Serial.println("6.66 KHz");
-    break;
+    case LSM6DS_RATE_SHUTDOWN:    Serial.println("0 Hz"); break;
+    case LSM6DS_RATE_12_5_HZ:     Serial.println("12.5 Hz"); break;
+    case LSM6DS_RATE_26_HZ:       Serial.println("26 Hz"); break;
+    case LSM6DS_RATE_52_HZ:       Serial.println("52 Hz"); break;
+    case LSM6DS_RATE_104_HZ:      Serial.println("104 Hz"); break;
+    case LSM6DS_RATE_208_HZ:      Serial.println("208 Hz"); break;
+    case LSM6DS_RATE_416_HZ:      Serial.println("416 Hz"); break;
+    case LSM6DS_RATE_833_HZ:      Serial.println("833 Hz"); break;
+    case LSM6DS_RATE_1_66K_HZ:    Serial.println("1.66 KHz"); break;
+    case LSM6DS_RATE_3_33K_HZ:    Serial.println("3.33 KHz"); break;
+    case LSM6DS_RATE_6_66K_HZ:    Serial.println("6.66 KHz"); break;
   }
 
-  // sox.setGyroDataRate(LSM6DS_RATE_12_5_HZ);
+  /* Mostrar frecuencia de muestreo del giroscopio */
   Serial.print("Gyro data rate set to: ");
   switch (imu.getGyroDataRate()) {
-  case LSM6DS_RATE_SHUTDOWN:
-    Serial.println("0 Hz");
-    break;
-  case LSM6DS_RATE_12_5_HZ:
-    Serial.println("12.5 Hz");
-    break;
-  case LSM6DS_RATE_26_HZ:
-    Serial.println("26 Hz");
-    break;
-  case LSM6DS_RATE_52_HZ:
-    Serial.println("52 Hz");
-    break;
-  case LSM6DS_RATE_104_HZ:
-    Serial.println("104 Hz");
-    break;
-  case LSM6DS_RATE_208_HZ:
-    Serial.println("208 Hz");
-    break;
-  case LSM6DS_RATE_416_HZ:
-    Serial.println("416 Hz");
-    break;
-  case LSM6DS_RATE_833_HZ:
-    Serial.println("833 Hz");
-    break;
-  case LSM6DS_RATE_1_66K_HZ:
-    Serial.println("1.66 KHz");
-    break;
-  case LSM6DS_RATE_3_33K_HZ:
-    Serial.println("3.33 KHz");
-    break;
-  case LSM6DS_RATE_6_66K_HZ:
-    Serial.println("6.66 KHz");
-    break;
+    case LSM6DS_RATE_SHUTDOWN:    Serial.println("0 Hz"); break;
+    case LSM6DS_RATE_12_5_HZ:     Serial.println("12.5 Hz"); break;
+    case LSM6DS_RATE_26_HZ:       Serial.println("26 Hz"); break;
+    case LSM6DS_RATE_52_HZ:       Serial.println("52 Hz"); break;
+    case LSM6DS_RATE_104_HZ:      Serial.println("104 Hz"); break;
+    case LSM6DS_RATE_208_HZ:      Serial.println("208 Hz"); break;
+    case LSM6DS_RATE_416_HZ:      Serial.println("416 Hz"); break;
+    case LSM6DS_RATE_833_HZ:      Serial.println("833 Hz"); break;
+    case LSM6DS_RATE_1_66K_HZ:    Serial.println("1.66 KHz"); break;
+    case LSM6DS_RATE_3_33K_HZ:    Serial.println("3.33 KHz"); break;
+    case LSM6DS_RATE_6_66K_HZ:    Serial.println("6.66 KHz"); break;
   }
 }
 
 void loop() {
-
-  //  /* Get a new normalized sensor event */
+  /* Variables para almacenar los eventos del sensor */
   sensors_event_t accel;
   sensors_event_t gyro;
   sensors_event_t temp;
+
+  /* Obtiene datos de acelerómetro, giroscopio y temperatura */
   imu.getEvent(&accel, &gyro, &temp);
 
+  /* Mostrar temperatura en grados Celsius */
   Serial.print("\t\tTemperature ");
   Serial.print(temp.temperature);
   Serial.println(" deg C");
 
-  /* Display the results (acceleration is measured in m/s^2) */
+  /* Mostrar aceleración en m/s^2 para cada eje */
   Serial.print("\t\tAccel X: ");
   Serial.print(accel.acceleration.x);
   Serial.print(" \tY: ");
@@ -224,7 +180,7 @@ void loop() {
   Serial.print(accel.acceleration.z);
   Serial.println(" m/s^2 ");
 
-  /* Display the results (rotation is measured in rad/s) */
+  /* Mostrar velocidad angular en rad/s para cada eje */
   Serial.print("\t\tGyro X: ");
   Serial.print(gyro.gyro.x);
   Serial.print(" \tY: ");
@@ -232,70 +188,79 @@ void loop() {
   Serial.print(" \tZ: ");
   Serial.print(gyro.gyro.z);
   Serial.println(" radians/s ");
-  Serial.println();
 
-  delay(100);
+  Serial.println();
+  delay(100);  /* Pequeña pausa entre lecturas */
 }
 ```
 
-
 ### Magnetómetro de 3 ejes
-```cpp LIS2MDL_test.ino lines icon="microchip"
+Este código convierte el kode dot en una brújula, mostrándo dónde está el norte.
+	
+```cpp mag_test.ino lines icon="microchip"
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LIS2MDL.h>
 
-#define I2C_SDA 48
-#define I2C_SCL 47
-#define I2C_FREQ 400000L
+/* Pines I2C configurables y frecuencia */
+#define I2C_SDA 48            /* Pin SDA en ESP32-S3 */
+#define I2C_SCL 47            /* Pin SCL en ESP32-S3 */
+#define I2C_FREQ 400000L      /* Frecuencia del bus I2C (400 kHz) */
 
+/* Instancia del magnetómetro con ID único */
 Adafruit_LIS2MDL mag = Adafruit_LIS2MDL(12345);
+/* Objeto del bus I2C (puerto 0) */
 TwoWire I2CBus = TwoWire(0);
 
-void setup(void)
-{
+void setup(void) {
+  /* Inicializa el puerto serie para depuración */
   Serial.begin(115200);
-  while (!Serial);
+  while (!Serial) {
+    /* Espera a que el puerto serie esté listo */
+  }
 
+  /* Inicializa el bus I2C con los pines SDA, SCL y frecuencia seleccionados */
   I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
-  
-  Serial.println("Magnetometer Test"); Serial.println("");
 
-  /* Initialise the sensor */
-  if(!mag.begin(0x1E, &I2CBus))
-  {
-    /* There was a problem detecting the LIS2MDL ... check your connections */
-    Serial.println("Ooops, no LIS2MDL detected ... Check your wiring!");
-    while(1);
+  Serial.println("Prueba del magnetómetro");
+  Serial.println();
+
+  /* Intenta inicializar el sensor LIS2MDL en la dirección I2C 0x1E */
+  if (!mag.begin(0x1E, &I2CBus)) {
+    /* Sensor no detectado: muestra error y detiene la ejecución */
+    Serial.println("¡Error, no se detectó el LIS2MDL! Verifica el cableado.");
+    while (1) {
+      delay(10);  /* Bucle infinito en caso de fallo */
+    }
   }
 }
 
-void loop(void)
-{
-  /* Get a new sensor event */
+void loop(void) {
+  /* Estructura para almacenar el evento del magnetómetro */
   sensors_event_t event;
+  /* Recupera la última lectura del campo magnético */
   mag.getEvent(&event);
 
-  float Pi = 3.14159;
+  /* Constante para convertir radianes a grados */
+  const float Pi = 3.14159;
 
-  // Calculate the angle of the vector y,x
-  float heading = (atan2(event.magnetic.y,event.magnetic.x) * 180) / Pi;
+  /* Calcula el ángulo de rumbo a partir de los componentes Y y X */
+  float heading = atan2(event.magnetic.y, event.magnetic.x) * 180 / Pi;
 
-  // Normalize to 0-360
-  if (heading < 0)
-  {
-    heading = 360 + heading;
+  /* Normaliza el ángulo al rango 0-360 grados */
+  if (heading < 0) {
+    heading += 360;  /* Ajusta ángulos negativos */
   }
-  Serial.print("Compass Heading: ");
+
+  /* Muestra el rumbo de la brújula */
+  Serial.print("Rumbo de la brújula: ");
   Serial.println(heading);
+
+  /* Pausa antes de la próxima lectura */
   delay(500);
 }
-
 ```
-
-
-
 ## Descarga del código
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
-- TBD
+[Ejemplos de la IMU y el magnetómetro](https://drive.google.com/drive/folders/1eAutUqjqenHA7lNoFHxKpBUXdwUa-6ZS)

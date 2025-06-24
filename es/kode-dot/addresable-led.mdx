@@ -5,7 +5,6 @@ icon: "lightbulb"
 ---
 
 # Características
-
 El kode dot integra un led direccionable que podrás programar para que cambie de color y brillo. 
 
 No es un led normal, sino que es un led direccionable WS2812B. Esto es que dentro del led hay un controlador que puede manejar el color de los leds RGB y el brillo de cada uno de ellos.
@@ -35,12 +34,69 @@ El led direccionable funciona mediante un sólo pin conectado al ESP32-S3.
 - [led_strip](https://components.espressif.com/components/espressif/led_strip)
 
 ## Código de ejemplo
-### Ejemplo sencillo
-TBD
-### Ejemplo con LVGL
-TBD
+Este código ilumina el led direccionable haciendo un ciclo de colores. Primero en rojo, luego en verde y por último en azul.
+```cpp rgb_cycle.ino lines icon="microchip"
+#include <Adafruit_NeoPixel.h>
+
+#define NEOPIXEL_PIN   4                 /* Pin GPIO donde está conectado el NeoPixel */
+#define NUMPIXELS      1                 /* Número de NeoPixels conectados */
+#define PIXEL_FORMAT   (NEO_GRB + NEO_KHZ800)  /* Formato de color y tasa de datos */
+
+Adafruit_NeoPixel *pixels;            /* Puntero al objeto NeoPixel */
+
+#define DELAYVAL       500               /* Retardo en milisegundos entre cambios */
+
+void setup() {
+  /* Inicializa la comunicación serie para debug */
+  Serial.begin(115200);
+
+  /* Crea dinámicamente el objeto NeoPixel con los parámetros definidos */
+  pixels = new Adafruit_NeoPixel(NUMPIXELS, NEOPIXEL_PIN, PIXEL_FORMAT);
+
+  /* Inicializa el strip de NeoPixels */
+  pixels->begin();
+
+  /* Asegura que el LED comience apagado */
+  pixels->clear();
+  pixels->show();
+}
+
+void loop() {
+  /* Enciende el NeoPixel en rojo */
+  pixels->setPixelColor(0, pixels->Color(150, 0, 0));
+  pixels->show();          /* Actualiza el LED */
+  delay(DELAYVAL);         /* Mantiene el color un tiempo */
+
+  /* Apaga el NeoPixel */
+  pixels->setPixelColor(0, pixels->Color(0, 0, 0));
+  pixels->show();          /* Actualiza el LED */
+  delay(DELAYVAL);         /* Espera antes de volver a encender */
+
+  /* Enciende el NeoPixel en verde */
+  pixels->setPixelColor(0, pixels->Color(0, 150, 0));
+  pixels->show();          /* Actualiza el LED */
+  delay(DELAYVAL);         /* Mantiene el color un tiempo */
+
+  /* Apaga el NeoPixel */
+  pixels->setPixelColor(0, pixels->Color(0, 0, 0));
+  pixels->show();          /* Actualiza el LED */
+  delay(DELAYVAL);         /* Espera antes de volver a encender */
+
+  /* Enciende el NeoPixel en azul */
+  pixels->setPixelColor(0, pixels->Color(0, 0, 150));
+  pixels->show();          /* Actualiza el LED */
+  delay(DELAYVAL);         /* Mantiene el color un tiempo */
+
+  /* Apaga el NeoPixel */
+  pixels->setPixelColor(0, pixels->Color(0, 0, 0));
+  pixels->show();          /* Actualiza el LED */
+  delay(DELAYVAL);         /* Espera antes de volver a encender */
+}
+```
+
+
 
 ## Descarga del código
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
-- TBD
+[Ejemplos del led direccionable](https://drive.google.com/drive/folders/1f7pmw24Q7ikkvg6vVaRGUN63GGYj1NbC)

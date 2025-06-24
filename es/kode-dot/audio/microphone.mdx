@@ -30,88 +30,98 @@ El micrófono está conectado al ESP32-S3 de la siguiente manera:
 
 
 ## Códigos de ejemplo
-```cpp record_to_wav.ino lines icon="microchip"
+Este código graba 5 segundos de audio y lo guarda en la microSD en formato WAV.
+
+```cpp record_to_microsd.ino lines icon="microchip"
 #include "ESP_I2S.h"
 #include "FS.h"
 #include "SD_MMC.h"
 
-const uint8_t I2S_SCK = 38;
-const uint8_t I2S_WS = 45;
-const uint8_t I2S_DIN = 21;
+/* Asignación de pines para I2S */
+const uint8_t I2S_SCK   = 38;  /* Pin de reloj serial (SCK) */
+const uint8_t I2S_WS    = 45;  /* Pin de selección de palabra (LRCLK) */
+const uint8_t I2S_DIN   = 21;  /* Pin de datos de entrada (SD) */
 
-const uint8_t SD_CMD = 5;
-const uint8_t SD_CLK = 6;
-const uint8_t SD_DATA0 = 7;
+/* Asignación de pines para tarjeta SD en modo 1-bit con SD_MMC */
+const uint8_t SD_CMD    = 5;   /* Pin de comando (CMD) */
+const uint8_t SD_CLK    = 6;   /* Pin de reloj (CLK) */
+const uint8_t SD_DATA0  = 7;   /* Pin de datos 0 (D0) */
 
 void setup() {
-  // Create an instance of the I2SClass
+  /* Crear instancia de la clase I2S */
   I2SClass i2s;
 
-  // Create variables to store the audio data
+  /* Variables para almacenar los datos WAV y su tamaño */
   uint8_t *wav_buffer;
   size_t wav_size;
 
-  // Initialize the serial port
+  /* Inicializar puerto serie para depuración */
   Serial.begin(115200);
+  Serial.println("Iniciando configuración...");
 
-  Serial.println("Initializing I2S bus...");
-
-  // Set up the pins used for audio input
+  /* Configurar los pines I2S (no se usa MCLK: pasar -1) */
   i2s.setPins(I2S_SCK, I2S_WS, -1, I2S_DIN);
 
-  // Initialize the I2S bus in standard mode
-  if (!i2s.begin(I2S_MODE_STD, 16000, I2S_DATA_BIT_WIDTH_32BIT, I2S_SLOT_MODE_MONO, I2S_STD_SLOT_LEFT)) {
-    Serial.println("Failed to initialize I2S bus!");
-    return;
+  /* Inicializar I2S en modo estándar: 16 kHz, 32 bits de datos, mono, alineación a la izquierda */
+  Serial.println("Inicializando bus I2S...");
+  if (!i2s.begin(
+        I2S_MODE_STD,
+        16000,
+        I2S_DATA_BIT_WIDTH_32BIT,
+        I2S_SLOT_MODE_MONO,
+        I2S_STD_SLOT_LEFT)) {
+    Serial.println("¡Error al inicializar el bus I2S!");
+    return;  /* Abortar si falla inicialización I2S */
   }
+  Serial.println("Bus I2S inicializado.");
 
-  Serial.println("I2S bus initialized.");
-  Serial.println("Initializing SD card...");
-
-  // Set up the pins used for SD card access
+  /* Configurar pines de SD_MMC para modo 1-bit */
+  Serial.println("Configurando pines de la tarjeta SD...");
   if (!SD_MMC.setPins(SD_CLK, SD_CMD, SD_DATA0)) {
-    Serial.println("Failed to set SD pins!");
+    Serial.println("¡Error al configurar pines SD!");
     return;
   }
 
-  // Mount the SD card
+  /* Montar la tarjeta SD en "/sdcard" */
+  Serial.println("Montando tarjeta SD...");
   if (!SD_MMC.begin("/sdcard", true)) {
-    Serial.println("Failed to initialize SD card!");
+    Serial.println("¡Error al inicializar la tarjeta SD!");
     return;
   }
+  Serial.println("Tarjeta SD montada correctamente.");
 
-  Serial.println("SD card initialized.");
-  Serial.println("Recording 5 seconds of audio data...");
+  /* Informar que comenzará la grabación */
+  Serial.println("Grabando 5 segundos de audio...");
 
-  // Record 5 seconds of audio data
+  /* Grabar datos WAV durante 5 segundos en wav_buffer */
   wav_buffer = i2s.recordWAV(5, &wav_size);
 
-  // Create a file on the SD card
+  /* Abrir un archivo en la tarjeta SD para escritura */
   File file = SD_MMC.open("/test.wav", FILE_WRITE);
   if (!file) {
-    Serial.println("Failed to open file for writing!");
+    Serial.println("¡Error al abrir el archivo para escribir!");
     return;
   }
 
-  Serial.println("Writing audio data to file...");
-
-  // Write the audio data to the file
+  /* Escribir datos grabados y verificar escritura completa */
+  Serial.println("Escribiendo datos de audio en el archivo...");
   if (file.write(wav_buffer, wav_size) != wav_size) {
-    Serial.println("Failed to write audio data to file!");
+    Serial.println("¡Error al escribir datos de audio en el archivo!");
+    file.close();
     return;
   }
 
-  // Close the file
+  /* Cerrar el archivo al finalizar */
   file.close();
-
-  Serial.println("Application complete.");
+  Serial.println("Grabación de audio y guardado completados.");
 }
 
-void loop() {}
+void loop() {
+  /* Bucle vacío: todo el trabajo se realiza en setup */
+}
 ```
-
 
 ## Descarga del código
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
-- TBD
+[Ejemplos de audio](https://drive.google.com/drive/folders/1rJPxfOXun4p1ijXyRdREydyOMEUJju0u)

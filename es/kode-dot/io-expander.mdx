@@ -5,14 +5,14 @@ icon: "expand"
 ---
 
 # Características
-Como todas las señales no caben en los pines del ESP32-S3, hemos decidido integrar en el kode dot un expansor de pines. A este expansor están conectadas todas las señales 
+Como todas las señales no caben en los pines del ESP32-S3, hemos decidido integrar un expansor de pines. A este expansor están conectadas todas las señales 
 que son de baja velocidad o que no son muy relevantes.
 
-Este expansor se comunica con el ESP32-S3 mediante el bus I2C interno, teniendo una dirección 0x20. Además, tiene un pin de interruptor que está conectado al ESP32-S3 
+Este expansor se comunica con el ESP32-S3 mediante el bus I2C y además tiene un pin de interruptor que está conectado al ESP32-S3 
 para saber cuándo ha habido un cambio en uno de sus pines y leer este cambio.
 
 ## Esquema de conexión
-El expansor de pines está conectado al ESP32-S3 de esta manera:
+El expansor de pines está conectado al ESP32-S3 mediante el bus I2C, usando la dirección 0x20, de esta manera:
 
 | Expansor     | ESP32-S3 |
 | ------------ | -------- |
@@ -49,3 +49,73 @@ aunque en los siguientes apartados irémos viendo cómo leer estas señales.
 - [ESP32_IO_Expander](https://github.com/esp-arduino-libs/ESP32_IO_Expander)
 ### ESP-IDF
 - [esp_io_expander_tca95xx_16bit](https://components.espressif.com/components/espressif/esp_io_expander_tca95xx_16bit)
+
+## Códigos de ejemplo
+Con este código puedes probar el funcionamiento del expansor de pines. Cuando pulses el botón de abajo, se imprimirá un mensaje en el monitor serie.
+```cpp expander_test.ino lines icon="microchip"	
+#include <esp_io_expander.hpp>
+
+/* Configuración del expansor de pines */
+#define CHIP_NAME       TCA95XX_16BIT
+#define I2C_SCL_PIN     (47)
+#define I2C_SDA_PIN     (48)
+#define EXP_INT_PIN     (18)
+#define I2C_ADDR        (0x20)
+
+/* Conexiones de los botones al expansor */
+#define BUTTON_DOWN     9  /* Pin del expansor para el botón "abajo" */
+
+/* Instancia del expansor */
+esp_expander::Base *expander = nullptr;
+
+/* Flag que indica que ha llegado una interrupción */
+volatile bool expanderInterrupted = false;
+
+/* ISR ligero: solo marca el flag */
+void IRAM_ATTR handleExpanderIRQ() {
+  expanderInterrupted = true;
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Test expansor por interrupción.");
+
+  /* Inicializa el expansor */
+  expander = new esp_expander::TCA95XX_16BIT(I2C_SCL_PIN, I2C_SDA_PIN, I2C_ADDR);
+  expander->init();
+  expander->begin();
+
+  /* Configura BUTTON_DOWN como entrada */
+  expander->pinMode(BUTTON_DOWN, INPUT);
+
+  /* Configura el pin de interrupción del ESP32 */
+  pinMode(EXP_INT_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(EXP_INT_PIN), handleExpanderIRQ, FALLING);
+
+  Serial.println("Configuración completa. A la espera de BUTTON_DOWN...");
+}
+
+void loop() {
+  /* Espera hasta que se marque la interrupción */
+  if (!expanderInterrupted) {
+    delay(10);
+    return;
+  }
+
+  /* Limpia el flag */
+  expanderInterrupted = false;
+
+  /* Si BUTTON_DOWN está pulsado (LOW), imprime el mensaje deseado */
+  if (expander->digitalRead(BUTTON_DOWN) == LOW) {
+    Serial.println("Botón abajo pulsado, interrupción del expansor detectada!");
+  }
+
+  /* Breve retardo para evitar rebotes */
+  delay(50);
+}
+```
+
+## Descarga del código
+Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
+
+[Ejemplos del expansor de pines](https://drive.google.com/drive/folders/1nJHAeJOtqmLtWnhrUvgWu9GuijLvPg9s)
