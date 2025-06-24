@@ -121,91 +121,112 @@ El regulador de 3V3 se puede activar o desactivar para darle alimentación a los
 ## Códigos de ejemplo
 
 #### Power Management Integrated Circuit (PMIC)
-```cpp BQ25896_test.ino lines icon="microchip"
+Con este código puedes ver los parámetros que devuelven el PMIC de la batería y la alimentación.
+```cpp pmic_test.ino lines icon="microchip"
 #include "PMIC_BQ25896.h"
 #include <Wire.h>
 
-#define I2C_SDA 48
-#define I2C_SCL 47
-#define I2C_FREQ 400000L
+/* Configuración del bus I2C: pines SDA, SCL y frecuencia */
+#define I2C_SDA 48           /* Pin SDA en ESP32-S3 */
+#define I2C_SCL 47           /* Pin SCL en ESP32-S3 */
+#define I2C_FREQ 400000L     /* Frecuencia del bus I2C (400 kHz) */
 
+/* Instancia del controlador PMIC BQ25896 y objeto del bus I2C */
 PMIC_BQ25896 bq25896;
 TwoWire I2CBus = TwoWire(0);
 
-void setup(){
+void setup() {
+  /* Inicializa el puerto serie para depuración */
   Serial.begin(115200);
-  while (!Serial);
+  while (!Serial) {
+    /* Espera a que se establezca la conexión serie */
+  }
 
+  /* Inicia el bus I2C con los pines y frecuencia especificados */
   I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
 
-  Serial.println("BQ25896 Power Management and Battery Charger Example");
+  Serial.println("Ejemplo de gestión de energía y carga con BQ25896");
 
+  /* Inicializa el dispositivo BQ25896 a través de I2C */
   bq25896.begin(&I2CBus);
-  delay(500);
-  if(!bq25896.isConnected()){
-      Serial.println("BQ25896 not found! Check connection and power");
-      while(1);
-  }else{
-      Serial.println("BQ25896 found successfully.");
-  }
-  Serial.println("Resetting BQ25896");
-  bq25896.reset(); //reset all registers to default
-  delay(1000);
-  bq25896.setEN_ILIM(false); //disable hardware ilim pin
-  //bq25896.setCONV_RATE(true); //set continous adc 1s read
-  bq25896.setCONV_START(true); //read adc in one shot (default)
-  bq25896.setWATCHDOG(0); //disable watchdog
-  //bq25896.setBATFET_DIS(true); //Shipping Mode
-  bq25896.setICHG(2000); //set charging current to 2000mA
+  delay(500);  /* Tiempo para estabilizar el dispositivo */
 
+  /* Comprueba la conexión con el PMIC */
+  if (!bq25896.isConnected()) {
+    Serial.println("¡BQ25896 no encontrado! Verifica la conexión y alimentación");
+    while (1) {
+      /* Detiene la ejecución si no se detecta el dispositivo */
+    }
+  } else {
+    Serial.println("BQ25896 encontrado correctamente.");
+  }
+
+  Serial.println("Reiniciando BQ25896");
+  /* Restablece todos los registros a valores predeterminados */
+  bq25896.reset();
+  delay(1000);
+
+  /* Configuraciones iniciales del PMIC */
+  bq25896.setEN_ILIM(false);    /* Deshabilita el pin de límite de corriente (ILIM) */
+  bq25896.setCONV_START(true);  /* Habilita conversión ADC de una sola lectura */
+  bq25896.setWATCHDOG(0);       /* Deshabilita el temporizador watchdog */
+
+  /* Establece la corriente de carga a 2000 mA */
+  bq25896.setICHG(2000);
 }
 
-void loop(){
-    Serial.println("BQ25896 System Parameters");
-    Serial.print("ILIM PIN : "); Serial.println(String(bq25896.getILIM_reg().en_ilim));
-    Serial.print("IINLIM : "); Serial.println(String(bq25896.getIINLIM()) + "mA");
-    Serial.print("VINDPM_OS : "); Serial.println(String(bq25896.getVINDPM_OS()) + "mV");
-    Serial.print("SYS_MIN : "); Serial.println(String(bq25896.getSYS_MIN()) + "mV");
-    Serial.print("ICHG : "); Serial.println(String(bq25896.getICHG()) + "mA");
-    Serial.print("IPRE : "); Serial.println(String(bq25896.getIPRECHG()) + "mA");
-    Serial.print("ITERM : "); Serial.println(String(bq25896.getITERM()) + "mA");
-    Serial.print("VREG : "); Serial.println(String(bq25896.getVREG()) + "mV");
-    Serial.print("BAT_COMP : "); Serial.println(String(bq25896.getBAT_COMP()) + "mΩ");
-    Serial.print("VCLAMP : "); Serial.println(String(bq25896.getVCLAMP()) + "mV");
-    Serial.print("BOOSTV : "); Serial.println(String(bq25896.getBOOSTV()) + "mV");
-    Serial.print("BOOST_LIM : "); Serial.println(String(bq25896.getBOOST_LIM()) + "mA");
-    Serial.print("VINDPM : "); Serial.println(String(bq25896.getVINDPM()) + "mV");
-    Serial.print("BATV : "); Serial.println(String(bq25896.getBATV()) + "mV");
-    Serial.print("SYSV : "); Serial.println(String(bq25896.getSYSV()) + "mV");
-    Serial.print("TSPCT : "); Serial.println(String(bq25896.getTSPCT()) + "%");
-    Serial.print("VBUSV : "); Serial.println(String(bq25896.getVBUSV()) + "mV");
-    Serial.print("ICHGR : "); Serial.println(String(bq25896.getICHGR()) + "mA");
-    
-    Serial.print("Fault -> "); 
-    Serial.print("NTC:" + String(bq25896.getFAULT_reg().ntc_fault));
-    Serial.print(" ,BAT:" + String(bq25896.getFAULT_reg().bat_fault));
-    Serial.print(" ,CHGR:" + String(bq25896.getFAULT_reg().chrg_fault));
-    Serial.print(" ,BOOST:" + String(bq25896.getFAULT_reg().boost_fault));
-    Serial.println(" ,WATCHDOG:" + String(bq25896.getFAULT_reg().watchdog_fault));
+void loop() {
+  Serial.println("Parámetros del sistema BQ25896");
 
-    Serial.print("Charging Status -> "); 
-    Serial.print("CHG_EN:" + String(bq25896.getSYS_CTRL_reg().chg_config));
-    Serial.print(" ,BATFET DIS:" + String(bq25896.getCTRL1_reg().batfet_dis));
-    Serial.print(" ,BATLOAD_EN:" + String(bq25896.getSYS_CTRL_reg().bat_loaden));
-    Serial.print(" ,PG STAT:" + String(bq25896.get_VBUS_STAT_reg().pg_stat));
-    Serial.print(" ,VBUS STAT:" + String(bq25896.get_VBUS_STAT_reg().vbus_stat));
-    Serial.print(" ,CHRG STAT:" + String(bq25896.get_VBUS_STAT_reg().chrg_stat));
-    Serial.println(",VSYS STAT:" + String(bq25896.get_VBUS_STAT_reg().vsys_stat));
+  /* Muestra el estado del pin ILIM */
+  Serial.print("ILIM PIN : ");
+  Serial.println(String(bq25896.getILIM_reg().en_ilim));
 
-    bq25896.setCONV_START(true);
-    delay(1000);
+  /* Lectura y muestra de diversos parámetros */
+  Serial.print("IINLIM       : "); Serial.println(String(bq25896.getIINLIM()) + " mA");
+  Serial.print("VINDPM_OS    : "); Serial.println(String(bq25896.getVINDPM_OS()) + " mV");
+  Serial.print("SYS_MIN      : "); Serial.println(String(bq25896.getSYS_MIN()) + " mV");
+  Serial.print("ICHG         : "); Serial.println(String(bq25896.getICHG()) + " mA");
+  Serial.print("IPRE         : "); Serial.println(String(bq25896.getIPRECHG()) + " mA");
+  Serial.print("ITERM        : "); Serial.println(String(bq25896.getITERM()) + " mA");
+  Serial.print("VREG         : "); Serial.println(String(bq25896.getVREG()) + " mV");
+  Serial.print("BAT_COMP     : "); Serial.println(String(bq25896.getBAT_COMP()) + " mΩ");
+  Serial.print("VCLAMP       : "); Serial.println(String(bq25896.getVCLAMP()) + " mV");
+  Serial.print("BOOSTV       : "); Serial.println(String(bq25896.getBOOSTV()) + " mV");
+  Serial.print("BOOST_LIM    : "); Serial.println(String(bq25896.getBOOST_LIM()) + " mA");
+  Serial.print("VINDPM       : "); Serial.println(String(bq25896.getVINDPM()) + " mV");
+  Serial.print("BATV         : "); Serial.println(String(bq25896.getBATV()) + " mV");
+  Serial.print("SYSV         : "); Serial.println(String(bq25896.getSYSV()) + " mV");
+  Serial.print("TSPCT        : "); Serial.println(String(bq25896.getTSPCT()) + "%");
+  Serial.print("VBUSV        : "); Serial.println(String(bq25896.getVBUSV()) + " mV");
+  Serial.print("ICHGR        : "); Serial.println(String(bq25896.getICHGR()) + " mA");
+
+  /* Muestra estados de falla (fault) */
+  Serial.print("Fallas -> "); 
+  Serial.print("NTC:" + String(bq25896.getFAULT_reg().ntc_fault));
+  Serial.print(" ,BAT:" + String(bq25896.getFAULT_reg().bat_fault));
+  Serial.print(" ,CHGR:" + String(bq25896.getFAULT_reg().chrg_fault));
+  Serial.print(" ,BOOST:" + String(bq25896.getFAULT_reg().boost_fault));
+  Serial.println(" ,WATCHDOG:" + String(bq25896.getFAULT_reg().watchdog_fault));
+
+  /* Muestra estados de carga */
+  Serial.print("Estado de carga -> "); 
+  Serial.print("CHG_EN:" + String(bq25896.getSYS_CTRL_reg().chg_config));
+  Serial.print(" ,BATFET DESHAB:" + String(bq25896.getCTRL1_reg().batfet_dis));
+  Serial.print(" ,BATLOAD_EN:" + String(bq25896.getSYS_CTRL_reg().bat_loaden));
+  Serial.print(" ,PG STAT:" + String(bq25896.get_VBUS_STAT_reg().pg_stat));
+  Serial.print(" ,EST_VBUS:" + String(bq25896.get_VBUS_STAT_reg().vbus_stat));
+  Serial.print(" ,EST_CHRG:" + String(bq25896.get_VBUS_STAT_reg().chrg_stat));
+  Serial.println(",EST_VSYS:" + String(bq25896.get_VBUS_STAT_reg().vsys_stat));
+
+  /* Inicia nueva conversión ADC */
+  bq25896.setCONV_START(true);
+
+  delay(1000); /* Actualiza cada segundo */
 }
 ```
-
-#### Fuel Gauge
-TBD
 
 ## Descarga del código
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
-- TBD
+[Códigos de la alimentación](https://drive.google.com/drive/folders/1I5WI-snWixP8urmTfhuuEfvBaxEJhqmo)

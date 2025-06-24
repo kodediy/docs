@@ -57,13 +57,440 @@ El driver del táctil es el CST820 y funciona mediante I2C. Está conectado al E
 
 
 ## Códigos de ejemplo
-### Ejemplo sencillo
-TBD
+### Ejemplo básico
+```cpp lvgl_test.ino lines icon="microchip"
+#include "Arduino_GFX_Library.h"
+
+/*-------------------------------------------------
+ * Crear instancia de bus QSPI para ESP32-S3
+ * Parámetros: CS, SCK, SDIO0, SDIO1, SDIO2, SDIO3
+ *-------------------------------------------------*/
+Arduino_DataBus *bus = new Arduino_ESP32QSPI(
+  9,   /* CS    */
+  17,  /* SCK   */
+  15,  /* SDIO0 */
+  14,  /* SDIO1 */
+  16,  /* SDIO2 */
+  10   /* SDIO3 */
+);
+
+/*-------------------------------------------------
+ * Crear instancia del controlador de pantalla CO5300
+ * Parámetros: bus, pin RST, rotación, flag IPS, resolución horizontal,
+ * resolución vertical, offset columna 1, offset fila 1, offset columna 2, offset fila 2
+ *-------------------------------------------------*/
+Arduino_GFX *gfx = new Arduino_CO5300(
+  bus,
+  8,     /* RST       */
+  0,     /* rotación  */
+  false, /* bandera IPS */
+  410,   /* RES_HOR   */
+  502,   /* RES_VER   */
+  20,    /* offset col 1 */
+  0,     /* offset fila 1 */
+  0,     /* offset col 2 */
+  0      /* offset fila 2 */
+);
+
+void setup() {
+  /* Inicializar comunicación serie para depuración */
+  Serial.begin(115200);
+  Serial.println("¡Hola mundo!");
+
+  /* Iniciar la pantalla con los parámetros configurados */
+  gfx->begin();
+
+  /* Dibujar un rectángulo vacío de 80×80 píxeles en (40,40) de color rojo */
+  gfx->drawRect(40, 40, 80, 80, RED);
+
+  /* Dibujar una línea vertical rápida de 80 píxeles en x=80, y=40 de color púrpura */
+  gfx->drawFastVLine(80, 40, 80, PURPLE);
+
+  /* Dibujar una línea horizontal rápida de 80 píxeles en x=40, y=80 de color púrpura */
+  gfx->drawFastHLine(40, 80, 80, PURPLE);
+
+  /* Dibujar un único píxel en (50,50) de color rojo */
+  gfx->drawPixel(50, 50, RED);
+
+  /* Dibujar un pequeño rectángulo relleno de 2×2 píxeles en (30,30) de color rojo */
+  gfx->fillRect(30, 30, 2, 2, RED);
+
+  /* Establecer la posición del cursor de texto en (100,100) */
+  gfx->setCursor(100, 100);
+
+  /* Establecer el color de texto a amarillo */
+  gfx->setTextColor(YELLOW);
+
+  /* Imprimir el mensaje "¡Hola mundo!" en pantalla */
+  gfx->println("¡Hola mundo!");
+}
+
+void loop() {
+  /* Pausa de 1 segundo antes de repetir (no hay animación en bucle) */
+  delay(1000);
+}
+```
+
 ### Ejemplo con LVGL
-TBD
+Este código implementa LVGL 9.3 y te permite probar la pantalla imprimiendo un texto, usando un ejemplo o usando una demo. Por defecto se usa la demo de musica de LVGL.
+```cpp lvgl_test.ino lines icon="microchip"
+/* El uso de LVGL con Arduino requiere algunos pasos adicionales:
+ * Asegúrate de leer la documentación aquí: https://docs.lvgl.io/master/integration/framework/arduino.html  */
+
+/*-------------------------------------------------
+ * Inclusión de librerías
+ *-------------------------------------------------
+ * El orden de las inclusiones es importante: primero LVGL en sí,
+ * opcionalmente sus demos/ejemplos incluidos y finalmente la capa
+ * de abstracción de pantalla proporcionada por Arduino_GFX.
+ */
+#include <lvgl.h>                     /* Biblioteca gráfica principal de LVGL */
+
+/* Para usar los ejemplos y demos integrados de LVGL descomenta las siguientes inclusiones respectivamente.
+ * También necesitas copiar `lvgl/examples` a `lvgl/src/examples`. De manera similar para los demos `lvgl/demos` a `lvgl/src/demos`.
+ * Ten en cuenta que la librería `lv_examples` es para LVGL v7 y no deberías instalarla para esta versión (LVGL v8)
+ * ya que los ejemplos y demos ahora forman parte de la librería principal de LVGL. */
+
+// #include <examples/lv_examples.h>
+#include <demos/lv_demos.h>           /* Colección de demos LVGL listas para usar */
+
+#include <Arduino_GFX_Library.h>      /* Capa de abstracción de controladores de pantalla de alto nivel para Arduino */
+
+// #define DIRECT_RENDER_MODE // Descomenta para habilitar búfer de trama completo
+
+/*-------------------------------------------------
+ * Definiciones GPIO/I²C del controlador táctil
+ *-------------------------------------------------*/
+#define TOUCH_MODULES_CST_SELF                 /* Uso de panel táctil capacitivo CST820 */
+#define TOUCH_MODULE_ADDR CTS820_SLAVE_ADDRESS /* Dirección I²C por defecto para CST820 */
+#define TOUCH_SCL 47                           /* Pin de reloj I²C */
+#define TOUCH_SDA 48                           /* Pin de datos I²C */
+#define TOUCH_RES 8                            /* Pin de reset (activo bajo) */
+// #define TOUCH_INT -1 // Pin INT opcional (aún no utilizado)
+
+/*-------------------------------------------------
+ * Parámetros de calibración táctil
+ *-------------------------------------------------
+ * Estos valores son rellenados por el sketch de ejemplo "TouchCalibration"
+ * de Arduino_GFX y permiten a LVGL mapear las coordenadas táctiles crudas
+ * reportadas por el controlador a las coordenadas de píxeles en pantalla.
+ *
+ * Hasta que no se ejecute un procedimiento de calibración, los valores son -1
+ * para que el mapeo basado en la orientación en tiempo de ejecución
+ * pueda encargarse.
+ */
+bool   touch_swap_xy = false;   /* Indica si intercambiar X e Y (vertical/horizontal) */
+int16_t touch_map_x1 = -1;      /* Mapeo crudo → pantalla para el mínimo de X */
+int16_t touch_map_x2 = -1;      /* Mapeo crudo → pantalla para el máximo de X */
+int16_t touch_map_y1 = -1;      /* Mapeo crudo → pantalla para el mínimo de Y */
+int16_t touch_map_y2 = -1;      /* Mapeo crudo → pantalla para el máximo de Y */
+
+/* Variables táctiles actualizadas en tiempo de ejecución */
+int16_t touch_max_x   = 0 , touch_max_y   = 0;  /* Resolución de pantalla menos uno */
+int16_t touch_raw_x   = 0 , touch_raw_y   = 0;  /* Última lectura cruda */
+int16_t touch_last_x  = 0 , touch_last_y  = 0;  /* Última coordenada traducida */
+
+/*-------------------------------------------------
+ * Instanciación de objetos
+ *-------------------------------------------------*/
+#include <Wire.h>
+#include <TouchLib.h>
+/* Crea el objeto del controlador táctil en el puerto Wire predeterminado con pines definidos por el usuario */
+TouchLib touch(Wire, TOUCH_SDA, TOUCH_SCL, TOUCH_MODULE_ADDR);
+
+/* Crea una instancia de bus QSPI que coincide con el pinout del ESP32-S3 */
+Arduino_DataBus *bus = new Arduino_ESP32QSPI(
+  9,  /* CS   */
+  17, /* SCK  */
+  15, /* SDIO0*/
+  14, /* SDIO1*/
+  16, /* SDIO2*/
+  10  /* SDIO3*/
+);
+
+/* Instancia el controlador de pantalla CO5300 (410×502 px) conectado mediante el bus */
+Arduino_GFX *gfx = new Arduino_CO5300(
+  bus,
+  8,     /* RST       */
+  0,     /* rotación  */
+  false, /* bandera IPS */
+  410,   /* RES_HOR   */
+  502,   /* RES_VER   */
+  20,    /* offset col 1 */
+  0,     /* offset fila 1*/
+  0,     /* offset col 2 */
+  0      /* offset fila 2*/
+);
+
+/*-------------------------------------------------
+ * Handles de pantalla/búfer de LVGL
+ *-------------------------------------------------*/
+uint32_t     screenWidth, screenHeight;  /* Actualizado en setup() */
+uint32_t     bufSize;                    /* Tamaño (en px) del búfer de dibujo */
+lv_display_t *disp;                      /* Objeto de pantalla de LVGL */
+lv_color_t  *disp_draw_buf;              /* Puntero a la memoria del búfer de píxeles */
+
+#if LV_USE_LOG != 0
+/* Redirige la salida de registro de LVGL a la consola Serial */
+void my_print(lv_log_level_t level, const char *buf) {
+  LV_UNUSED(level);
+  Serial.println(buf);
+  Serial.flush();
+}
+#endif
+
+/*-------------------------------------------------
+ * Inicialización táctil y funciones auxiliares
+ *-------------------------------------------------*/
+void touch_init(int16_t w, int16_t h, uint8_t r) {
+  /* Guarda la resolución de la pantalla para que la calibración funcione */
+  touch_max_x = w - 1;
+  touch_max_y = h - 1;
+
+  /* Si no existe una calibración explícita, infiere el mapeo de ejes
+   * en función del valor de rotación de la pantalla proporcionado por el controlador.
+   */
+  if (touch_map_x1 == -1) {
+    switch (r) {
+      case 3: /* Rotación de 270° */
+        touch_swap_xy = true;
+        touch_map_x1 = touch_max_x; touch_map_x2 = 0;
+        touch_map_y1 = 0;            touch_map_y2 = touch_max_y;
+        break;
+      case 2: /* Rotación de 180° */
+        touch_swap_xy = false;
+        touch_map_x1 = touch_max_x; touch_map_x2 = 0;
+        touch_map_y1 = touch_max_y; touch_map_y2 = 0;
+        break;
+      case 1: /* Rotación de 90° */
+        touch_swap_xy = true;
+        touch_map_x1 = 0;            touch_map_x2 = touch_max_x;
+        touch_map_y1 = touch_max_y; touch_map_y2 = 0;
+        break;
+      default:  /* Rotación de 0° (horizontal) */
+        touch_swap_xy = false;
+        touch_map_x1 = 0;            touch_map_x2 = touch_max_x;
+        touch_map_y1 = 0;            touch_map_y2 = touch_max_y;
+        break;
+    }
+  }
+
+  /* Secuencia de reinicio de hardware para el controlador táctil */
+  pinMode(TOUCH_RES, OUTPUT);
+  digitalWrite(TOUCH_RES, 0);
+  delay(200);
+  digitalWrite(TOUCH_RES, 1);
+  delay(200);
+
+  /* Inicia I²C e inicializa el controlador */
+  Wire.begin(TOUCH_SDA, TOUCH_SCL);
+  touch.init();
+}
+
+/* Devuelve true si la línea INT (opcional) indica actividad */
+bool touch_has_signal()
+{
+  // TODO: implementar el manejo de TOUCH_INT
+  return true;
+}
+
+/* Convierte las coordenadas crudas del controlador a coordenadas de pantalla */
+void translate_touch_raw() {
+  if (touch_swap_xy) {
+    touch_last_x = map(touch_raw_y, touch_map_x1, touch_map_x2, 0, touch_max_x);
+    touch_last_y = map(touch_raw_x, touch_map_y1, touch_map_y2, 0, touch_max_y);
+  } else {
+    touch_last_x = map(touch_raw_x, touch_map_x1, touch_map_x2, 0, touch_max_x);
+    touch_last_y = map(touch_raw_y, touch_map_y1, touch_map_y2, 0, touch_max_y);
+  }
+  /* Descomenta la siguiente línea para salida de depuración detallada */
+  // Serial.printf("touch_raw_x: %d, touch_raw_y: %d → touch_last_x: %d, touch_last_y: %d\n", touch_raw_x, touch_raw_y, touch_last_x, touch_last_y);
+}
+
+/* Lee una muestra táctil y la traduce */
+bool touch_touched() {
+  if (touch.read()) {
+    TP_Point t = touch.getPoint(0);
+    touch_raw_x = t.x;
+    touch_raw_y = t.y;
+
+    /* Mantiene el último valor crudo para procesamiento adicional opcional */
+    touch_last_x = touch_raw_x;
+    touch_last_y = touch_raw_y;
+
+    translate_touch_raw();
+    return true;
+  }
+  return false;
+}
+
+/* Marcador de posición para futura detección de "toque liberado" */
+bool touch_released() {
+  return false;
+}
+
+/* Adaptador para que LVGL pueda llamar a millis() de Arduino */
+uint32_t millis_cb(void) {
+  return millis();
+}
+
+/*-------------------------------------------------
+ * Callbacks de pantalla y entrada de LVGL
+ *-------------------------------------------------*/
+/* LVGL llama a esta función cuando tiene una región de la pantalla que
+ * necesita ser actualizada (el llamado "flush"). La tarea aquí es copiar
+ * los datos de píxel del búfer de LVGL a la pantalla y luego notificar
+ * a LVGL que la transferencia está completa mediante lv_display_flush_ready().
+ */
+void my_disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map) {
+#ifndef DIRECT_RENDER_MODE
+  uint32_t w = lv_area_get_width(area);
+  uint32_t h = lv_area_get_height(area);
+
+  /* Usa la función de Arduino_GFX para escribir un bitmap RGB565 en pantalla */
+  gfx->draw16bitRGBBitmap(area->x1, area->y1, (uint16_t *)px_map, w, h);
+#endif  /* !DIRECT_RENDER_MODE */
+
+  /* Indica a LVGL que estamos listos para el siguiente frame */
+  lv_display_flush_ready(disp);
+}
+
+/* Callback del dispositivo de entrada de LVGL: obtiene el estado y las coordenadas táctiles actuales */
+void my_touchpad_read(lv_indev_t *indev, lv_indev_data_t *data) {
+  if (touch_has_signal()) {
+    if (touch_touched()) {
+      data->state = LV_INDEV_STATE_PRESSED;
+      /* Rellena la estructura de punto de LVGL */
+      data->point.x = touch_last_x;
+      data->point.y = touch_last_y;
+    } else if (touch_released()) {
+      data->state = LV_INDEV_STATE_RELEASED;
+    }
+  } else {
+    data->state = LV_INDEV_STATE_RELEASED;
+  }
+}
+
+/*-------------------------------------------------
+ * setup() de Arduino – se ejecuta una vez al iniciar
+ *-------------------------------------------------*/
+void setup() {
+#ifdef DEV_DEVICE_INIT
+  DEV_DEVICE_INIT();
+#endif
+
+  Serial.begin(115200);
+  // Serial.setDebugOutput(true);
+  // while(!Serial);
+  Serial.println("Arduino_GFX LVGL_Arduino_v9 example");
+  String LVGL_Arduino = String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
+  Serial.println(LVGL_Arduino);
+
+  /*-------------------------------------------------
+   * Inicialización de pantalla
+   *-------------------------------------------------*/
+  if (!gfx->begin()) {
+    Serial.println("gfx->begin() failed!");
+  }
+  gfx->fillScreen(RGB565_BLACK); /* Borra el búfer de trama */
+
+  /*-------------------------------------------------
+   * Inicialización táctil
+   *-------------------------------------------------*/
+  touch_init(gfx->width(), gfx->height(), gfx->getRotation());
+
+  /*-------------------------------------------------
+   * Inicialización del núcleo de LVGL
+   *-------------------------------------------------*/
+  lv_init();
+
+  /* Proporciona a LVGL una fuente de ticks en milisegundos */
+  lv_tick_set_cb(millis_cb);
+
+#if LV_USE_LOG != 0
+  /* Envía el registro interno de LVGL a Serial */
+  lv_log_register_print_cb(my_print);
+#endif
+
+  /* Almacena la resolución de pantalla para la futura asignación de búfer */
+  screenWidth  = gfx->width();
+  screenHeight = gfx->height();
+
+  /*-------------------------------------------------
+   * Asignar búfer de dibujo de pantalla
+   *-------------------------------------------------*/
+#if defined(DIRECT_RENDER_MODE) && (defined(CANVAS) || defined(RGB_PANEL) || defined(DSI_PANEL))
+  /* En modo directo LVGL dibuja directamente en el búfer de trama del panel */
+  disp_draw_buf = (lv_color_t *)gfx->getFramebuffer();
+#else
+  /* De lo contrario asigna un bloque de heap – dos veces bufSize (doble búfer) */
+  disp_draw_buf = (lv_color_t *)heap_caps_malloc(bufSize * 2, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+  if (!disp_draw_buf) {
+    /* Recurso a RAM externa si la asignación interna falla */
+    disp_draw_buf = (lv_color_t *)heap_caps_malloc(bufSize * 2, MALLOC_CAP_8BIT);
+  }
+#endif
+
+  if (!disp_draw_buf) {
+    Serial.println("LVGL disp_draw_buf allocate failed!");
+  } else {
+    /*-------------------------------------------------
+     * Crear pantalla LVGL y registrar callbacks
+     *-------------------------------------------------*/
+    disp = lv_display_create(screenWidth, screenHeight);
+    lv_display_set_flush_cb(disp, my_disp_flush);
+
+#ifdef DIRECT_RENDER_MODE
+    lv_display_set_buffers(disp, disp_draw_buf, NULL, bufSize * 2, LV_DISPLAY_RENDER_MODE_DIRECT);
+#else
+    lv_display_set_buffers(disp, disp_draw_buf, NULL, bufSize * 2, LV_DISPLAY_RENDER_MODE_PARTIAL);
+#endif
+
+    /*-------------------------------------------------
+     * Registrar dispositivo de entrada táctil
+     *-------------------------------------------------*/
+    lv_indev_t *indev = lv_indev_create();
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /* El panel táctil informa eventos de puntero */
+    lv_indev_set_read_cb(indev, my_touchpad_read);
+
+    /*-------------------------------------------------
+     * Elegir qué mostrar al iniciar
+     *-------------------------------------------------*/
+    /* Opción 1: Etiqueta simple "Hello World" */
+    // lv_obj_t *label = lv_label_create(lv_scr_act());
+    // lv_label_set_text(label, "Hello Arduino, I'm LVGL!(V" GFX_STR(LVGL_VERSION_MAJOR) "." GFX_STR(LVGL_VERSION_MINOR) "." GFX_STR(LVGL_VERSION_PATCH) ")");
+    // lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+
+    /* Opción 2: Probar un ejemplo. Ver todos los ejemplos
+     *  - En línea: https://docs.lvgl.io/master/examples.html
+     *  - Códigos fuente: https://github.com/lvgl/lvgl/tree/master/examples
+     * ----------------------------------------------------------------
+     */
+    // lv_example_btn_1();
+
+    /* Opción 3: Ejecutar uno de los demos integrados */
+    // lv_demo_widgets();
+    // lv_demo_benchmark();
+    // lv_demo_keypad_encoder();
+    lv_demo_music(); /* Predeterminado: demostración de reproductor de música animado y elegante */
+    // lv_demo_stress();
+  }
+
+  Serial.println("Setup done");
+}
+
+/*-------------------------------------------------
+ * loop() de Arduino – se ejecuta continuamente tras setup()
+ *-------------------------------------------------*/
+void loop() {
+  /* Deja que LVGL procese temporizadores y animaciones */
+  lv_timer_handler();
+  delay(5); /* Da un breve descanso a la CPU */
+}
+```
 
 
 ## Descarga del código
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
-- TBD
+[Ejemplos de código de la pantalla](https://drive.google.com/drive/folders/1dw2ThNCUiHljMfDs-s67guQxr_ILJ5BL)

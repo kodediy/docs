@@ -40,69 +40,87 @@ El driver que controla los motores está conectado de la siguiente manera:
 <Info> AIPROPI y BIPROPI sirven para medir la corriente que está consumiendo cada motor. Para más información consulta el Datasheet del driver.</Info>
 
 ## Código de ejemplo
+Conecta dos motores DC a los conectores y con este código verás como primero aceleran, luego mantienen la velocidad máxima y finalmente desaceleran.
 ```cpp Inventor_test.ino lines icon="microchip"
-// Pines
-const int PIN_AIN1 = 42;
-const int PIN_AIN2 = 41;
-const int PIN_BIN1 = 40;
-const int PIN_BIN2 = 39;
+/* Definición de pines para el control de dos motores (A y B) usando un puente H de fast-decay:
+ * PIN_xIN1 controla la señal PWM (velocidad), PIN_xIN2 se mantiene LOW para modo fast-decay (frenado rápido)
+ */
+const int PIN_AIN1 = 42;  /* PWM para motor A, dirección forward */
+const int PIN_AIN2 = 41;  /* Fast-decay para motor A */
+const int PIN_BIN1 = 40;  /* PWM para motor B, dirección forward */
+const int PIN_BIN2 = 39;  /* Fast-decay para motor B */
 
-// LEDC (PWM) settings
-const int PWM_FREQ       = 5000;
-const int PWM_RES_BITS   = 8;
-const int CHANNEL_A      = 0;
-const int CHANNEL_B      = 1;
+/* Configuración del módulo LEDC (PWM) del ESP32:
+ * - Frecuencia de PWM en Hz
+ * - Resolución de PWM en bits (0–2^8-1)
+ * - Dos canales independientes (uno por cada motor)
+ */
+const int PWM_FREQ     = 5000;
+const int PWM_RES_BITS = 8;
+const int CHANNEL_A    = 0;
+const int CHANNEL_B    = 1;
 
-// Ciclo de temporización (en ms)
-const uint16_t RAMP_TIME = 3000; // subida/bajada
-const uint16_t HOLD_TIME = 2000; // velocidad máxima
+/* Tiempos para rampa y mantenimiento de velocidad, en milisegundos */
+const uint16_t RAMP_TIME = 3000; /* Duración total para subir o bajar de 0 a máximo (o viceversa) */
+const uint16_t HOLD_TIME = 2000; /* Tiempo para mantener la velocidad máxima */
 
 void setup() {
-  // Pines digitales para fast-decay
+  /* Configura los pines de fast-decay como salida y los deja en LOW:
+   * Esto asegura que al desactivar el PWM, el motor se frene rápidamente por cortocircuito de bobinas
+   */
   pinMode(PIN_AIN2, OUTPUT);
   pinMode(PIN_BIN2, OUTPUT);
   digitalWrite(PIN_AIN2, LOW);
   digitalWrite(PIN_BIN2, LOW);
 
-  // Configurar canales LEDC
+  /* Inicializa los canales LEDC con la frecuencia y resolución deseadas */
   ledcSetup(CHANNEL_A, PWM_FREQ, PWM_RES_BITS);
   ledcSetup(CHANNEL_B, PWM_FREQ, PWM_RES_BITS);
 
-  // Mapear canales a pines
+  /* Asocia cada canal LEDC a su pin PWM correspondiente */
   ledcAttachPin(PIN_AIN1, CHANNEL_A);
   ledcAttachPin(PIN_BIN1, CHANNEL_B);
 }
 
 void loop() {
-  // --- Rampa arriba de 0 a 255 en RAMP_TIME ---
+  /* ========================================================================
+   * 1) Rampa de aceleración: incrementa la salida PWM de 0 a 255 de forma lineal
+   *    El retraso entre pasos = RAMP_TIME / 255 → controla la duración total de la rampa
+   * ======================================================================== */
   for (int v = 0; v <= 255; v++) {
-    ledcWrite(CHANNEL_A, v);
-    ledcWrite(CHANNEL_B, v);
-    delay(RAMP_TIME / 255);
+    ledcWrite(CHANNEL_A, v);  /* Escribe valor PWM en motor A */
+    ledcWrite(CHANNEL_B, v);  /* Escribe valor PWM en motor B */
+    delay(RAMP_TIME / 255);   /* Espera para suavizar el cambio de velocidad */
   }
 
-  // Mantener velocidad máxima
+  /* ========================================================================
+   * 2) Mantener velocidad máxima durante HOLD_TIME
+   * ======================================================================== */
   ledcWrite(CHANNEL_A, 255);
   ledcWrite(CHANNEL_B, 255);
   delay(HOLD_TIME);
 
-  // --- Rampa abajo de 255 a 0 en RAMP_TIME ---
+  /* ========================================================================
+   * 3) Rampa de desaceleración: decrementa la salida PWM de 255 a 0
+   *    Igual que en la aceleración, pero en sentido inverso
+   * ======================================================================== */
   for (int v = 255; v >= 0; v--) {
     ledcWrite(CHANNEL_A, v);
     ledcWrite(CHANNEL_B, v);
     delay(RAMP_TIME / 255);
   }
 
-  // Asegurar parada
+  /* ========================================================================
+   * 4) Asegurar parada: escribe 0 PWM y queda detenido en fast-decay
+   * ======================================================================== */
   ledcWrite(CHANNEL_A, 0);
   ledcWrite(CHANNEL_B, 0);
 
-  // Bucle infinito
+  /* El loop se repite indefinidamente, generando ciclos de aceleración y frenado */
 }
-
 ```
 
 ## Descarga del código
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
-- TBD
+[Ejemplos de código del módulo Inventor](https://drive.google.com/drive/folders/1wom3hU-bjWmbpT9DnZFzFtpL3cr-7Qzg)
