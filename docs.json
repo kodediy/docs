@@ -36,6 +36,8 @@
             "group": "kode dot",
             "pages": [
               "en/kode-dot/quickstart", 
+              "en/kode-dot/esp32s3",
+              "en/kode-dot/io-expander",
               "en/kode-dot/display", 
               "en/kode-dot/addresable-led", 
               "en/kode-dot/buttons", 
@@ -51,12 +53,19 @@
                 ]	
               },
               "en/kode-dot/imu",
-              "en/kode-dot/power"
+              "en/kode-dot/rtc",
+              "en/kode-dot/power",
+              "en/kode-dot/connectors"
             ]
           },
           {
             "group": "kodeOS",
-            "pages": ["en/kodeOS/architecture"]
+            "pages": 
+            [
+              "en/kodeOS/hammy",
+              "en/kodeOS/apps",
+              "en/kodeOS/firmware"	
+            ]
           },
           {
             "group": "External Modules",

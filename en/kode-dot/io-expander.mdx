@@ -1,0 +1,124 @@
+---
+title: "IO Expander"
+description: "Learn to control the programmable pins of the IO expander."
+icon: "expand"
+---
+
+# Features
+Although all the **important signals** of the components of the kode dot are connected to the **pins of the ESP32-S3,** there are some **less important signals** that do not fit.
+
+The IO expander is a component that has **16 programmable pins** and to which the rest of the signals are connected that, or are of **low speed** or that **are not very relevant.**
+
+## Connection diagram
+The pins of the expander are controlled by the ESP32-S3 through the **I2C bus.** In addition, it has an **interrupt pin** that is connected to the ESP32-S3 to know when there has been a change in one of its pins.
+
+The IO expander is connected to the ESP32-S3 in the following way:
+
+| Expander     | ESP32-S3 |
+| ------------ | -------- |
+| SDA          | GPIO48   |
+| SCL          | GPIO47   |
+| Interrupt    | GPIO18   |
+
+<Note>The expander has the address 0x20 on the I2C bus.</Note>
+
+The signals of the different components of the kode dot that are connected to the expander are:
+
+| Signal                           | Expander |
+| -------------------------------- | -------- |
+| Magnetometer - INT               | EXP0   |
+| RTC - INTB                       | EXP1   |
+| RTC - INTA                       | EXP2   |
+| Amplifier - SD                   | EXP3   |
+| Power supply - 3V3 peripherals   | EXP4   |
+| Battery indicator - GPOUT        | EXP5   |
+| Pad - Up                         | EXP6   |
+| Pad - Left                       | EXP7   |
+| Pad - Down                       | EXP8   |
+| Button - Down                    | EXP9   |
+| PMIC - INT                       | EXP10  |
+| Pad - Right                      | EXP11  |
+| IMU - INT2                       | EXP12  |
+| IMU - INT1                       | EXP13  |
+| microSD - CD                     | EXP14  |
+| Screen - TP INT                  | EXP15  |
+
+Most of the signals are interrupt signals of the different integrated circuits or buttons and in the examples of the following sections it is implemented the reading of these signals.
+
+## Recommended libraries
+### Arduino
+- [ESP32_IO_Expander](https://github.com/esp-arduino-libs/ESP32_IO_Expander)
+### ESP-IDF
+- [esp_io_expander_tca95xx_16bit](https://components.espressif.com/components/espressif/esp_io_expander_tca95xx_16bit)
+
+## Example code
+With this code you can test the operation of the expander of pins. When you press the **down button,** a message will be printed on the **serial monitor.**
+
+```cpp expander_test.ino lines icon="microchip"	
+#include <esp_io_expander.hpp>
+
+/* Expander configuration */
+#define CHIP_NAME       TCA95XX_16BIT
+#define I2C_SCL_PIN     (47)
+#define I2C_SDA_PIN     (48)
+#define EXP_INT_PIN     (18)
+#define I2C_ADDR        (0x20)
+
+/* Button connection on the expander */
+#define BUTTON_DOWN     9  /* Expander pin for the "down" button */
+
+/* Expander instance */
+esp_expander::Base *expander = nullptr;
+
+/* Flag indicating an interrupt has occurred */
+volatile bool expanderInterrupted = false;
+
+/* ISR: mark the interrupt flag (no I2C calls) */
+void IRAM_ATTR handleExpanderIRQ() {
+  expanderInterrupted = true;
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Expander interrupt test start.");
+
+  /* Initialize the expander */
+  expander = new esp_expander::TCA95XX_16BIT(I2C_SCL_PIN, I2C_SDA_PIN, I2C_ADDR);
+  expander->init();
+  expander->begin();
+
+  /* Configure BUTTON_DOWN as input */
+  expander->pinMode(BUTTON_DOWN, INPUT);
+
+  /* Configure the ESP32 interrupt pin with internal pull-up */
+  pinMode(EXP_INT_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(EXP_INT_PIN),
+                  handleExpanderIRQ, FALLING);
+
+  Serial.println("Setup complete. Waiting for BUTTON_DOWN...");
+}
+
+void loop() {
+  /* Wait until an interrupt is flagged */
+  if (!expanderInterrupted) {
+    delay(10);
+    return;
+  }
+
+  /* Clear the interrupt flag */
+  expanderInterrupted = false;
+
+  /* If BUTTON_DOWN is pressed (LOW), print the message */
+  if (expander->digitalRead(BUTTON_DOWN) == LOW) {
+    Serial.println("Button down pressed, expander interrupt detected!");
+  }
+
+  /* Short delay for debouncing */
+  delay(50);
+}
+```
+
+## Download of examples
+You can test the example codes using the Arduino IDE or the ESP-IDF IDE or download the codes in our drive:
+
+[IO expander examples](https://drive.google.com/drive/folders/1nJHAeJOtqmLtWnhrUvgWu9GuijLvPg9s)

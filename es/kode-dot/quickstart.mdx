@@ -1,82 +1,90 @@
 ---
 title: "Inicio rápido"
-description: "Cómo empezar con el kode dot"
+description: "Guía rápida para comprender el kode dot y empezar con las aplicaciones."
 icon: "stairs"
 ---
 
 # Qué es el kode dot
-El kode dot es el mejor dispositivo maker del mercado. Se trata de un dispositivo todo en uno que te permite aprender mientras construyes y hacer realidad tus ideas.
+El kode dot es el **mejor dispositivo maker del mercado.** Se trata de un dispositivo **todo en uno, de tamaño de bolsillo y con capacidad de IA,** que te permite aprender a programar electrónica y sistemas embebidos mientras **construyes y haces realidad tus ideas.**
 
-Integra el hardware más avanzado y lo combina con el kodeOS, nuestro sistema operativo, que te permite guardar tu código en aplicaciones o instalar aplicaciones de la comunidad.
+Integra el **hardware más avanzado y lo combina con kodeOS**, nuestro sistema operativo de código abierto, que te permite **guardar tu código en aplicaciones y compartirlas con la comunidad.**
 
 Las principales características técnicas del kode dot son:
 
 | Característica    | Descripción |
-| ---------------- | ----------- |
-| Microcontrolador | ESP32-S3 - 32MB de flash y 8 MB de PSRAM |
-| Pantalla         | AMOLED 2.13" |
-| Led              | RGB Direccionable |
-| Botones          | Pad de 4 botones + 2 botones |
-| Audio            | Micrófono y altavoz |
-| Almacenamiento   | microSD |
-| IMU              | IMU de 6 ejes + magnetómetro de 3 ejes |
-| Conectividad     | WiFi - Bluetooth - ESP-NOW |
-| Conectores       | USB-C - Superior de 20 pines - Trasero magnético |
+| ----------------- | ----------- |
+| Microcontrolador  | **ESP32-S3** - 32MB de flash y 8 MB de PSRAM |
+| Pantalla          | AMOLED 2.13" |
+| Led               | RGB Direccionable |
+| Botones           | Pad de 4 botones + 2 botones |
+| Audio             | **Micrófono y altavoz** |
+| Almacenamiento    | microSD |
+| IMU               | **IMU** de 6 ejes + **magnetómetro** de 3 ejes |
+| Conectividad      | WiFi - Bluetooth - ESP-NOW - **2.4GHz** |
+| Conectores        | **USB-C** - **Superior de 20 pines** - **Trasero magnético** |
 
-
-![Parte frontal y trasera del kode dot](/images/kode-dot/quickstart/kode-dot-render.png)
+<Frame caption="Parte frontal y trasera del kode dot">
+  <img width="600"  src="/images/kode-dot/quickstart/kode-dot-render.png" />
+</Frame>
 
 ## Qué hay en la caja
-En la caja del kode dot encontrarás:
+Cuando compres el kode dot, en la caja te llegarán:
 
-- 1x kode dot
-- 1x cable de carga y programación
-- 3x pegatinas
-- 1x manual de inicio rápido
+- 1x **kode dot**
+- 1x **cable de carga y programación**
+- 3x **pegatinas**
+- 1x **manual de inicio rápido**
 
-![Elementos dentro de la caja](/images/kode-dot/quickstart/inside-box.png)
+<Frame caption="kode dot y extras">
+  <img width="600"  src="/images/kode-dot/quickstart/inside-box.png" />
+</Frame>
 
 ## Cómo encender el kode dot
 
-Nada más sacar el kode dot de la caja, pulsa el botón de encendido durante 1 segundo para encenderlo. 
+Nada más sacar el kode dot de la caja, **pulsa el botón de abajo a la derecha durante 2 segundos para encenderlo.**
 
-No tienes que preocuparte de apagarlo ya que automáticamente detectará cuando no lo estás usando y entrará en modo suspensión.
+No tienes que preocuparte de apagarlo ya que **automáticamente** detectará cuando no lo estás usando y entrará en **modo suspensión.**
 
-<Warning>Si no vas a usar tu kode dot durante un largo peridodo de tiempo, puedes apagarlo pulsando el botón de abajo a la derecha durante 5 segundos.</Warning>
+<Warning>Si no vas a usar tu kode dot durante un **largo peridodo de tiempo**, puedes pulsar el botón de abajo a la derecha durante **5 segundos** para apagarlo por completo.</Warning>
 
-## Cómo arrancar una aplicación
+## Lanza tu primera aplicación
 
 Prueba a lanzar tu primera aplicación siguiendo estos pasos:
 
 <Steps>
-  <Step title="Menú de aplicaciones">
-    Desliza el dedo hacia la izquierda para entrar en el menú de aplicaciones. Aquí, aparecerán todos los temas en los que se agrupan las aplicaciones. Selecciona el apartado de "Games". 
+  <Step title="Entra al menú de aplicaciones">
+    Desliza el dedo **hacia la izquierda** para entrar en el **menú de aplicaciones.** Aquí, aparecerán todas las categorías en las que se agrupan las aplicaciones. Desliza hacia abajo y selecciona el apartado de **"Games"**. 
   </Step>
   <Step title="Lanza la aplicación">
-    Ahora te van a aparecer todas las aplicaciones que hay en el apartado de "Games". Selecciona la aplicación "Snake". 
+    Aqui te aparecerán todas las aplicaciones que hay en el apartado de "Games". Selecciona la **aplicación "Snake"** para lanzarla. 
   </Step>
   <Step title="Información de la aplicación">
-    En esta pantalla verás el título de la aplicación y una pequeña descripción. Confirma que quieres lanzar la aplicación pulsando el botón de "YES".
+    En esta pantalla verás el **título de la aplicación y una pequeña descripción.** Confirma que quieres lanzar la aplicación **pulsando "YES".**
   </Step>
-  <Step title="Juega jeje">
-    Ahora ya puedes jugar a Snake.
+  <Step title="Disfruta del juego">
+    Tu **kode dot se reiniciará** y ya podrás **empezar a jugar al mítico Snake.**
   </Step>
 </Steps>
 
-## Sube tu primera aplicación
-Subir aplicaciones a tu kode dot es muy sencillo. En Arduino IDE, sigue estos pasos:
+<Tip>Para salir de la aplicación, pulsa el botón de abajo a la derecha a la vez que el pad izquierdo.</Tip>
+
+## Crea tu primera aplicación
+Subir tu código y convertirlo en una aplicación es muy sencillo, vamos a poner de ejemplo cómo se hace con Arduino IDE:
 
 <Steps>
   <Step title="Selecciona el kode dot">
-    En el menú de Arduino IDE, selecciona "Tools" > "Board" > "kode" > "kode dot".
+    En el menú de **Arduino IDE**, selecciona *Tools > Board > kode > kode dot*.
   </Step>
   <Step title="Hola mundo!">
-    Abre el ejemplo de "Hello World" en Arduino IDE. Dale a "File" > "Examples" > "kode" > "Hello World".
+    Abre el ejemplo de **"Hello World"** en Arduino IDE en *File > Examples > kode > Hello World*.
   </Step>
   <Step title="Conecta tu kode dot y sube el código">
-    Al conectar tu kode dot, te saldrá en la lista de dispositivos. Desliza el dedo hacia la derecha en el kode dot para entrar en el menú de subir una aplicación y dale a "maker mode". Dale al botón de "Upload" para subir el código y deja que el kodeOS se encargue de todo.
+    Desliza el **dedo hacia la derecha** en el kode dot para entrar en el **menú de subir código**. Al conectar tu kode dot al ordenador, en el Arduino IDE te saldrá en la **lista de dispositivos** y dándole al botón de **"Upload"** se subirá el código.
   </Step>
-  <Step title="Juega jeje">
-    Al estar en modo maker, el kode dot se reiniciará y se ejecutará tu aplicación automáticamente. Verás que el led del kode dot empezará a parpadear y que la pantalla mostrará "Hello World".
+  <Step title="Crea la aplicación">
+    Ahora en el **menú de subir código del kode dot**, te saldrá la opción de **ejecutar el código que acabas de subir o crear una aplicación.** Selecciona la opción de **"Create App"** y guardala en la categoría de **"General"**.
+  </Step>
+  <Step title="Comprueba la aplicación">
+    Ve al menú de aplicaciones, entra en la categoría de **"General"** y ya te **aparecerá tu aplicación recién creada** lista para ser lanzada.
   </Step>
 </Steps>

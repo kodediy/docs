@@ -1,57 +1,59 @@
 ---
 title: "ESP32-S3"
-description:  "El microprocesador que le da vida al kode dot"
+description:  "Conoce el microprocesador que le da vida al kode dot y su control de estados."
 icon: "microchip"
 ---
 
 # Características
 
-El ESP32-S3 es uno de los mejores microprocesadores de Espressif que incorpora un doble núcleo XTensa LX7, capaz de correr a 240MHz.
+El **ESP32-S3** es uno de los mejores microprocesadores de **Espressif** que incorpora un **doble núcleo XTensa LX7,** capaces de correr hasta **240MHz**. Además, integra conectividad de **2.4GHz** con soporte **WiFi** y **Bluetooth LE**. 
 
-Además, integra conectividad de 2.4GHz con soporte Wi-Fi y Bluetooth LE. En la siguiente imagen se puede ver el diagrama funcional del ESP32-S3 y todos los periféricos que incorpora:
+En la siguiente imagen se puede ver el **diagrama funcional del ESP32-S3** con todos los periféricos que incorpora:
 
-![Diagrama de bloques del ESP32-S3](/images/kode-dot/esp32s3/funtionalblock.png)
 
-Hemos conseguido aumentar la potencia del kode dot gracias a añadirle 32MB de flash y usar 8MB de PSRAM. Así, el kode dot puede ejecutar programas mucho más grandes y complejos.
+<Frame caption="Diagrama funcional del ESP32-S3">
+  <img width="600"  src="/images/kode-dot/esp32s3/funtionalblock.png" />
+</Frame>
+
+Además de su potencia y versatilidad, lo hemos integrado en el kode dot ampliando sus capacidades con **32MB de flash** y **8MB de PSRAM.** Así, hace honor a su estatus de ser el **mejor dispositivo maker del mercado** y ejecutar programas mucho más grandes y complejos.
 
 | Característica    | Descripción |
 | ---------------- | ----------- |
-| Flash | Memoria externa de 32MB usando Octalbus |
-| PSRAM | Memoria interna de 8MB usando Octalbus |
+| Flash | Memoria externa de **32MB por Octalbus** |
+| PSRAM | Memoria interna de **8MB por Octalbus** |
 
 ## Antena
-El kode dot incorpora una antena de 2.4GHz integrada en la PCB. Con esta antena vas a poder usar el Wi-Fi y el Bluetooth LE del ESP32-S3, además de ESP-NOW y otros protocolos de comunicación que funcionen
-en esta banda de frecuencia.
-
+Dentro del kode dot hemos incorporado una antena de **2.4GHz** en la PCB. Con esta antena vas a poder usar el **WiFi** y el **Bluetooth LE** del ESP32-S3, además de **ESP-NOW** y otros protocolos de comunicación que funcionen en esta banda de frecuencia.
 
 ## Programación
+**Programar el kode dot se hace como cualquier otra placa basada en el ESP32-S3.** Conectalo diréctamente a tu ordenador mediante el cable USB-C y empieza a subir tus códigos.
 
-Para programar tu kode dot, puedes conectarlo diréctamente a tu ordenador mediante el conector USB-C. Internamente, está conectado a los pines GPIO19 y GPIO20, usando el protocolo de programación USB-Serial.
+<Tip>En el apartado [Aplicaciones](/es/kodeOS/apps) se explica en detalle cómo subir código y crear aplicaciones.</Tip>
 
-Para los más avanzados, también usando el conector USB-C, se puede usar el controlador JTAG interno que incorpora el ESP32-S3 para flashear el kode dot.
+Internamente, las **lineas de datos del USB-C** están conectadas a los pines **GPIO19 y GPIO20** para usar el periférico interno de **USB-Serial**.
 
-Para los un más avanzados, se pueden usar los pines GPIO39, GPIO40, GPIO41 y GPIO42 para debuggear un programa usando una interfaz JTAG.
+Con el USB-C, también tienes la opción de usar el periférico **USB Serial/JTAG** interno que incorpora el ESP32-S3 para **flashear y debuggear el kode dot.**
 
+Para los más avanzados, se pueden usar los pines **GPIO39, GPIO40, GPIO41 y GPIO42** del **conector superior del kode dot** para debuggear un programa usando una **interfaz externa de JTAG.**
 
 ## Control de estados
-El control de los estados de BOOT y RESET del ESP32-S3 se realiza mediante unas sencillas combinaciones con los botones del kode dot.
+El control de los estados de **BOOT** y **RESET** del ESP32-S3 se realiza mediante unas sencillas combinaciones con los **botones del kode dot.**
 
 ### RESET
-Para resetear el kode dot, se debe pulsar el botón izquierdo del pad a la vez que se pulsa el botón de abajo. Esto es útil para estos casos:
+Para resetear el kode dot, se debe pulsar el **botón izquierdo del pad** a la vez que se pulsa el **botón de abajo.** Esto es útil para estos casos: 
 
-- Cuando se ha flasheado un programa y se queda bloqueado el kode dot.
-- Cuando se quiere salir de una aplicación y volver al kodeOS.
+- Cuando se ha **flasheado** un programa y el kode dot se queda **bloqueado.**
+- Para **salir de una aplicación** y volver al menú principal.
 
 ### BOOT
-Para que el kode dot entre en modo BOOT, mientras se mantiene el botón de arriba, se debe resetear el kode dot siguiendo la combinación del RESET. 
+Para que el kode dot entre en modo BOOT, mientras se mantiene el **botón de arriba,** se debe resetear el kode dot siguiendo la combinación del RESET. 
 
-Este proceso es muy útil cuando después de subirle un programa al kode dot, se queda bloqueado y reiniciandose constantemente.
+<Info>Es probable que no tengas que usar este proceso ya que si el código que subes al kode dot bloquea o hace reiniciar al ESP32-S3, el kode dot volverá al menú principal automáticamente.</Info>
 
-<Tip>No es probable que tengas que usar este proceso ya que si el código que subes al kode dot se bloquea o hace reiniciar al ESP32-S3, el kode dot se reiniciará automáticamente y entrará en el kodeOS.</Tip>
+## Ejemplo de código
+Con este código puedes obtener la **dirección MAC** de las diferentes interfaces del ESP32-S3.
 
-## Código de ejemplo
-Con este código puedes obtener la dirección MAC de los diferentes interfaces del ESP32-S3.
-```cpp esp32-s3-mac.ino lines icon="microchip"
+```cpp esp32s3_mac.ino lines icon="microchip"
 #include "esp_mac.h"
 
 void setup() {
@@ -141,7 +143,7 @@ String getInterfaceMacAddress(esp_mac_type_t interface) {
 }
 ```
 
-## Descarga del código
+## Descarga de ejemplos
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
 [Ejemplos del ESP32-S3](https://drive.google.com/drive/folders/11FnC9pj8qADzXAlg8xAT0knNWh9bgYV6)

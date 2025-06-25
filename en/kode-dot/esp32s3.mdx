@@ -1,0 +1,149 @@
+---
+title: "ESP32-S3"
+description:  "Know the microcontroller that gives life to the kode dot and its state control."
+icon: "microchip"
+---
+
+# Features
+
+The **ESP32-S3** is one of the best microcontrollers of **Espressif** that incorporates a **double core XTensa LX7,** capable of running up to **240MHz**. In addition, it integrates **2.4GHz** connectivity with support for **WiFi** and **Bluetooth LE**. 
+
+In the following image you can see the **functional diagram of the ESP32-S3** with all the peripherals it incorporates:
+
+
+<Frame caption="Functional diagram of the ESP32-S3">
+  <img width="600"  src="/images/kode-dot/esp32s3/funtionalblock.png" />
+</Frame>
+
+In addition to its power and versatility, we have integrated it into the kode dot expanding its capabilities with **32MB of flash** and **8MB of PSRAM.** Thus, it makes honor to its status as the **best maker device on the market** and executing programs much larger and more complex.
+
+| Feature    | Description |
+| ---------------- | ----------- |
+| Flash | External memory of **32MB by Octalbus** |
+| PSRAM | Internal memory of **8MB by Octalbus** |
+
+## Antenna
+Inside the kode dot we have integrated a **2.4GHz antenna** in the PCB. With this antenna you will be able to use the **WiFi** and **Bluetooth LE** of the ESP32-S3, as well as **ESP-NOW** and other communication protocols that work in this frequency band.
+
+## Programming
+**Programming the kode dot is done like any other ESP32-S3-based board.** Connect it directly to your computer using the USB-C cable and start uploading your code.
+
+<Tip>In the [Applications](/en/kodeOS/apps) section it is explained in detail how to upload code and create applications.</Tip>
+
+Internally, the **USB-C data lines** are connected to the **GPIO19 and GPIO20** pins to use the internal USB-Serial peripheral.
+
+With the USB-C, you also have the option to use the internal **USB Serial/JTAG** peripheral that the ESP32-S3 incorporates to **flash and debug the kode dot.**
+
+For the most advanced, you can use the **GPIO39, GPIO40, GPIO41 and GPIO42** pins of the **top connector of the kode dot** to debug a program using an **external JTAG interface.**
+
+## State control
+The control of the **BOOT** and **RESET** states of the ESP32-S3 is performed using simple combinations with the **buttons of the kode dot.**
+
+### RESET
+To reset the kode dot, you must press the **left button of the pad** at the same time as you press the **bottom button.** This is useful in these cases: 
+
+- When a program has been **flashed** and the kode dot is **locked.**
+- To **exit an application** and return to the main menu.
+
+### BOOT
+Para que el kode dot entre en modo BOOT, mientras se mantiene el **botón de arriba,** se debe resetear el kode dot siguiendo la combinación del RESET. 
+
+<Info>Es probable que no tengas que usar este proceso ya que si el código que subes al kode dot bloquea o hace reiniciar al ESP32-S3, el kode dot volverá al menú principal automáticamente.</Info>
+
+## Example code
+With this code you can get the **MAC address** of the different interfaces of the ESP32-S3.
+
+```cpp esp32s3_mac.ino lines icon="microchip"
+#include "esp_mac.h"
+
+void setup() {
+  Serial.begin(115200);
+
+  Serial.println("Interface\t\t\t\t\t\tMAC address (6 bytes, 4 universally administered, default)");
+
+  /*
+    Gets and prints the default MAC address of the Wi-Fi station
+    using esp_efuse_mac_get_default
+  */
+  Serial.print("Wi-Fi Station (using 'esp_efuse_mac_get_default')\t");
+  Serial.println(getDefaultMacAddress());
+
+  /*
+    Reads and prints the MAC address of the Wi-Fi station
+    using esp_read_mac
+  */
+  Serial.print("WiFi Station (using 'esp_read_mac')\t\t\t");
+  Serial.println(getInterfaceMacAddress(ESP_MAC_WIFI_STA));
+
+  /*
+    Reads and prints the MAC address of the Wi-Fi Soft-AP
+    using esp_read_mac
+  */
+  Serial.print("WiFi Soft-AP (using 'esp_read_mac')\t\t\t");
+  Serial.println(getInterfaceMacAddress(ESP_MAC_WIFI_SOFTAP));
+
+  /*
+    Reads and prints the MAC address of the Bluetooth
+    using esp_read_mac
+  */
+  Serial.print("Bluetooth (using 'esp_read_mac')\t\t\t");
+  Serial.println(getInterfaceMacAddress(ESP_MAC_BT));
+
+  /*
+    Reads and prints the MAC address of the Ethernet
+    using esp_read_mac
+  */
+  Serial.print("Ethernet (using 'esp_read_mac')\t\t\t\t");
+  Serial.println(getInterfaceMacAddress(ESP_MAC_ETH));
+}
+
+void loop() {
+  /* Nothing is done in the main loop */
+}
+
+/*
+  Function to get the default MAC address
+  (stored in efuses)
+*/
+String getDefaultMacAddress() {
+  String mac = "";
+  unsigned char mac_base[6] = {0};
+
+  /* Try to read the default MAC address from efuse */
+  if (esp_efuse_mac_get_default(mac_base) == ESP_OK) {
+    /* Buffer to format the MAC as XX:XX:XX:XX:XX:XX */
+    char buffer[18];
+    sprintf(buffer, "%02X:%02X:%02X:%02X:%02X:%02X",
+            mac_base[0], mac_base[1], mac_base[2],
+            mac_base[3], mac_base[4], mac_base[5]);
+    mac = buffer;  /* convert to String */
+  }
+
+  return mac;
+}
+
+/*
+  Function to read the MAC address of a specific interface
+*/
+String getInterfaceMacAddress(esp_mac_type_t interface) {
+  String mac = "";
+  unsigned char mac_base[6] = {0};
+
+  /* Read the MAC using esp_read_mac for the indicated interface */
+  if (esp_read_mac(mac_base, interface) == ESP_OK) {
+    /* Buffer to format the MAC */
+    char buffer[18];
+    sprintf(buffer, "%02X:%02X:%02X:%02X:%02X:%02X",
+            mac_base[0], mac_base[1], mac_base[2],
+            mac_base[3], mac_base[4], mac_base[5]);
+    mac = buffer;  /* convert to String */
+  }
+
+  return mac;
+}
+```
+
+## Download ofexamples
+You can test the example codes using the Arduino IDE or the ESP-IDF IDE or download the codes in our drive:
+
+[ESP32-S3 examples](https://drive.google.com/drive/folders/11FnC9pj8qADzXAlg8xAT0knNWh9bgYV6)
