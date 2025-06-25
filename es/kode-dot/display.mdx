@@ -1,25 +1,25 @@
 ---
 title: "Pantalla"
-description: "La mejor pantalla AMOLED en el mejor dispositivo maker"
+description: "Aprende a programarla y a crear increibles interfaces con LVGL."
 icon: "display"
 ---
 
 # Características
-
-El kode dot integra la mejor pantalla en el mercado para dispositivos maker. Se trata de una pantalla táctil AMOLED de 2.13 pulgadas con las siguientes características:
+El kode dot tiene la **mejor pantalla en un dispositivo maker del mercado.** Se trata de una **pantalla táctil AMOLED de 2.13 pulgadas** con las siguientes características:
 
 | Característica    | Descripción |
 | ----------------  | ----------- |
 | Tamaño            | 2.13 pulgadas | 
 | Resolución        | 410x502 píxeles |
-| Profundidad de colors | 16.7 M colors (24 bits) |
+| Profundidad de color | 16 bits (RGB565) |
 | Driver            | CO5300 - QSPI |
 | Driver táctil     | CST820 - I2C |
 
+La pantalla es totalmente programable con **librerías de Arduino y ESP-IDF ya existentes** y compatible con **LVGL.**
 
 ## Esquema de conexión
 ### Driver de la pantalla
-El driver de la pantalla es el CO5300 y funciona mediante Quad SPI. Está conectado al ESP32-S3 de la siguiente manera:
+El driver de la pantalla es el **CO5300** y funciona usando bus **QuadSPI.** Este driver está conectado al ESP32-S3 de la siguiente manera:
 
 | CO5300       | ESP32-S3 |
 | ------------ | -------- |
@@ -31,20 +31,24 @@ El driver de la pantalla es el CO5300 y funciona mediante Quad SPI. Está conect
 | Data 3       | GPIO10   |
 | Reset        | GPIO8    |
 
+<Note>El bus QuadSPI es de la misma familia que el bus SPI, pero tiene el doble de ancho de banda.</Note>
+
 
 ### Driver del táctil
-El driver del táctil es el CST820 y funciona mediante I2C. Está conectado al ESP32-S3 de la siguiente manera:
+El driver del táctil es el **CST820** y funciona mediante **I2C.** Este driver está conectado al ESP32-S3 de la siguiente manera:
 
 | CST820       | ESP32-S3 |
 | ------------ | -------- |
 | SDA          | GPIO48   |
 | SCL          | GPIO47   |
-| Interrupt    | P17      |
+| Interrupt    | EXP15    |
 | Reset        | GPIO8    |
 
-<Warning>El pin de Interrupt está conectado al pin 17 del expansor de pines. Ve a TBD para más información.</Warning>
-<Warning>El pin de Reset está conectado al mismo pin que el de Reset de la pantalla.</Warning>
+<Tip>El driver del táctil tiene la dirección 0x15 en el bus I2C.</Tip>
 
+<Note>El pin de Interrupt está conectado al EXP15 del expansor de pines. Ve a [Expansor de pines](/es/kode-dot/io-expander) para más información.</Note>
+
+<Warning>Tanto el reset del driver del táctil como el de la pantalla están conectados al mismo pin del ESP32-S3.</Warning>
 
 ## Librerías recomendadas
 ### Arduino
@@ -56,9 +60,11 @@ El driver del táctil es el CST820 y funciona mediante I2C. Está conectado al E
 - [esp_lcd_touch_cst820](https://components.espressif.com/components/kodediy/esp_lcd_touch_cst820)
 
 
-## Códigos de ejemplo
+## Ejemplos de código
 ### Ejemplo básico
-```cpp lvgl_test.ino lines icon="microchip"
+Este es el código más básico para probar la pantalla, únicamente imprime un **¡Hola mundo!** en la pantalla.
+
+```cpp gfx_simple.ino lines icon="microchip"
 #include "Arduino_GFX_Library.h"
 
 /*-------------------------------------------------
@@ -132,7 +138,8 @@ void loop() {
 ```
 
 ### Ejemplo con LVGL
-Este código implementa LVGL 9.3 y te permite probar la pantalla imprimiendo un texto, usando un ejemplo o usando una demo. Por defecto se usa la demo de musica de LVGL.
+Este código implementa **LVGL 9.3** y te permite probar la pantalla **imprimiendo un texto, usando un ejemplo o usando una demo.** Por defecto se usa la **demo de musica de LVGL.**
+
 ```cpp lvgl_test.ino lines icon="microchip"
 /* El uso de LVGL con Arduino requiere algunos pasos adicionales:
  * Asegúrate de leer la documentación aquí: https://docs.lvgl.io/master/integration/framework/arduino.html  */
@@ -489,8 +496,7 @@ void loop() {
 }
 ```
 
-
-## Descarga del código
+## Descarga de ejemplos
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
 [Ejemplos de código de la pantalla](https://drive.google.com/drive/folders/1dw2ThNCUiHljMfDs-s67guQxr_ILJ5BL)
