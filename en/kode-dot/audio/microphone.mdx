@@ -1,9 +1,267 @@
 ---
 title: "Microphone"
-description: "Microphone"
+# description: "Microphone"
 icon: "microphone"
 ---
 
-# Welcome
+# Features
+The kode dot integrates a **digital MEMS microphone.** This type of microphones are very common in modern electronic devices and give a great reliability since **they do not depend on any analog part.**
 
-This is the main entry point for your documentation in English.
+## Connection diagram
+The microphone is connected to the ESP32-S3 as follows:
+
+| Microphone    | ESP32-S3 |
+| ------------ | -------- |
+| SCK          | GPIO38   |
+| WS           | GPIO45   |
+| DIN          | GPIO21   |
+
+## Recommended libraries
+### Arduino
+- [ESP_I2S](https://github.com/espressif/arduino-esp32/blob/master/libraries/ESP_I2S)
+
+### ESP-IDF
+- [ESP-ADF](https://github.com/espressif/esp-adf)
+
+<Warning>The use of ESP-ADF is for advanced users. If you do not have experience in this framework, we recommend using the Arduino library.</Warning>
+
+## Example code
+This code **records 5 seconds of audio** and saves it in the microSD in WAV format.
+
+```cpp record_to_microsd.ino lines icon="microchip"
+#include "FS.h"
+#include "SD_MMC.h"
+
+/* Custom pins for SD_MMC (SD in 1-bit mode) */
+int clk = 6;    /* Clock pin (CLK) */
+int cmd = 5;    /* Command pin (CMD) */
+int d0  = 7;    /* Data0 pin (D0) */
+
+/* Recursive function to list directories */
+void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
+  Serial.printf("Listing directory: %s\n", dirname);
+
+  /* Open the directory */
+  File root = fs.open(dirname);
+  if (!root) {
+    Serial.println("Failed to open directory");
+    return;
+  }
+  if (!root.isDirectory()) {
+    Serial.println("Not a directory");
+    return;
+  }
+
+  /* Iterate through files and subdirectories */
+  File file = root.openNextFile();
+  while (file) {
+    if (file.isDirectory()) {
+      Serial.print("  DIR : ");
+      Serial.println(file.name());
+      /* Recurse into subdirectories if levels > 0 */
+      if (levels) {
+        listDir(fs, file.path(), levels - 1);
+      }
+    } else {
+      /* It's a file: print name and size */
+      Serial.print("  FILE: ");
+      Serial.print(file.name());
+      Serial.print("  SIZE: ");
+      Serial.println(file.size());
+    }
+    file = root.openNextFile();
+  }
+}
+
+/* Function to create a directory */
+void createDir(fs::FS &fs, const char *path) {
+  Serial.printf("Creating Dir: %s\n", path);
+  if (fs.mkdir(path)) {
+    Serial.println("Dir created");
+  } else {
+    Serial.println("mkdir failed");
+  }
+}
+
+/* Function to remove a directory */
+void removeDir(fs::FS &fs, const char *path) {
+  Serial.printf("Removing Dir: %s\n", path);
+  if (fs.rmdir(path)) {
+    Serial.println("Dir removed");
+  } else {
+    Serial.println("rmdir failed");
+  }
+}
+
+/* Function to read and display file contents */
+void readFile(fs::FS &fs, const char *path) {
+  Serial.printf("Reading file: %s\n", path);
+
+  File file = fs.open(path);
+  if (!file) {
+    Serial.println("Failed to open file for reading");
+    return;
+  }
+
+  Serial.print("Read from file: ");
+  /* Read byte by byte and write to Serial */
+  while (file.available()) {
+    Serial.write(file.read());
+  }
+}
+
+/* Function to write a message to a file (overwrite) */
+void writeFile(fs::FS &fs, const char *path, const char *message) {
+  Serial.printf("Writing file: %s\n", path);
+
+  File file = fs.open(path, FILE_WRITE);
+  if (!file) {
+    Serial.println("Failed to open file for writing");
+    return;
+  }
+  /* Write the message and check result */
+  if (file.print(message)) {
+    Serial.println("File written");
+  } else {
+    Serial.println("Write failed");
+  }
+}
+
+/* Function to append a message to a file */
+void appendFile(fs::FS &fs, const char *path, const char *message) {
+  Serial.printf("Appending to file: %s\n", path);
+
+  File file = fs.open(path, FILE_APPEND);
+  if (!file) {
+    Serial.println("Failed to open file for appending");
+    return;
+  }
+  if (file.print(message)) {
+    Serial.println("Message appended");
+  } else {
+    Serial.println("Append failed");
+  }
+}
+
+/* Function to rename a file */
+void renameFile(fs::FS &fs, const char *path1, const char *path2) {
+  Serial.printf("Renaming file %s to %s\n", path1, path2);
+  if (fs.rename(path1, path2)) {
+    Serial.println("File renamed");
+  } else {
+    Serial.println("Rename failed");
+  }
+}
+
+/* Function to delete a file */
+void deleteFile(fs::FS &fs, const char *path) {
+  Serial.printf("Deleting file: %s\n", path);
+  if (fs.remove(path)) {
+    Serial.println("File deleted");
+  } else {
+    Serial.println("Delete failed");
+  }
+}
+
+/* File I/O performance test on a large file */
+void testFileIO(fs::FS &fs, const char *path) {
+  File file = fs.open(path);
+  static uint8_t buf[512];  /* 512-byte buffer */
+  size_t len = 0;
+  uint32_t start = millis();
+  uint32_t elapsed;
+
+  if (file) {
+    /* Get file size */
+    len = file.size();
+    size_t originalLen = len;
+    start = millis();
+    /* Read file in chunks */
+    while (len) {
+      size_t toRead = (len > sizeof(buf)) ? sizeof(buf) : len;
+      file.read(buf, toRead);
+      len -= toRead;
+    }
+    elapsed = millis() - start;
+    Serial.printf("%u bytes read in %lu ms\n", originalLen, elapsed);
+    file.close();
+  } else {
+    Serial.println("Failed to open file for reading");
+  }
+
+  /* Write performance measurement */
+  file = fs.open(path, FILE_WRITE);
+  if (!file) {
+    Serial.println("Failed to open file for writing");
+    return;
+  }
+  start = millis();
+  /* Write 2048 blocks of 512 bytes */
+  for (size_t i = 0; i < 2048; i++) {
+    file.write(buf, sizeof(buf));
+  }
+  elapsed = millis() - start;
+  Serial.printf("%u bytes written in %lu ms\n", 2048 * sizeof(buf), elapsed);
+  file.close();
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  /* Assign custom pins for SD_MMC in 1-bit mode */
+  if (!SD_MMC.setPins(clk, cmd, d0)) {
+    Serial.println("Pin change failed!");
+    return;
+  }
+
+  /* Mount the SD card via SD_MMC */
+  if (!SD_MMC.begin()) {
+    Serial.println("Card Mount Failed");
+    return;
+  }
+
+  /* Check card type */
+  uint8_t cardType = SD_MMC.cardType();
+  if (cardType == CARD_NONE) {
+    Serial.println("No SD_MMC card attached");
+    return;
+  }
+  Serial.print("SD_MMC Card Type: ");
+  if (cardType == CARD_MMC) Serial.println("MMC");
+  else if (cardType == CARD_SD) Serial.println("SDSC");
+  else if (cardType == CARD_SDHC) Serial.println("SDHC");
+  else Serial.println("UNKNOWN");
+
+  /* Print card size in MB */
+  uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
+  Serial.printf("SD_MMC Card Size: %lluMB\n", cardSize);
+
+  /* Examples of file and directory operations */
+  listDir(SD_MMC, "/", 0);
+  createDir(SD_MMC, "/mydir");
+  listDir(SD_MMC, "/", 0);
+  removeDir(SD_MMC, "/mydir");
+  listDir(SD_MMC, "/", 2);
+  writeFile(SD_MMC, "/hello.txt", "Hello ");
+  appendFile(SD_MMC, "/hello.txt", "World!\n");
+  readFile(SD_MMC, "/hello.txt");
+  deleteFile(SD_MMC, "/foo.txt");
+  renameFile(SD_MMC, "/hello.txt", "/foo.txt");
+  readFile(SD_MMC, "/foo.txt");
+  testFileIO(SD_MMC, "/test.txt");
+
+  /* Print total and used space in MB */
+  Serial.printf("Total space: %lluMB\n", SD_MMC.totalBytes() / (1024 * 1024));
+  Serial.printf("Used space: %lluMB\n", SD_MMC.usedBytes() / (1024 * 1024));
+}
+
+void loop() {
+  /* Nothing to do in the main loop */
+  delay(10);
+}
+```
+
+## Download examples
+You can test the example codes using the Arduino IDE or the ESP-IDF IDE or download the codes in our drive:
+
+[Audio examples](https://drive.google.com/drive/folders/1rJPxfOXun4p1ijXyRdREydyOMEUJju0u)

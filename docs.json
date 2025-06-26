@@ -27,109 +27,125 @@
     "languages": [
       {
         "language": "en",
-        "groups": [
+        "dropdowns": [
           {
-            "group": "Introduction",
-            "pages": ["en/introduction", "en/faq"]
-          },
-          {
-            "group": "kode dot",
-            "pages": [
-              "en/kode-dot/quickstart", 
-              "en/kode-dot/esp32s3",
-              "en/kode-dot/io-expander",
-              "en/kode-dot/display", 
-              "en/kode-dot/addresable-led", 
-              "en/kode-dot/buttons", 
-              "en/kode-dot/microsd",
+            "dropdown": "Documentation",
+            "icon": "book",
+            "groups": [
               {
-                "group": "Audio",	
-                "icon": "play",
-                "pages": 
-                [
-                  "en/kode-dot/audio/overview",
-                  "en/kode-dot/audio/microphone", 
-                  "en/kode-dot/audio/speaker"
-                ]	
+                "group": "Introduction",
+                "pages": ["en/introduction", "en/faq"]
               },
-              "en/kode-dot/imu",
-              "en/kode-dot/rtc",
-              "en/kode-dot/power",
-              "en/kode-dot/connectors"
+              {
+                "group": "kode dot",
+                "pages": [
+                  "en/kode-dot/quickstart",
+                  "en/kode-dot/esp32s3",
+                  "en/kode-dot/io-expander",
+                  "en/kode-dot/display",
+                  "en/kode-dot/addresable-led",
+                  "en/kode-dot/buttons",
+                  "en/kode-dot/microsd",
+                  {
+                    "group": "Audio",
+                    "icon": "play",
+                    "pages": [
+                      "en/kode-dot/audio/overview",
+                      "en/kode-dot/audio/microphone",
+                      "en/kode-dot/audio/speaker"
+                    ]
+                  },
+                  "en/kode-dot/imu",
+                  "en/kode-dot/rtc",
+                  "en/kode-dot/power",
+                  "en/kode-dot/connectors"
+                ]
+              },
+              {
+                "group": "kodeOS",
+                "pages": [
+                  "en/kodeOS/hammy",
+                  "en/kodeOS/apps",
+                  "en/kodeOS/firmware"
+                ]
+              },
+              {
+                "group": "External Modules",
+                "pages": [
+                  "en/external-modules/maker",
+                  "en/external-modules/inventor",
+                  "en/external-modules/camera",
+                  "en/external-modules/radio"
+                ]
+              }
             ]
           },
           {
-            "group": "kodeOS",
-            "pages": 
-            [
-              "en/kodeOS/hammy",
-              "en/kodeOS/apps",
-              "en/kodeOS/firmware"	
-            ]
-          },
-          {
-            "group": "External Modules",
-            "pages": 
-            [
-              "en/external-modules/maker", 
-              "en/external-modules/inventor", 
-              "en/external-modules/camera", 
-              "en/external-modules/radio"
-            ]
+            "dropdown": "Changelog",
+            "icon": "clock",
+            "pages": ["en/changelog"]
           }
         ]
       },
       {
         "language": "es",
-        "groups": [
+        "dropdowns": [
           {
-            "group": "Introducción",
-            "pages": ["es/introduction", "es/faq"]
-          },
-          {
-            "group": "kode dot",
-            "pages": [
-              "es/kode-dot/quickstart", 
-              "es/kode-dot/esp32s3",
-              "es/kode-dot/io-expander",
-              "es/kode-dot/display", 
-              "es/kode-dot/addresable-led", 
-              "es/kode-dot/buttons", 
-              "es/kode-dot/microsd",
+            "dropdown": "Documentación",
+            "icon": "book",
+            "groups": [
               {
-                "group": "Audio",	
-                "icon": "play",
-                "pages": 
-                [
-                  "es/kode-dot/audio/overview",
-                  "es/kode-dot/audio/microphone", 
-                  "es/kode-dot/audio/speaker"
-                ]	
+                "group": "Introducción",
+                "pages": ["es/introduction", "es/faq"]
               },
-              "es/kode-dot/imu",
-              "es/kode-dot/rtc",
-              "es/kode-dot/power",
-              "es/kode-dot/connectors"
+              {
+                "group": "kode dot",
+                "pages": [
+                  "es/kode-dot/quickstart",
+                  "es/kode-dot/esp32s3",
+                  "es/kode-dot/io-expander",
+                  "es/kode-dot/display",
+                  "es/kode-dot/addresable-led",
+                  "es/kode-dot/buttons",
+                  "es/kode-dot/microsd",
+                  {
+                    "group": "Audio",
+                    "icon": "play",
+                    "pages": [
+                      "es/kode-dot/audio/overview",
+                      "es/kode-dot/audio/microphone",
+                      "es/kode-dot/audio/speaker"
+                    ]
+                  },
+                  "es/kode-dot/imu",
+                  "es/kode-dot/rtc",
+                  "es/kode-dot/power",
+                  "es/kode-dot/connectors"
+                ]
+              },
+              {
+                "group": "kodeOS",
+                "pages": [
+                  "es/kodeOS/hammy",
+                  "es/kodeOS/apps",
+                  "es/kodeOS/firmware"
+                ]
+              },
+              {
+                "group": "Módulos Externos",
+                "pages": [
+                  "es/external-modules/maker",
+                  "es/external-modules/inventor",
+                  "es/external-modules/camera",
+                  "es/external-modules/radio"
+                ]
+              }
             ]
           },
           {
-            "group": "kodeOS",
-            "pages": 
-            [
-              "es/kodeOS/hammy",
-              "es/kodeOS/apps",
-              "es/kodeOS/firmware"	
-            ]
-          },
-          {
-            "group": "Módulos Externos",
-            "pages": 
-            [
-              "es/external-modules/maker", 
-              "es/external-modules/inventor", 
-              "es/external-modules/camera", 
-              "es/external-modules/radio"
-            ]
+            "dropdown": "Historial de cambios",
+            "icon": "clock",
+            "pages": ["es/changelog"]
           }
         ]
       }

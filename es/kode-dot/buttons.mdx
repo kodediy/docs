@@ -1,29 +1,32 @@
 ---
 title: "Botones"
-description: "Aprende a controlar los botones del kode dot"
+description: "Entiende la distribución de los botones y cómo usarlos en tus proyectos."
 icon: "circle-dot"
 ---
 
 # Características
 
-EL kode dot dispone de un pad direcinal de 4 botones más dos botones independientes. Mediante estos botones se puede navegar por el kodeOS, controlar el estado del ESP32-S3 y apagar/encender el dispositivo.
+Los botones del kode dot se distribuyen entre un **pad direccional de cuatro botones y dos botones independientes.** 
+
+Con estos botones se puede navegar por kodeOS, controlar el estado del ESP32-S3 y apagar o encender el dispositivo.
 
 ## Esquema de conexión
-Todos los botones tienen una resistencia de pull-up y están conectados al expansor de pines I2C, exceptuando el botón de arriba que está conectado directamente al ESP32-S3.
 
-<Info>Ve a [Expansor de pines](/es/kode-dot/io-expander)  para más información.</Info>
+Todos los botones están conectados al **expansor de pines**, exceptuando el **botón de arriba** que está conectado directamente al ESP32-S3. Además, todos tienen conectada una **resistencia de pull-up física.**
 
-
-El botón de arriba está conectado al pin GPIO0, para controlar el BOOT del ESP32-S3. Los demás botones están conectados al expansor de pines de esta manera:
+La conexión de los botones es la siguiente:
 
 | Botón         | Expansor de pines |
 | ------------  | ----------------- |
-| Pad Izquierdo | P7                |
-| Pad Arriba    | P6                |
-| Pad Derecha   | P13               |
-| Pad Abajo     | P10               |
-| Botón Abajo   | P11               |
+| Pad Izquierdo | EXP7              |
+| Pad Arriba    | EXP6              |
+| Pad Derecha   | EXP11             |
+| Pad Abajo     | EXP8              |
+| Botón Arriba  | GPIO0             |
+| Botón Abajo   | EXP9              |
 
+<Note>Ve a [Expansor de pines](/es/kode-dot/io-expander) para conocer cómo funciona el expansor de pines.</Note>
+<Tip>El botón de arriba está conectado al pin GPIO0, para controlar el estado BOOT del ESP32-S3.</Tip>
 
 ## Librerías recomendadas
 ### Arduino
@@ -32,8 +35,8 @@ El botón de arriba está conectado al pin GPIO0, para controlar el BOOT del ESP
 - [button](https://components.espressif.com/components/espressif/button)
 - [esp_io_expander_tca95xx_16bit](https://components.espressif.com/components/espressif/esp_io_expander_tca95xx_16bit)
 
-## Código de ejemplo
-Con este código puedes comprobar el funcionamiento de los botones. Conecta el kode dot al serial monitor y verás qué botón se ha pulsado.
+## Ejemplo de código
+Con este código puedes comprobar el **funcionamiento de los botones.** Conecta el kode dot al **monitor serie** y según qué botón pulses, verás un mensaje en el monitor.
 
 ```cpp buttons_check.ino lines icon="microchip"	
 #include <esp_io_expander.hpp>
@@ -140,7 +143,7 @@ void loop() {
 }
 ```
 
-## Descarga del código
+## Descarga de ejemplos
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
 [Ejemplos usando los botones](https://drive.google.com/drive/folders/1-K3qP_pf7niBGDafzZQtoZ7c4Zyx9w1W)

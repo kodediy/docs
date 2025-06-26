@@ -5,43 +5,35 @@ icon: "volume-high"
 ---
 
 # Características
-
-El kode dot integra un altavoz de 1W conectado a un amplificador. Así, solo te tienes que preocupar de darle sonido a tus proyectos a través del bus I2S.
+El kode dot integra un **altavoz de 1W conectado a un amplificador.** Así, solo te tienes que preocupar de darle sonido a tus proyectos a través del bus I2S y el amplificador se encargará de hacer todo el trabajo.
 
 ## Esquema de conexión
-
-El micrófono está conectado al ESP32-S3 de la siguiente manera:
+El altavoz está conectado al ESP32-S3 de la siguiente manera:
 
 | Micrófono | ESP32-S3 |
 | --------- | -------- |
 | SCK       | GPIO38   |
 | WS        | GPIO45   |
 | DOUT      | GPIO46   |
-| SD        | P3       |
+| SD        | EXP3     |
 
-<Note>
-  El amplificador por defecto está apagado para no gastar energía. Para encenderlo, pon el pin EXP3 del [expansor de pines](/es/kode-dot/io-expander) en HIGH.
-</Note>
+<Note>El amplificador por defecto está apagado para no gastar energía. Para encenderlo, pon el pin EXP3 del [expansor de pines](/es/kode-dot/io-expander) en HIGH.</Note>
 
 ## Librerías recomendadas
 
 ### Arduino
-
 - [ESP_I2S](https://github.com/espressif/arduino-esp32/blob/master/libraries/ESP_I2S)
 - [ESP32_IO_Expander](https://github.com/esp-arduino-libs/ESP32_IO_Expander)
 
 ### ESP-IDF
-
 - [ESP-ADF](https://github.com/espressif/esp-adf)
 - [esp_io_expander_tca95xx_16bit](https://components.espressif.com/components/espressif/esp_io_expander_tca95xx_16bit)
 
-<Warning>
-  El uso de ESP-ADF es para usuarios avanzados. Si no tienes experiencia en este
-  framework, te recomendamos usar la librería de Arduino.
-</Warning>
+<Warning>El uso de ESP-ADF es para usuarios avanzados. Si no tienes experiencia en este framework, te recomendamos usar la librería de Arduino.</Warning>
 
-## Códigos de ejemplo
-Este código reproduce el tono que especifiques en la variable `frequency`.
+## Ejemplo de código
+Este código **reproduce el tono que especifiques en la variable `frequency`.**
+
 ```cpp speaker_tone.ino lines icon="microchip"
 #include <Arduino.h>
 #include <ESP_I2S.h>
@@ -119,7 +111,7 @@ void loop() {
 }
 ```
 
-## Descarga del código
+## Descarga de ejemplos
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
 [Ejemplos de audio](https://drive.google.com/drive/folders/1rJPxfOXun4p1ijXyRdREydyOMEUJju0u)

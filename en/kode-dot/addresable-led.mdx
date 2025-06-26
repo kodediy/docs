@@ -1,9 +1,100 @@
 ---
 title: "Addresable LED"
-description: "Addresable LED"
+description: "Learn how the addresable LED works and give light to your projects."
 icon: "lightbulb"
 ---
 
-# Welcome
+# Features
+The kode dot integrates an **addresable LED** on the top left of the pad, that you can light up with the **color and brightness you want.**
 
-This is the main entry point for your documentation in English.
+It is not a normal RGB LED, but an **addresable RGB LED WS2812B.** This means that inside the LED there is a **small integrated circuit** that can independently handle the color of the RGB LEDs and the brightness of each one.
+
+| Feature           | Description |
+| ----------------  | ----------- |
+| Driver            | WS2812B - 1-Wire |
+| Size              | 2mm x 2mm |
+| Color             | RGB |
+
+## Connection diagram
+The addresable LED works through a single pin connected to the ESP32-S3.
+
+| WS2812B       | ESP32-S3 |
+| ------------  | -------- |
+| Data          | GPIO4   |
+
+<Note> 1-Wire is a communication protocol that allows data communication through a single pin.</Note>
+
+## Recommended libraries
+### Arduino
+- [Adafruit_NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
+- [FastLED](https://github.com/FastLED/FastLED)
+
+### ESP-IDF
+- [led_indicator](https://components.espressif.com/components/espressif/led_indicator)
+- [led_strip](https://components.espressif.com/components/espressif/led_strip)
+
+## Example code
+This code lights up the addresable LED by making a color cycle: first red, then green, and finally blue.
+```cpp rgb_cycle.ino lines icon="microchip"
+#include <Adafruit_NeoPixel.h>
+
+#define NEOPIXEL_PIN   4                 /* GPIO pin where the NeoPixel is connected */
+#define NUMPIXELS      1                 /* Number of NeoPixels connected */
+#define PIXEL_FORMAT   (NEO_GRB + NEO_KHZ800)  /* Color format and data rate */
+
+Adafruit_NeoPixel *pixels;            /* Pointer to the NeoPixel object */
+
+#define DELAYVAL       500               /* Delay in milliseconds between changes */
+
+void setup() {
+  /* Initialize serial communication for debugging */
+  Serial.begin(115200);
+
+  /* Create the NeoPixel object dynamically with the defined parameters */
+  pixels = new Adafruit_NeoPixel(NUMPIXELS, NEOPIXEL_PIN, PIXEL_FORMAT);
+
+  /* Initialize the NeoPixel strip */
+  pixels->begin();
+
+  /* Ensure the LED starts off */
+  pixels->clear();
+  pixels->show();
+}
+
+void loop() {
+  /* Turn on the NeoPixel in red */
+  pixels->setPixelColor(0, pixels->Color(150, 0, 0));
+  pixels->show();          /* Update the LED */
+  delay(DELAYVAL);         /* Keep the color on for a while */
+
+  /* Turn off the NeoPixel */
+  pixels->setPixelColor(0, pixels->Color(0, 0, 0));
+  pixels->show();          /* Update the LED */
+  delay(DELAYVAL);         /* Wait before turning on again */
+
+  /* Turn on the NeoPixel in green */
+  pixels->setPixelColor(0, pixels->Color(0, 150, 0));
+  pixels->show();          /* Update the LED */
+  delay(DELAYVAL);         /* Keep the color on for a while */
+
+  /* Turn off the NeoPixel */
+  pixels->setPixelColor(0, pixels->Color(0, 0, 0));
+  pixels->show();          /* Update the LED */
+  delay(DELAYVAL);         /* Wait before turning on again */
+
+  /* Turn on the NeoPixel in blue */
+  pixels->setPixelColor(0, pixels->Color(0, 0, 150));
+  pixels->show();          /* Update the LED */
+  delay(DELAYVAL);         /* Keep the color on for a while */
+
+  /* Turn off the NeoPixel */
+  pixels->setPixelColor(0, pixels->Color(0, 0, 0));
+  pixels->show();          /* Update the LED */
+  delay(DELAYVAL);         /* Wait before turning on again */
+}
+```
+
+## Download examples    
+You can test the example codes using the Arduino IDE or the ESP-IDF IDE or download the codes in our drive:
+
+[Addresable LED examples](https://drive.google.com/drive/folders/1f7pmw24Q7ikkvg6vVaRGUN63GGYj1NbC)

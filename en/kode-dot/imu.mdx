@@ -1,9 +1,269 @@
 ---
 title: "IMU"
-description: "IMU"
+description: "Learn what an IMU is for and how to use it in your kode dot"
 icon: "compass"
 ---
 
-# Welcome
+# Features
+The kode dot integrates a **3-axis gyroscope, 3-axis accelerometer and 3-axis magnetometer.** Thus, you can know the relative position to itself and its absolute position relative to the Earth.
 
-This is the main entry point for your documentation in English.
+The gyroscope and accelerometer are in the **same integrated** and have the following characteristics:
+| Feature                        | Description                                                                                                              |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Accelerometer + gyroscope “always-on” | Total consumption of **0,55 mA** in high-performance mode for continuous operation.                                        |
+| Ranges                      | Accelerometer **±2/4/8/16 g**  •  Gyroscope **±125/250/500/1000/2000 dps**.                                              |
+| Smart FIFO                      | Data buffer of up to **9 KB** with compression and dynamic batching.                                                     |
+| Embedded AI motor                  | **16 FSMs** programmable + **MLC** (up to 8 flows / 256 nodes).                             |
+| Event recognition             | Pedometer, step counter, significant motion, inclination, free-fall, wake-up, 6D/4D orientation, click and double click. |
+| Temperature sensor                 | Internal thermometer to monitor the chip temperature.                                                             |
+
+The magnetometer has the following characteristics:
+
+| Feature                        | Detail                                                    |
+| ------------------------------------- | ---------------------------------------------------------- |
+| Dynamic range                        | **±50 gauss** (three axes)                                      |
+| Output resolution                  | **16 bits**                                                    |
+| Typical consumption                        | 200 µA @ 20 Hz (high-resolution mode) / 50 µA (low-power)  |
+
+
+## Connection diagram
+### 6-axis IMU
+The IMU is connected to the ESP32-S3 through the I2C bus using these connections:
+
+| IMU     | ESP32-S3 |
+| ------------ | -------- |
+| SDA          | GPIO48   |
+| SCL          | GPIO47   |
+| INT1         | EXP13    |
+| INT2         | EXP12    |
+
+<Tip>The IMU has the address 0x6A on the I2C bus.</Tip>
+<Note>The interrupt pins are connected to the [IO expander](/en/kode-dot/io-expander).</Note>
+
+### 3-axis magnetometer
+The magnetometer is connected in the same way to the I2C bus using these connections:
+| Magnetometer     | ESP32-S3 |
+| ------------ | -------- |
+| SDA          | GPIO48   |
+| SCL          | GPIO47   |
+| INT1         | EXP0     |
+
+<Tip>The magnetometer has the address 0x1E on the I2C bus.</Tip>
+<Note>The interrupt pin is connected to the [IO expander](/en/kode-dot/io-expander).</Note>
+
+## Recommended libraries
+### Arduino
+- [Adafruit LSM6DS](https://github.com/adafruit/Adafruit_LSM6DS)
+- [Adafruit LIS2MDL](https://github.com/adafruit/Adafruit_LIS2MDL)
+
+### ESP-IDF
+- [kode_lsm6dsox](https://components.espressif.com/components/kodediy/kode_lsm6dsox)
+- [kode_lis2mdl](TBD)
+
+## Example code
+### 6-axis IMU
+This code shows the measurement range of the sensors and the sampling frequency. It also shows the temperature, acceleration and angular velocity.
+
+```cpp imu_test.ino lines icon="microchip"
+#include <Adafruit_LSM6DSOX.h>  /* Library for the LSM6DSOX sensor */
+#include <Wire.h>               /* I2C communication library */
+
+/* Configurable I2C pins */
+#define I2C_SDA 48            /* SDA pin on ESP32-S3 */
+#define I2C_SCL 47            /* SCL pin on ESP32-S3 */
+#define I2C_FREQ 400000L      /* I2C bus frequency (400 kHz) */
+
+/* IMU sensor instance and I2C bus object */
+Adafruit_LSM6DSOX imu;
+TwoWire I2CBus = TwoWire(0);
+
+void setup(void) {
+  /* Initialize serial port for debugging */
+  Serial.begin(115200);
+  while (!Serial);
+
+  /* Initialize I2C bus with specified pins and frequency */
+  I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+
+  Serial.println("LSM6DSOX test");
+
+  /* Attempt to initialize the sensor at I2C address 0x6A */
+  if (!imu.begin_I2C(0x6A, &I2CBus)) {
+    Serial.println("Failed to find LSM6DSOX chip");
+    while (1) {
+      delay(10);  /* Infinite loop if initialization fails */
+    }
+  }
+  Serial.println("LSM6DSOX Found!");
+
+  /* Display configured accelerometer range */
+  Serial.print("Accelerometer range set to: ");
+  switch (imu.getAccelRange()) {
+    case LSM6DS_ACCEL_RANGE_2_G:
+      Serial.println("+-2G"); break;
+    case LSM6DS_ACCEL_RANGE_4_G:
+      Serial.println("+-4G"); break;
+    case LSM6DS_ACCEL_RANGE_8_G:
+      Serial.println("+-8G"); break;
+    case LSM6DS_ACCEL_RANGE_16_G:
+      Serial.println("+-16G"); break;
+  }
+
+  /* Display configured gyroscope range */
+  Serial.print("Gyro range set to: ");
+  switch (imu.getGyroRange()) {
+    case LSM6DS_GYRO_RANGE_125_DPS:
+      Serial.println("125 degrees/s"); break;
+    case LSM6DS_GYRO_RANGE_250_DPS:
+      Serial.println("250 degrees/s"); break;
+    case LSM6DS_GYRO_RANGE_500_DPS:
+      Serial.println("500 degrees/s"); break;
+    case LSM6DS_GYRO_RANGE_1000_DPS:
+      Serial.println("1000 degrees/s"); break;
+    case LSM6DS_GYRO_RANGE_2000_DPS:
+      Serial.println("2000 degrees/s"); break;
+    case ISM330DHCX_GYRO_RANGE_4000_DPS:
+      /* Unsupported range for the DSOX */
+      break;
+  }
+
+  /* Display accelerometer data rate */
+  Serial.print("Accelerometer data rate set to: ");
+  switch (imu.getAccelDataRate()) {
+    case LSM6DS_RATE_SHUTDOWN:    Serial.println("0 Hz"); break;
+    case LSM6DS_RATE_12_5_HZ:     Serial.println("12.5 Hz"); break;
+    case LSM6DS_RATE_26_HZ:       Serial.println("26 Hz"); break;
+    case LSM6DS_RATE_52_HZ:       Serial.println("52 Hz"); break;
+    case LSM6DS_RATE_104_HZ:      Serial.println("104 Hz"); break;
+    case LSM6DS_RATE_208_HZ:      Serial.println("208 Hz"); break;
+    case LSM6DS_RATE_416_HZ:      Serial.println("416 Hz"); break;
+    case LSM6DS_RATE_833_HZ:      Serial.println("833 Hz"); break;
+    case LSM6DS_RATE_1_66K_HZ:    Serial.println("1.66 KHz"); break;
+    case LSM6DS_RATE_3_33K_HZ:    Serial.println("3.33 KHz"); break;
+    case LSM6DS_RATE_6_66K_HZ:    Serial.println("6.66 KHz"); break;
+  }
+
+  /* Display gyroscope data rate */
+  Serial.print("Gyro data rate set to: ");
+  switch (imu.getGyroDataRate()) {
+    case LSM6DS_RATE_SHUTDOWN:    Serial.println("0 Hz"); break;
+    case LSM6DS_RATE_12_5_HZ:     Serial.println("12.5 Hz"); break;
+    case LSM6DS_RATE_26_HZ:       Serial.println("26 Hz"); break;
+    case LSM6DS_RATE_52_HZ:       Serial.println("52 Hz"); break;
+    case LSM6DS_RATE_104_HZ:      Serial.println("104 Hz"); break;
+    case LSM6DS_RATE_208_HZ:      Serial.println("208 Hz"); break;
+    case LSM6DS_RATE_416_HZ:      Serial.println("416 Hz"); break;
+    case LSM6DS_RATE_833_HZ:      Serial.println("833 Hz"); break;
+    case LSM6DS_RATE_1_66K_HZ:    Serial.println("1.66 KHz"); break;
+    case LSM6DS_RATE_3_33K_HZ:    Serial.println("3.33 KHz"); break;
+    case LSM6DS_RATE_6_66K_HZ:    Serial.println("6.66 KHz"); break;
+  }
+}
+
+void loop() {
+  /* Variables to hold sensor events */
+  sensors_event_t accel;
+  sensors_event_t gyro;
+  sensors_event_t temp;
+
+  /* Get accelerometer, gyroscope, and temperature events */
+  imu.getEvent(&accel, &gyro, &temp);
+
+  /* Print temperature in degrees Celsius */
+  Serial.print("\t\tTemperature: ");
+  Serial.print(temp.temperature);
+  Serial.println(" deg C");
+
+  /* Print acceleration in m/s^2 for each axis */
+  Serial.print("\t\tAccel X: ");
+  Serial.print(accel.acceleration.x);
+  Serial.print(" \tY: ");
+  Serial.print(accel.acceleration.y);
+  Serial.print(" \tZ: ");
+  Serial.print(accel.acceleration.z);
+  Serial.println(" m/s^2");
+
+  /* Print gyroscope rotation in rad/s for each axis */
+  Serial.print("\t\tGyro X: ");
+  Serial.print(gyro.gyro.x);
+  Serial.print(" \tY: ");
+  Serial.print(gyro.gyro.y);
+  Serial.print(" \tZ: ");
+  Serial.print(gyro.gyro.z);
+  Serial.println(" radians/s");
+
+  Serial.println();
+  delay(100);  /* Small delay between readings */
+}
+```
+
+### 3-axis magnetometer
+This code turns the kode dot into a compass, showing where the north is.
+	
+```cpp mag_test.ino lines icon="microchip"
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_LIS2MDL.h>
+
+/* Configurable I2C pins and frequency */
+#define I2C_SDA 48            /* SDA pin on ESP32-S3 */
+#define I2C_SCL 47            /* SCL pin on ESP32-S3 */
+#define I2C_FREQ 400000L      /* I2C bus frequency (400 kHz) */
+
+/* Magnetometer instance with unique ID */
+Adafruit_LIS2MDL mag = Adafruit_LIS2MDL(12345);
+/* I2C bus object (port 0) */
+TwoWire I2CBus = TwoWire(0);
+
+void setup(void) {
+  /* Initialize serial port for debug output */
+  Serial.begin(115200);
+  while (!Serial) {
+    /* wait for serial */
+  }
+
+  /* Initialize I2C bus with selected SDA, SCL pins and frequency */
+  I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+
+  Serial.println("Magnetometer Test");
+  Serial.println();
+
+  /* Attempt to initialize the LIS2MDL sensor at I2C address 0x1E */
+  if (!mag.begin(0x1E, &I2CBus)) {
+    /* Sensor not detected: print error and halt */
+    Serial.println("Ooops, no LIS2MDL detected ... Check your wiring!");
+    while (1) {
+      delay(10);  /* infinite loop on failure */
+    }
+  }
+}
+
+void loop(void) {
+  /* Create a sensor event to hold magnetometer data */
+  sensors_event_t event;
+  /* Retrieve the latest magnetic field data */
+  mag.getEvent(&event);
+
+  /* Constant for converting radians to degrees */
+  const float Pi = 3.14159;
+
+  /* Calculate heading angle from Y and X magnetic components */
+  float heading = atan2(event.magnetic.y, event.magnetic.x) * 180 / Pi;
+
+  /* Normalize heading to range 0-360 degrees */
+  if (heading < 0) {
+    heading += 360;  /* adjust negative angles */
+  }
+
+  /* Print the compass heading */
+  Serial.print("Compass Heading: ");
+  Serial.println(heading);
+
+  /* Delay before next reading */
+  delay(500);
+}
+```
+## Download examples
+You can test the example codes using the Arduino IDE or the ESP-IDF IDE or download the codes in our drive:
+
+[IMU and magnetometer examples](https://drive.google.com/drive/folders/1eAutUqjqenHA7lNoFHxKpBUXdwUa-6ZS)

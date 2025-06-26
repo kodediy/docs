@@ -1,16 +1,13 @@
 ---
 title: "Alimentación"
-description: "En electrónica, la arquitectura de alimentación de un dispositivo es la parte más importante, ya que sobre ella se basa el funcionamiento de los componentes."
+description: "El sistema de alimentación en electrónica es la parte más importante porque de ella dependen los componentes."
 icon: "power-off"
 ---
 
-<Warning>
-Lee detenidamente esta sección para no dañar el kode dot.
-</Warning>
+<Warning>Lee detenidamente esta sección para no dañar el kode dot.</Warning>
 
 ## Características
-
-El kode dot integra un sistema de alimentación complejo y sofisticado, pero a la vez robusto, modular y fácil de usar. El kode dot se puede alimentar de tres maneras: de la batería de 500mAh, del USB-C o de los conectores externos.
+El kode dot integra un **sistema de alimentación complejo y sofisticado, pero a la vez robusto, modular y fácil de usar.** Se puede alimentar de tres maneras: de la batería de 500mAh, del USB-C o a través de los conectores externos.
 
 El sistema está formado por estos componentes:
 
@@ -21,15 +18,16 @@ El sistema está formado por estos componentes:
 - Regulador para el RTC interno del ESP32-S3
 
 ### Power Management Integrated Circuit (PMIC)
-La parte centrar del sistema de alimentación es un PMIC (Power Management Integrated Circuit) que se encarga de gestionar de dónde se obtiene la energía, si de la batería, del USB-C o de los conectores externos.
+La **parte central del sistema de alimentación es un PMIC** que se encarga de gestionar de dónde se obtiene la energía, **si de la batería, del USB-C o de los conectores externos.**
 
-Además, el PMIC se encarga la seguridad y la protección de los componentes, como por ejemplo la protección contra sobrecargas, cortocircuitos, sobrecorrientes y nos permite obtener datos de la batería o de la alimentación.
+Además, el PMIC se encarga de **la seguridad y la protección de los componentes**, asegurando la protección contra sobrecargas, cortocircuitos o sobrecorrientes. Además,nos permite **obtener datos de la batería y de la alimentación.**
 
-También permite generar desde la batería un bus de 5V y hasta 2A de corriente que se puede usar para alimentar periféricos externos.
+También permite **generar desde la batería un bus de 5V y hasta 2A de corriente** que se puede usar para alimentar periféricos externos a través de los conectores externos.
 
 ### Fuel Gauge
-El fuel gauge es un componente que se encarga de medir varios datos de la batería y darnos un análisis y estado de su estado. Así podemos conocer los siguientes datos de la batería:
+El fuel gauge es un componente que **se encarga de medir varios datos de la batería y darnos un análisis de su estado.**
 
+Así podemos conocer los siguientes datos de la batería: 
 - Capacidad restante
 - Estado de carga
 - Tiempo restante de uso
@@ -38,10 +36,10 @@ El fuel gauge es un componente que se encarga de medir varios datos de la bater�
 - Salud
 - Corriente de salida o entrada
 
-Además, nos avisa ante posibles problemas como sobrecargas, cortocircuitos, sobrecorrientes, etc.
+Además, **nos avisa ante posibles problemas como sobrecargas, cortocircuitos, sobrecorrientes, etc.**
 
 ### Regulador de 3V3 para los integrados internos
-Este es el principal regulador de tensión del kode dot y soporta hasta 1A de corriente. Se encarga de estabilizar la tensión a 3V3 y alimenta estos integrados:
+Este es el **principal regulador de tensión del kode dot** y soporta hasta **1A de corriente.** Se encarga de estabilizar la tensión a 3V3 y alimenta estos integrados:
 
 - ESP32-S3
 - Expansor de pines
@@ -51,25 +49,24 @@ Este es el principal regulador de tensión del kode dot y soporta hasta 1A de co
 - IMU de 6 ejes
 - Magnetómetro de 3 ejes
 
-Así, cuando el kode dot entre en estado de suspensión, este regulador se encarga de mantener la tensión en el ESP32-S3 y a los integrados internos.
+Así, cuando el kode dot entre en **estado de suspensión**, este regulador se encarga de **mantener la tensión en el ESP32-S3 y a los integrados internos.**
 
 ### Regulador de 3V3 para los periféricos
-Este regulador, que soporta hasta 2A de corriente, se puede activar o desactivar para darle alimentación a los siguientes periféricos del kode dot:
+Este regulador, que soporta hasta **2A de corriente**, se puede **activar o desactivar** para darle alimentación a los siguientes periféricos del kode dot:
 
 - Pantalla
 - microSD
 - Bus 3V3 del conector superior
 
-Cuando el kode dot está en modo suspensión, este regulador se desactiva y se desconecta la alimentación de los periféricos.
+Cuando el kode dot está en **modo suspensión**, este regulador se desactiva y desconecta la alimentación de los periféricos.
 
 ### Regulador para el RTC interno del ESP32-S3
-Este regulador se encarga de darle alimentación al RTC interno del ESP32-S3.
+Este regulador se encarga de darle **alimentación al RTC interno del ESP32-S3.**
 
 
 ## Esquema de conexión
 ### Power Management Integrated Circuit (PMIC)
-El PMIC está conectado al bus I2C, usando la dirección 0x6B, y está conectado de la siguiente manera:
-
+El PMIC está conectado al bus I2C usando estas conexiones:
 
 | PMIC       | ESP32-S3 |
 | ---------- | -------- |
@@ -77,17 +74,17 @@ El PMIC está conectado al bus I2C, usando la dirección 0x6B, y está conectado
 | SCL        | GPIO47   |
 | INT        | EXP10    |
 
-El bus de 5V y 2A está conectado al conector superior y al trasero del kode dot. Si el USB-C está conectado, la potencia del bus de 5V proviene de este. Si no está conectado, la potencia del bus de 5V 
-proviene de la batería.
+<Tip>El PMIC tiene la dirección 0x6B en el bus I2C.</Tip>
+<Note>El pin de interrupción está conectado al [expansor de pines](/es/kode-dot/io-expander).</Note>
 
-Además se puede conectar por uno de los conectores externos una fuente externa de alimentación de 5V para cargar el kode dot.
+El **bus de 5V y 2A que genera el PMIC está conectado al conector superior y al trasero del kode dot.** Si el USB-C está conectado, la potencia del bus de 5V proviene de este. Si no está conectado, la potencia del bus de 5V proviene de la batería. 
 
-<Warning>
-**No conectes una fuente de 5V a la vez que está conectado el USB-C.**
-</Warning>
+Además, se puede conectar por uno de los conectores externos una **fuente externa de alimentación de 5V** para cargar el kode dot.
+
+<Warning>**No conectes una fuente externa de 5V a la vez que está conectado el USB-C.**</Warning>
 
 ### Fuel Gauge
-El fuel gauge está conectado al bus I2C, usando la dirección 0x75, y está conectado de la siguiente manera:
+El fuel gauge está conectado al bus I2C usando estas conexiones:
 
 | Fuel Gauge | ESP32-S3 |
 | ---------- | -------- |
@@ -95,13 +92,17 @@ El fuel gauge está conectado al bus I2C, usando la dirección 0x75, y está con
 | SCL        | GPIO47   |
 | GPOUT      | EXP5     |
 
+<Tip>El fuel gauge tiene la dirección 0x55 en el bus I2C.</Tip>
+<Note>El pin de GPOUT está conectado al [expansor de pines](/es/kode-dot/io-expander).</Note>
+
 ### Regulador de 3V3 para los periféricos
-El regulador de 3V3 se puede activar o desactivar para darle alimentación a los siguientes periféricos del kode dot. Por defecto está activado, para desactivarlo pon el siguiente pin en LOW:
+Este regulador se puede **activar o desactivar** para darle alimentación a los periféricos del kode dot. Por **defecto está activado, para desactivarlo pon el siguiente pin en LOW:**
 
 | Regulador 3V3 | ESP32-S3 |
 | ------------- | -------- |
 | EN            | EXP4     |
 
+<Note>El pin EN está conectado al [expansor de pines](/es/kode-dot/io-expander).</Note>
 
 ## Librerías recomendadas
 ### Arduino
@@ -118,8 +119,7 @@ El regulador de 3V3 se puede activar o desactivar para darle alimentación a los
 #### Fuel Gauge
 - TBD
 
-## Códigos de ejemplo
-
+## Ejemplo de código
 #### Power Management Integrated Circuit (PMIC)
 Con este código puedes ver los parámetros que devuelven el PMIC de la batería y la alimentación.
 ```cpp pmic_test.ino lines icon="microchip"
@@ -226,7 +226,7 @@ void loop() {
 }
 ```
 
-## Descarga del código
+## Descarga de ejemplos
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
 [Códigos de la alimentación](https://drive.google.com/drive/folders/1I5WI-snWixP8urmTfhuuEfvBaxEJhqmo)

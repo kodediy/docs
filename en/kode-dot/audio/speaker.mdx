@@ -1,9 +1,116 @@
 ---
 title: "Speaker"
-description: "Speaker"
+# description: "Speaker"
 icon: "volume-high"
 ---
 
-# Welcome
+# Features
+The kode dot integrates a **1W speaker connected to an amplifier.** Thus, you only have to worry about giving sound to your projects through the I2S bus and the amplifier will take care of doing all the work.
 
-This is the main entry point for your documentation in English.
+## Connection diagram
+The speaker is connected to the ESP32-S3 as follows:
+
+| Speaker | ESP32-S3 |
+| --------- | -------- |
+| SCK       | GPIO38   |
+| WS        | GPIO45   |
+| DOUT      | GPIO46   |
+| SD        | EXP3     |
+
+<Note>The amplifier is off by default to not waste energy. To turn it on, set the EXP3 pin of the [IO expander](/en/kode-dot/io-expander) to HIGH.</Note>
+
+## Recommended libraries
+### Arduino
+- [ESP_I2S](https://github.com/espressif/arduino-esp32/blob/master/libraries/ESP_I2S)
+- [ESP32_IO_Expander](https://github.com/esp-arduino-libs/ESP32_IO_Expander)
+
+### ESP-IDF
+- [ESP-ADF](https://github.com/espressif/esp-adf)
+- [esp_io_expander_tca95xx_16bit](https://components.espressif.com/components/espressif/esp_io_expander_tca95xx_16bit)
+
+<Warning>The use of ESP-ADF is for advanced users. If you do not have experience in this framework, we recommend using the Arduino library.</Warning>
+
+## Example code
+This code **reproduces the tone specified in the `frequency` variable.**
+
+```cpp speaker_tone.ino lines icon="microchip"
+#include <Arduino.h>
+#include <ESP_I2S.h>
+#include <esp_io_expander.hpp>
+
+/* Expander pin configuration */
+#define CHIP_NAME       TCA95XX_16BIT
+#define I2C_SCL_PIN     (47)
+#define I2C_SDA_PIN     (48)
+#define EXP_INT_PIN     (18)
+#define I2C_ADDR        (0x20)
+
+/* I2S interface pins */
+const uint8_t I2S_SCK   = 38;  // Serial clock (SCK)
+const uint8_t I2S_WS    = 45;  // Word Select / LRCLK
+const uint8_t I2S_DOUT  = 46;  // Data output (SD)
+
+/* Audio signal parameters */
+const int frequency   = 440;    // Square wave frequency in Hz
+const int amplitude   = 500;    // Square wave amplitude
+const int sampleRate  = 16000;  // Sample rate in Hz
+
+/* I2S data format and mode */
+i2s_data_bit_width_t bps = I2S_DATA_BIT_WIDTH_32BIT;  // Bits per sample
+i2s_mode_t mode           = I2S_MODE_STD;            // Standard mode
+i2s_slot_mode_t slot      = I2S_SLOT_MODE_MONO;       // Mono channel
+
+/* Calculate half wavelength for square wave */
+const int halfWavelength = (sampleRate / frequency);
+
+/* Signal generation state variables */
+int32_t sample = amplitude;  // Current sample value
+int count = 0;               // Sample counter
+
+/* Global instances */
+I2SClass i2s;                // I2S interface object
+esp_expander::Base *expander = nullptr;  // Expander instance pointer
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Simple I2S tone");
+
+  /* Configure I2S pins (no MCLK: pass -1) */
+  i2s.setPins(I2S_SCK, I2S_WS, I2S_DOUT, -1);
+
+  /* Initialize I2S with specified parameters */
+  if (!i2s.begin(mode, sampleRate, bps, slot, I2S_STD_SLOT_LEFT)) {
+    Serial.println("Failed to initialize I2S!");
+    while (1);  // Halt on failure
+  }
+  Serial.println("I2S bus initialized.");
+
+  /* Initialize the I/O expander */
+  expander = new esp_expander::TCA95XX_16BIT(I2C_SCL_PIN, I2C_SDA_PIN, I2C_ADDR);
+  expander->init();
+  expander->begin();
+
+  /* Set expander pin 3 as output to enable the amplifier */
+  expander->pinMode(3, OUTPUT);
+  expander->digitalWrite(3, HIGH); /* Enable amplifier */
+}
+
+void loop() {
+  /* Toggle sample sign every half wavelength to create square wave */
+  if (count % halfWavelength == 0) {
+    sample = -sample;
+  }
+
+  /* Write the sample to both right and left channels (mono) */
+  i2s.write(sample); // Right channel
+  i2s.write(sample); // Left channel
+
+  /* Increment sample counter */
+  count++;
+}
+```
+
+## Download examples
+You can test the example codes using the Arduino IDE or the ESP-IDF IDE or download the codes in our drive:
+
+[Audio examples](https://drive.google.com/drive/folders/1rJPxfOXun4p1ijXyRdREydyOMEUJju0u)

@@ -1,9 +1,128 @@
 ---
 title: "Inventor"
-description: "Inventor Module"
+description: "Connect motors DC, a servo motor and sensors to create your own robot."
 icon: "robot"
 ---
 
-# Welcome
+**Module:** Basic <Icon icon="seedling" iconType="solid" />
 
-This is the main entry point for your documentation in English.
+# Features
+With this module you can connect **motors to your kode dot and make robots like a car following lines.** 
+
+You can connect the following:
+
+- 2x DC motors or 1x stepper motor
+- 1x servo motor
+- 4x GPIOs for sensors
+- 1x I2C bus
+
+It is not necessary to use an external power supply because **everything is powered from the kode dot.**
+
+The **DC motors have to be 5V and are limited by hardware to a current of 700mA per motor.** So, as the kode dot can supply up to 2A, there are **600mA left to connect a servo motor.**
+
+The **DC motors are controlled by PWM** and you can measure the current that each motor is consuming to have an estimation of its torque.
+
+<Frame>
+  <img width="400" src="/images/external-modules/inventor.png" />
+</Frame>
+
+## Connection scheme
+The driver that controls the motors is connected as follows:
+
+| Driver  | ESP32-S3 |
+| ------- | -------- |
+| AIN1    | GPIO42   |
+| AIN2    | GPIO41   |
+| BIN1    | GPIO40   |
+| BIN2    | GPIO39   |
+| nFAULT  | GPIO38   |
+| AIPROPI | GPIO37   |
+| BIPROPI | GPIO36   |
+
+<Tip> AIPROPI and BIPROPI are used to measure the current that each motor is consuming. For more information, consult the driver's datasheet.</Tip>
+
+## Example code
+Connect **two DC motors to the connectors** and with this code you will see how they first accelerate, then maintain the maximum speed and finally decelerate.
+```cpp motors_test.ino lines icon="microchip"
+/* Definition of pins for controlling two motors (A and B) using a fast-decay H-bridge:
+ * PIN_xIN1 controls the PWM signal (speed), PIN_xIN2 stays LOW for fast-decay mode (quick brake)
+ */
+const int PIN_AIN1 = 42;  /* PWM for motor A, forward direction */
+const int PIN_AIN2 = 41;  /* Fast-decay for motor A */
+const int PIN_BIN1 = 40;  /* PWM for motor B, forward direction */
+const int PIN_BIN2 = 39;  /* Fast-decay for motor B */
+
+/* Configuration of the ESP32 LEDC (PWM) module:
+ * - PWM frequency in Hz
+ * - PWM resolution in bits (0–2^8-1)
+ * - Two independent channels (one per motor)
+ */
+const int PWM_FREQ     = 5000;
+const int PWM_RES_BITS = 8;
+const int CHANNEL_A    = 0;
+const int CHANNEL_B    = 1;
+
+/* Timing for ramping and holding speed, in milliseconds */
+const uint16_t RAMP_TIME = 3000; /* Total duration to ramp from 0 to max (or vice versa) */
+const uint16_t HOLD_TIME = 2000; /* Time to hold max speed */
+
+void setup() {
+  /* Set fast-decay pins as outputs and drive them LOW:
+   * Ensures that when PWM is off, the motor brakes quickly by shorting coils
+   */
+  pinMode(PIN_AIN2, OUTPUT);
+  pinMode(PIN_BIN2, OUTPUT);
+  digitalWrite(PIN_AIN2, LOW);
+  digitalWrite(PIN_BIN2, LOW);
+
+  /* Initialize LEDC channels with desired frequency and resolution */
+  ledcSetup(CHANNEL_A, PWM_FREQ, PWM_RES_BITS);
+  ledcSetup(CHANNEL_B, PWM_FREQ, PWM_RES_BITS);
+
+  /* Attach each LEDC channel to its corresponding PWM pin */
+  ledcAttachPin(PIN_AIN1, CHANNEL_A);
+  ledcAttachPin(PIN_BIN1, CHANNEL_B);
+}
+
+void loop() {
+  /* =========================================================================
+   * 1) Acceleration ramp: increase PWM output from 0 to 255 linearly
+   *    Delay between steps = RAMP_TIME / 255 → controls total ramp duration
+   * ========================================================================= */
+  for (int v = 0; v <= 255; v++) {
+    ledcWrite(CHANNEL_A, v);  /* Write PWM value to motor A */
+    ledcWrite(CHANNEL_B, v);  /* Write PWM value to motor B */
+    delay(RAMP_TIME / 255);   /* Pause to smooth speed change */
+  }
+
+  /* =========================================================================
+   * 2) Hold maximum speed for HOLD_TIME
+   * ========================================================================= */
+  ledcWrite(CHANNEL_A, 255);
+  ledcWrite(CHANNEL_B, 255);
+  delay(HOLD_TIME);
+
+  /* =========================================================================
+   * 3) Deceleration ramp: decrease PWM output from 255 to 0
+   *    Same as acceleration but in reverse
+   * ========================================================================= */
+  for (int v = 255; v >= 0; v--) {
+    ledcWrite(CHANNEL_A, v);
+    ledcWrite(CHANNEL_B, v);
+    delay(RAMP_TIME / 255);
+  }
+
+  /* =========================================================================
+   * 4) Ensure stop: set PWM to 0 and remain in fast-decay
+   * ========================================================================= */
+  ledcWrite(CHANNEL_A, 0);
+  ledcWrite(CHANNEL_B, 0);
+
+  /* Loop repeats indefinitely, creating cycles of acceleration and braking */
+}
+```
+
+## Download examples
+You can test the example codes using the Arduino IDE or the ESP-IDF IDE or download the codes in our drive:
+
+[Example codes of the Inventor module](https://drive.google.com/drive/folders/1wom3hU-bjWmbpT9DnZFzFtpL3cr-7Qzg)

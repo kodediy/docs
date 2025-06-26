@@ -1,9 +1,232 @@
 ---
 title: "Power"
-description: "Power"
+description: "The power system in electronics is the most important part because of the components that depend on it."
 icon: "power-off"
 ---
 
-# Welcome
+<Warning>Read this section carefully to avoid damaging the kode dot.</Warning>
 
-This is the main entry point for your documentation in English.
+## Features
+The kode dot integrates a **complex and sophisticated power system, but at the same time robust, modular and easy to use.** It can be powered in three ways: from the 500mAh battery, from the USB-C or through the external connectors.
+
+The system is formed by these components:
+
+- Power Management Integrated Circuit (PMIC)
+- Fuel Gauge
+- 3V3 regulator for internal components
+- 3V3 regulator for peripherals
+- 3V3 regulator for the internal RTC of the ESP32-S3
+
+### Power Management Integrated Circuit (PMIC)
+The **central part of the power system is a PMIC** that is responsible for managing where the energy comes from, **whether from the battery, the USB-C or the external connectors.**
+
+In addition, the PMIC is responsible for **the security and protection of the components**, ensuring protection against overcurrents, short circuits or overcurrents. In addition, it allows **to obtain data from the battery and the power supply.**
+
+It also allows **to generate a 5V bus and up to 2A of current** that can be used to power external peripherals through the external connectors.
+
+### Fuel Gauge
+The fuel gauge is a component that **is responsible for measuring several battery data and giving us an analysis of its state.**
+
+So we can know the following data from the battery: 
+- Remaining capacity
+- Charge state
+- Remaining usage time
+- Battery voltage
+- Battery temperature
+- Health
+- Output or input current
+
+In addition, **it warns us about possible problems such as overcurrents, short circuits, overcurrents, etc.**
+
+### 3V3 regulator for internal components
+This is the **main voltage regulator of the kode dot** and supports up to **1A of current.** It is responsible for stabilizing the voltage to 3V3 and powering these components:
+
+- ESP32-S3
+- IO expander
+- RTC
+- Audio amplifier
+- Microphone
+- 6-axis IMU
+- 3-axis magnetometer
+
+So, when the kode dot enters **suspend mode**, this regulator is responsible for **maintaining the voltage on the ESP32-S3 and the internal components.**
+
+### 3V3 regulator for peripherals
+This regulator, which supports up to **2A of current**, can be **activated or deactivated** to power the following peripherals of the kode dot:
+
+- Screen
+- microSD
+- 3V3 bus of the upper connector
+
+When the kode dot is in **suspend mode**, this regulator is deactivated and disconnects the power to the peripherals.
+
+### 3V3 regulator for the internal RTC of the ESP32-S3
+This regulator is responsible for **powering the internal RTC of the ESP32-S3.**
+
+
+## Connection diagram
+### Power Management Integrated Circuit (PMIC)
+The PMIC is connected to the I2C bus using these connections:
+
+| PMIC       | ESP32-S3 |
+| ---------- | -------- |
+| SDA        | GPIO48   |
+| SCL        | GPIO47   |
+| INT        | EXP10    |
+
+<Tip>The PMIC has the address 0x6B on the I2C bus.</Tip>
+<Note>The interrupt pin is connected to the [IO expander](/en/kode-dot/io-expander).</Note>
+
+The **5V and 2A bus that the PMIC generates is connected to the upper connector and the back of the kode dot.** If the USB-C is connected, the power of the 5V bus comes from this. If not, the power of the 5V bus comes from the battery. 
+
+In addition, a **external 5V power supply** can be connected through one of the external connectors to charge the kode dot.
+
+<Warning>**Do not connect an external 5V power supply while the USB-C is connected.**</Warning>
+
+### Fuel Gauge
+The fuel gauge is connected to the I2C bus using these connections:
+
+| Fuel Gauge | ESP32-S3 |
+| ---------- | -------- |
+| SDA        | GPIO48   |
+| SCL        | GPIO47   |
+| GPOUT      | EXP5     |
+
+<Tip>The fuel gauge has the address 0x55 on the I2C bus.</Tip>
+<Note>The GPOUT pin is connected to the [IO expander](/en/kode-dot/io-expander).</Note>
+
+### 3V3 regulator for peripherals
+This regulator can be **activated or deactivated** to power the peripherals of the kode dot. By **default it is activated, to deactivate it set the following pin to LOW:**
+
+| 3V3 regulator | ESP32-S3 |
+| ------------- | -------- |
+| EN            | EXP4     |
+
+<Note>The EN pin is connected to the [IO expander](/en/kode-dot/io-expander).</Note>
+
+## Recommended libraries
+### Arduino
+#### Power Management Integrated Circuit (PMIC)
+- [PMIC_BQ25896](https://github.com/sqmsmu/PMIC_BQ25896)
+
+#### Fuel Gauge
+- TBD pero workaround [SparkFun_BQ27441_Arduino_Library](https://github.com/sparkfun/SparkFun_BQ27441_Arduino_Library)
+
+### ESP-IDF
+#### Power Management Integrated Circuit (PMIC)
+- [kode_bq25896](https://components.espressif.com/components/kodediy/kode_bq25896)
+
+#### Fuel Gauge
+- TBD
+
+## Example code
+#### Power Management Integrated Circuit (PMIC)
+With this code you can see the parameters that the PMIC returns from the battery and the power supply.
+```cpp pmic_test.ino lines icon="microchip"
+#include "PMIC_BQ25896.h"
+#include <Wire.h>
+
+/* I2C bus configuration: SDA, SCL pins, and frequency */
+#define I2C_SDA 48           /* SDA pin on ESP32-S3 */
+#define I2C_SCL 47           /* SCL pin on ESP32-S3 */
+#define I2C_FREQ 400000L     /* I2C bus frequency (400 kHz) */
+
+/* Instantiate PMIC BQ25896 driver and I2C bus object */
+PMIC_BQ25896 bq25896;
+TwoWire I2CBus = TwoWire(0);
+
+void setup() {
+  /* Initialize serial port for debug output */
+  Serial.begin(115200);
+  while (!Serial) {
+    /* Wait for serial connection */
+  }
+
+  /* Initialize I2C bus with specified pins and frequency */
+  I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+
+  Serial.println("BQ25896 Power Management and Battery Charger Example");
+
+  /* Initialize the BQ25896 device over I2C */
+  bq25896.begin(&I2CBus);
+  delay(500);  /* Allow device to power up */
+
+  /* Check device connectivity */
+  if (!bq25896.isConnected()) {
+    Serial.println("BQ25896 not found! Check connection and power");
+    while (1) {
+      /* Halt execution if device not found */
+    }
+  } else {
+    Serial.println("BQ25896 found successfully.");
+  }
+
+  Serial.println("Resetting BQ25896");
+  /* Reset all registers to default values */
+  bq25896.reset();
+  delay(1000);
+
+  /* Disable hardware ILIM pin and configure ADC conversion */
+  bq25896.setEN_ILIM(false);       /* Disable ILIM pin */
+  bq25896.setCONV_START(true);     /* Single-shot ADC conversion */
+  bq25896.setWATCHDOG(0);          /* Disable watchdog timer */
+
+  /* Configure charge current to 2000 mA */
+  bq25896.setICHG(2000);
+}
+
+void loop() {
+  Serial.println("BQ25896 System Parameters");
+
+  /* Print input current limit pin status */
+  Serial.print("ILIM PIN : ");
+  Serial.println(String(bq25896.getILIM_reg().en_ilim));
+
+  /* Read and print various system parameters */
+  Serial.print("IINLIM       : "); Serial.println(String(bq25896.getIINLIM()) + " mA");
+  Serial.print("VINDPM_OS    : "); Serial.println(String(bq25896.getVINDPM_OS()) + " mV");
+  Serial.print("SYS_MIN      : "); Serial.println(String(bq25896.getSYS_MIN()) + " mV");
+  Serial.print("ICHG         : "); Serial.println(String(bq25896.getICHG()) + " mA");
+  Serial.print("IPRE         : "); Serial.println(String(bq25896.getIPRECHG()) + " mA");
+  Serial.print("ITERM        : "); Serial.println(String(bq25896.getITERM()) + " mA");
+  Serial.print("VREG         : "); Serial.println(String(bq25896.getVREG()) + " mV");
+  Serial.print("BAT_COMP     : "); Serial.println(String(bq25896.getBAT_COMP()) + " mΩ");
+  Serial.print("VCLAMP       : "); Serial.println(String(bq25896.getVCLAMP()) + " mV");
+  Serial.print("BOOSTV       : "); Serial.println(String(bq25896.getBOOSTV()) + " mV");
+  Serial.print("BOOST_LIM    : "); Serial.println(String(bq25896.getBOOST_LIM()) + " mA");
+  Serial.print("VINDPM       : "); Serial.println(String(bq25896.getVINDPM()) + " mV");
+  Serial.print("BATV         : "); Serial.println(String(bq25896.getBATV()) + " mV");
+  Serial.print("SYSV         : "); Serial.println(String(bq25896.getSYSV()) + " mV");
+  Serial.print("TSPCT        : "); Serial.println(String(bq25896.getTSPCT()) + "%");
+  Serial.print("VBUSV        : "); Serial.println(String(bq25896.getVBUSV()) + " mV");
+  Serial.print("ICHGR        : "); Serial.println(String(bq25896.getICHGR()) + " mA");
+
+  /* Print fault status bits */
+  Serial.print("Fault -> "); 
+  Serial.print("NTC:" + String(bq25896.getFAULT_reg().ntc_fault));
+  Serial.print(" ,BAT:" + String(bq25896.getFAULT_reg().bat_fault));
+  Serial.print(" ,CHGR:" + String(bq25896.getFAULT_reg().chrg_fault));
+  Serial.print(" ,BOOST:" + String(bq25896.getFAULT_reg().boost_fault));
+  Serial.println(" ,WATCHDOG:" + String(bq25896.getFAULT_reg().watchdog_fault));
+
+  /* Print charging status bits */
+  Serial.print("Charging Status -> "); 
+  Serial.print("CHG_EN:" + String(bq25896.getSYS_CTRL_reg().chg_config));
+  Serial.print(" ,BATFET DIS:" + String(bq25896.getCTRL1_reg().batfet_dis));
+  Serial.print(" ,BATLOAD_EN:" + String(bq25896.getSYS_CTRL_reg().bat_loaden));
+  Serial.print(" ,PG STAT:" + String(bq25896.get_VBUS_STAT_reg().pg_stat));
+  Serial.print(" ,VBUS STAT:" + String(bq25896.get_VBUS_STAT_reg().vbus_stat));
+  Serial.print(" ,CHRG STAT:" + String(bq25896.get_VBUS_STAT_reg().chrg_stat));
+  Serial.println(",VSYS STAT:" + String(bq25896.get_VBUS_STAT_reg().vsys_stat));
+
+  /* Trigger a new ADC conversion */
+  bq25896.setCONV_START(true);
+
+  delay(1000); /* Update every second */
+}
+```
+
+## Download examples
+You can test the example codes through the Arduino IDE or the ESP-IDF IDE or download the codes in our drive:
+
+[Power codes](https://drive.google.com/drive/folders/1I5WI-snWixP8urmTfhuuEfvBaxEJhqmo)

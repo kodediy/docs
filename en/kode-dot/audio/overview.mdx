@@ -1,9 +1,28 @@
 ---
 title: "Overview"
-description: "Overview of the audio features"
+description: "Understand how audio works in the kode dot and what is the I2S bus"
 icon: "music"
 ---
 
-# Welcome
+# What is the I2S bus
+**Inter-IC Sound (I2S)** is a digital communication protocol designed specifically to **transmit audio between electronic devices.**
 
-This is the main entry point for your documentation in English.
+Unlike other buses like I2C, which are used to transmit general data between chips, I2S is **optimized to send audio data of high quality in real time.**
+
+## How does I2S work?
+The I2S bus uses several lines to transmit the information:
+- **Serial Data (SD):** Where the audio data travels.
+- **Serial Clock (SCK):** Marks the rhythm at which the bits are sent.
+- **Word Select (WS):** Indicates if the data corresponds to the left or right channel (in stereo audio).
+
+The **SCK and WS lines are common** to all devices that are connected to the I2S bus. However, both the speaker and the microphone have their **own SD lines.**
+
+This structure allows the audio to be transmitted in a **synchronized and lossless manner, ideal for applications where sound quality is important.**
+
+## Why use I2S for digital audio?
+
+- **Quality:** Allows digital audio transmission without interference or typical noise of analog signals.
+- **Synchronization:** Ensures that the data arrives at the right time, avoiding phase shifts or distortions.
+- **Compatibility:** It is the standard in most modern audio chips, facilitating the integration of microphones and digital speakers.
+
+In the kode dot, both the **microphone and the speaker are connected via I2S,** which allows recording and reproducing sound with great fidelity and efficiency.

@@ -1,21 +1,19 @@
 ---
 title: "LED direccionable"
-description: "Descubre cómo darle color a tu kode dot"
+description: "Conoce cómo funciona el led direccionable y dale luz a tus proyectos."
 icon: "lightbulb"
 ---
 
 # Características
-El kode dot integra un led direccionable que podrás programar para que cambie de color y brillo. 
+El kode dot integra un **led direccionable** arriba a la izquierda del pad, que podrás iluminar con el **color y brillo que quieras.**
 
-No es un led normal, sino que es un led direccionable WS2812B. Esto es que dentro del led hay un controlador que puede manejar el color de los leds RGB y el brillo de cada uno de ellos.
+No es un led RGB normal, sino que es un **led RGB direccionable WS2812B.** Esto significa que dentro del led hay un **pequeño integrado** que puede manejar independientemente el color de los leds RGB y el brillo de cada uno.
 
 | Característica    | Descripción |
 | ----------------  | ----------- |
 | Driver            | WS2812B - 1-Wire |
 | Tamaño            | 2mm x 2mm |
 | Color             | RGB |
-| Número de colores | 16.7 M colors (24 bits) |
-
 
 ## Esquema de conexión
 El led direccionable funciona mediante un sólo pin conectado al ESP32-S3.
@@ -24,17 +22,19 @@ El led direccionable funciona mediante un sólo pin conectado al ESP32-S3.
 | ------------  | -------- |
 | Data          | GPIO4   |
 
+<Note> 1-Wire es un protocolo de comunicación que permite la comunicación de datos por medio de un único pin.</Note>
+
 ## Librerías recomendadas
 ### Arduino
-- [FastLED](https://github.com/FastLED/FastLED)
 - [Adafruit_NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
+- [FastLED](https://github.com/FastLED/FastLED)
 
 ### ESP-IDF
 - [led_indicator](https://components.espressif.com/components/espressif/led_indicator)
 - [led_strip](https://components.espressif.com/components/espressif/led_strip)
 
-## Código de ejemplo
-Este código ilumina el led direccionable haciendo un ciclo de colores. Primero en rojo, luego en verde y por último en azul.
+## Ejemplo de código
+Este código ilumina el led direccionable haciendo un ciclo de colores: primero rojo, luego verde y por último azul.
 ```cpp rgb_cycle.ino lines icon="microchip"
 #include <Adafruit_NeoPixel.h>
 
@@ -94,9 +94,7 @@ void loop() {
 }
 ```
 
-
-
-## Descarga del código
+## Descarga de ejemplos
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
 [Ejemplos del led direccionable](https://drive.google.com/drive/folders/1f7pmw24Q7ikkvg6vVaRGUN63GGYj1NbC)

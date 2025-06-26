@@ -1,26 +1,23 @@
 ---
 title: "Resumen"
-description: "Cómo funciona el audio en el kode dot y qué es el bus I2S"
+description: "Entiende cómo funciona el audio en el kode dot y qué es el bus I2S"
 icon: "music"
 ---
 
 # Qué es el bus I2S
+**Inter-IC Sound (I2S)** es un protocolo de comunicación digital diseñado específicamente para **transmitir audio entre dispositivos electrónicos.**
 
-I2S (Inter-IC Sound) es un protocolo de comunicación digital diseñado específicamente para transmitir audio entre dispositivos electrónicos, como microcontroladores, altavoces y micrófonos digitales.
-
-A diferencia de otros buses como I2C, que se usan para transmitir datos generales entre chips, I2S está optimizado para enviar datos de audio de alta calidad en tiempo real.
-
+A diferencia de otros buses como I2C, que se usan para transmitir datos generales entre chips, I2S está **optimizado para enviar datos de audio de alta calidad en tiempo real.**
 
 ## ¿Cómo funciona I2S?
-
 El bus I2S utiliza varias líneas para transmitir la información:
 - **Serial Data (SD):** Por donde viajan los datos de audio.
 - **Serial Clock (SCK):** Marca el ritmo al que se envían los bits.
 - **Word Select (WS):** Indica si los datos corresponden al canal izquierdo o derecho (en audio estéreo).
 
-Las líneas de SCK y WS son comunes a todos los dispositivos que se conecten al bus I2S. Sin embargo, tanto el altavoz como el micrófono tienen sus propias líneas de SD.
+Las **líneas de SCK y WS son comunes** a todos los dispositivos que se conecten al bus I2S. Sin embargo, tanto el altavoz como el micrófono tienen sus **propias líneas de SD.**
 
-Esta estructura permite que el audio se transmita de forma sincronizada y sin pérdidas, ideal para aplicaciones donde la calidad de sonido es importante.
+Esta estructura permite que el audio se transmita de forma **sincronizada y sin pérdidas, ideal para aplicaciones donde la calidad de sonido es importante.**
 
 ## ¿Por qué usar I2S para audio digital?
 
@@ -28,4 +25,4 @@ Esta estructura permite que el audio se transmita de forma sincronizada y sin p�
 - **Sincronización:** Garantiza que los datos lleguen en el momento correcto, evitando desfases o distorsiones.
 - **Compatibilidad:** Es el estándar en la mayoría de chips de audio modernos, facilitando la integración de micrófonos y altavoces digitales.
 
-En el kode dot, tanto el micrófono como el altavoz están conectados mediante I2S, lo que permite grabar y reproducir sonido con gran fidelidad y eficiencia.
+En el kode dot, tanto el **micrófono como el altavoz están conectados mediante I2S,** lo que permite grabar y reproducir sonido con gran fidelidad y eficiencia.

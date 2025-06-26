@@ -1,9 +1,147 @@
 ---
 title: "Buttons"
-description: "Buttons"
+description: "Understand the distribution of buttons and how to use them in your projects."
 icon: "circle-dot"
 ---
 
-# Welcome
+# Features
 
-This is the main entry point for your documentation in English.
+The buttons of the kode dot are distributed between a **directional pad of four buttons and two independent buttons.** 
+
+With these buttons you can navigate through kodeOS, control the state of the ESP32-S3 and turn the device on or off.
+
+## Connection diagram
+
+All buttons are connected to the **IO expander**, except for the **top button** that is connected directly to the ESP32-S3. In addition, all have a physical **pull-up resistor.**
+
+The connection of the buttons is as follows:
+
+| Button         | IO expander |
+| ------------  | ----------------- |
+| Left pad      | EXP7              |
+| Up pad        | EXP6              |
+| Right pad     | EXP11             |
+| Down pad     | EXP8              |
+| Up button  | GPIO0             |
+| Down button   | EXP9              |
+
+<Note>See [IO expander](/en/kode-dot/io-expander) to learn how the IO expander works.</Note>
+<Tip>The top button is connected to GPIO0, to control the BOOT state of the ESP32-S3.</Tip>
+
+## Recommended libraries
+### Arduino
+- [ESP32_IO_Expander](https://github.com/esp-arduino-libs/ESP32_IO_Expander)
+### ESP-IDF
+- [button](https://components.espressif.com/components/espressif/button)
+- [esp_io_expander_tca95xx_16bit](https://components.espressif.com/components/espressif/esp_io_expander_tca95xx_16bit)
+
+## Example code
+With this code you can check the **functionality of the buttons.** Connect the kode dot to the **serial monitor** and depending on which button you press, you will see a message in the monitor.
+
+```cpp buttons_check.ino lines icon="microchip"	
+#include <esp_io_expander.hpp>
+
+/* Expander configuration */
+#define CHIP_NAME         TCA95XX_16BIT
+#define I2C_SCL_PIN       (47)
+#define I2C_SDA_PIN       (48)
+#define EXP_INT_PIN       (18)
+#define I2C_ADDR          (0x20)
+
+/* Button connections on expander */
+#define PAD_UP            6
+#define PAD_LEFT          7
+#define PAD_DOWN          8
+#define PAD_RIGHT         11
+#define BUTTON_BOTTOM     9
+
+/* Button connected directly to ESP32-S3 */
+#define BUTTON_UP_PIN     0    // GPIO0
+
+/* Expander instance */
+esp_expander::Base *expander = nullptr;
+
+/* Flags for pending interrupts */
+volatile bool expanderInterrupted = false;
+volatile bool buttonUpInterrupted = false;
+
+/* ISR for expander interrupt */
+void IRAM_ATTR handleExpanderIRQ() {
+  expanderInterrupted = true;
+}
+
+/* ISR for button on GPIO0 */
+void IRAM_ATTR handleButtonUpIRQ() {
+  buttonUpInterrupted = true;
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Button interrupt test start");
+
+  /* Initialize expander */
+  expander = new esp_expander::TCA95XX_16BIT(I2C_SCL_PIN, I2C_SDA_PIN, I2C_ADDR);
+  expander->init();
+  expander->begin();
+
+  /* Configure expander pins as inputs */
+  expander->pinMode(PAD_UP,       INPUT);
+  expander->pinMode(PAD_LEFT,     INPUT);
+  expander->pinMode(PAD_DOWN,     INPUT);
+  expander->pinMode(PAD_RIGHT,    INPUT);
+  expander->pinMode(BUTTON_BOTTOM, INPUT);
+
+  /* Configure expander interrupt pin */
+  pinMode(EXP_INT_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(EXP_INT_PIN),
+                  handleExpanderIRQ, FALLING);
+
+  /* Configure direct button on GPIO0 */
+  pinMode(BUTTON_UP_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_UP_PIN),
+                  handleButtonUpIRQ, FALLING);
+
+  Serial.println("Setup complete. Waiting for button presses...");
+}
+
+void loop() {
+  if (!expanderInterrupted && !buttonUpInterrupted) {
+    delay(10);
+    return;
+  }
+
+  /* Handle direct button */
+  if (buttonUpInterrupted) {
+    buttonUpInterrupted = false;
+    Serial.println("→ BUTTON_UP (GPIO0) pressed");
+    delay(50);
+  }
+
+  /* Handle expander buttons */
+  if (expanderInterrupted) {
+    expanderInterrupted = false;
+    if (expander->digitalRead(PAD_UP) == LOW) {
+      Serial.println("→ PAD_UP pressed");
+    }
+    if (expander->digitalRead(PAD_LEFT) == LOW) {
+      Serial.println("→ PAD_LEFT pressed");
+    }
+    if (expander->digitalRead(PAD_DOWN) == LOW) {
+      Serial.println("→ PAD_DOWN pressed");
+    }
+    if (expander->digitalRead(BUTTON_BOTTOM) == LOW) {
+      Serial.println("→ BUTTON_BOTTOM pressed");
+    }
+    if (expander->digitalRead(PAD_RIGHT) == LOW) {
+      Serial.println("→ PAD_RIGHT pressed");
+    }
+    delay(50);
+  }
+}
+ç
+```
+
+## Download examples
+You can test the example codes using the Arduino IDE or the ESP-IDF IDE or download the codes in our drive:
+
+[Examples using the buttons](https://drive.google.com/drive/folders/1-K3qP_pf7niBGDafzZQtoZ7c4Zyx9w1W)

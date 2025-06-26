@@ -1,16 +1,13 @@
 ---
 title: "IMU"
-description: "Conoce la posición de tu kode dot"
+description: "Aprende para qué sirve una IMU y cómo usarla en tu kode dot"
 icon: "compass"
 ---
 
 # Características
+En el interior de tu kode dot tienes integrado un **giroscópio de 3 ejes, un acelerómetro de 3 ejes y un magnetómetro de 3 ejes.** Así, puedes conocer la posición relativa a si mismo y su posición absoluta respecto a la Tierra.
 
-En el interior de tu kode dot tienes integrado un giroscópio de 3 ejes, un acelerómetro de 3 ejes y un magnetómetro de 3 ejes. Así, puedes conocer la posición relativa a si 
-mismo y su posición absoluta respecto La Tierra.
-
-El giroscópio y el acelerómetro están en un mismo integrado y tienen las siguientes características:
-
+El giroscópio y el acelerómetro están en un **mismo integrado** y tienen las siguientes características:
 | Característica                        | Descripción                                                                                                              |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | Acelerómetro + giroscopio “always-on” | Consumo total de **0,55 mA** en modo de alto rendimiento para operación continua.                                        |
@@ -24,29 +21,35 @@ El magnetómetro tiene las siguientes características:
 
 | Característica                        | Detalle                                                    |
 | ------------------------------------- | ---------------------------------------------------------- |
-| Rango dinámico                        | ±50 gauss (tres ejes)                                      |
-| Resolución de salida                  | 16 bits                                                    |
+| Rango dinámico                        | **±50 gauss** (tres ejes)                                      |
+| Resolución de salida                  | **16 bits**                                                    |
 | Consumo típico                        | 200 µA @ 20 Hz (modo alta resolución) / 50 µA (low-power)  |
 
 
 ## Esquema de conexión
 ### IMU de 6 ejes
-La IMU está conectado al ESP32-S3 a través del bus I2C con la dirección 0x6A y usando estas conexiones:
+La IMU está conectado al ESP32-S3 a través del bus I2C usando estas conexiones:
 
-| Expansor     | ESP32-S3 |
+| IMU     | ESP32-S3 |
 | ------------ | -------- |
 | SDA          | GPIO48   |
 | SCL          | GPIO47   |
 | INT1         | EXP13    |
 | INT2         | EXP12    |
 
+<Tip>La IMU tiene la dirección 0x6A en el bus I2C.</Tip>
+<Note>Los pines de interrupción están conectados al [expansor de pines](/es/kode-dot/io-expander).</Note>
+
 ### Magnetómetro de 3 ejes
-El magnetómetro está conectado de la misma manera el bus I2C con la dirección 0x1E y usa estas conexiones:
-| Expansor     | ESP32-S3 |
+El magnetómetro está conectado de la misma manera al bus I2C usando estas conexiones:
+| Magnetómetro     | ESP32-S3 |
 | ------------ | -------- |
 | SDA          | GPIO48   |
 | SCL          | GPIO47   |
 | INT1         | EXP0     |
+
+<Tip>El magnetómetro tiene la dirección 0x1E en el bus I2C.</Tip>
+<Note>El pin de interrupción está conectado al [expansor de pines](/es/kode-dot/io-expander).</Note>
 
 ## Librerías recomendadas
 ### Arduino
@@ -57,7 +60,7 @@ El magnetómetro está conectado de la misma manera el bus I2C con la dirección
 - [kode_lsm6dsox](https://components.espressif.com/components/kodediy/kode_lsm6dsox)
 - [kode_lis2mdl](TBD)
 
-## Códigos de ejemplo
+## Ejemplo de código
 ### IMU de 6 ejes
 Este código muestra el rango de medida de los sensores y la frecuencia de muestreo. También muestra la temperatura, la aceleración y la velocidad angular.
 
@@ -260,7 +263,7 @@ void loop(void) {
   delay(500);
 }
 ```
-## Descarga del código
+## Descarga de ejemplos
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
 [Ejemplos de la IMU y el magnetómetro](https://drive.google.com/drive/folders/1eAutUqjqenHA7lNoFHxKpBUXdwUa-6ZS)

@@ -28,7 +28,7 @@ Inside the kode dot we have integrated a **2.4GHz antenna** in the PCB. With thi
 ## Programming
 **Programming the kode dot is done like any other ESP32-S3-based board.** Connect it directly to your computer using the USB-C cable and start uploading your code.
 
-<Tip>In the [Applications](/en/kodeOS/apps) section it is explained in detail how to upload code and create applications.</Tip>
+<Note>In the [Applications](/en/kodeOS/apps) section it is explained in detail how to upload code and create applications.</Note>
 
 Internally, the **USB-C data lines** are connected to the **GPIO19 and GPIO20** pins to use the internal USB-Serial peripheral.
 
@@ -46,9 +46,9 @@ To reset the kode dot, you must press the **left button of the pad** at the same
 - To **exit an application** and return to the main menu.
 
 ### BOOT
-Para que el kode dot entre en modo BOOT, mientras se mantiene el **botón de arriba,** se debe resetear el kode dot siguiendo la combinación del RESET. 
+To enter the kode dot in BOOT mode, while holding the **top button,** the kode dot must be reset following the RESET combination.
 
-<Info>Es probable que no tengas que usar este proceso ya que si el código que subes al kode dot bloquea o hace reiniciar al ESP32-S3, el kode dot volverá al menú principal automáticamente.</Info>
+<Info>It is likely that you will not have to use this process since if the code you upload to the kode dot blocks or makes the ESP32-S3 restart, the kode dot will return to the main menu automatically.</Info>
 
 ## Example code
 With this code you can get the **MAC address** of the different interfaces of the ESP32-S3.

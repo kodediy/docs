@@ -1,9 +1,43 @@
 ---
 title: "Maker"
-description: "Maker Module"
+description: "Create custom circuits, prototype your ideas and program with the GPIOs."
 icon: "microchip"
 ---
 
-# Welcome
+**Module:** Basic <Icon icon="seedling" iconType="solid" />
 
-This is the main entry point for your documentation in English.
+# Features
+With this module you can **create circuits and prototype your ideas using the integrated breadboard,** being able to program the circuit with the available pins of the kode dot.
+
+In addition, you have the two power buses of the kode dot available:
+
+| Voltage | Maximum current |
+| ------- | ---------------- |
+| 5V      | 2A               |
+| 3.3V    | 2A               |
+
+<Frame>
+  <img width="400" src="/images/external-modules/maker.png" />
+</Frame>
+
+## Available pins
+You can use the following pins:
+
+| Pin    | Description |
+| ------ | ----------- |
+| GPIO1  | RTC_GPIO1, ADC1_CH0, TOUCH1 |
+| GPIO2  | RTC_GPIO2, ADC1_CH1, TOUCH2 |
+| GPIO3  | RTC_GPIO3, ADC1_CH2, TOUCH3 |
+| GPIO11 | RTC_GPIO11, ADC2_CH0, TOUCH11 |
+| GPIO12 | RTC_GPIO12, ADC2_CH1, TOUCH12 |
+| GPIO13 | RTC_GPIO13, ADC2_CH2, TOUCH13 |
+| SCL    | GPIO47 |
+| SDA    | GPIO46 |
+| U0TXD  | GPIO43 |
+| U0RXD  | GPIO44 |
+| GPIO39 | JTAG-MTCK   |
+| GPIO40 | JTAG-MTCDO  |
+| GPIO41 | JTAG-MTCDI  |
+| GPIO42 | JTAG-MTMS   |
+
+<Warning>The SCL and SDA pins are of the I2C bus of the kode dot, **only they can be used to connect other components to the I2C bus.**</Warning>

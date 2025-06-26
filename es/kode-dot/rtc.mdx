@@ -1,18 +1,16 @@
 ---
 title: "Reloj de tiempo real"
-# description: "El kode dot integra un reloj de tiempo real para que puedas obtener la hora y la fecha."
+description: "Lleva el control del tiempo en tus proyectos con los RTCs de tu kode dot. "
 icon: "clock"
 ---
 
 # Características
-
-El kode dot integra dos relojes de tiempo real, el interno del ESP32-S3 y uno externo.
+El kode dot integra **dos relojes de tiempo real**, el interno del ESP32-S3 y uno externo.
 
 ## Esquema de conexión
+El reloj interno del ESP32-S3 se puede usar directamente usando la **documentación de Espressif.**
 
-El reloj inteno del ESP32-S3 se puede usar directamente usando la documentación de Espressif.
-
-El reloj externo está conectado al I2C del ESP32-S3, usando la dirección 0XD0, y está conectado de la siguiente manera:
+El reloj externo está conectado al I2C del ESP32-S3 usando estas conexiones:
 
 | RTC externo | ESP32-S3 |
 | ----------- | -------- |
@@ -21,6 +19,9 @@ El reloj externo está conectado al I2C del ESP32-S3, usando la dirección 0XD0,
 | INTA        | EXP2     |
 | INTB        | EXP1     |
 
+<Tip>El reloj externo tiene la dirección 0xD0 en el bus I2C.</Tip>
+<Note>Los pines de interrupción están conectados al [expansor de pines](/es/kode-dot/io-expander).</Note>
+
 ## Librerías recomendadas
 ### Arduino
 - [AnalogRTCLibrary](https://github.com/analogdevicesinc/AnalogRTCLibrary)
@@ -28,7 +29,7 @@ El reloj externo está conectado al I2C del ESP32-S3, usando la dirección 0XD0,
 ### ESP-IDF
 - TBD
 
-## Código de ejemplo
+## Ejemplo de código
 Este código configura el RTC con una fecha y hora específica y luego imprime la hora actual cada segundo.
 
 ```cpp rtc_test.ino lines icon="microchip"
@@ -102,7 +103,7 @@ void loop()  {
 }
 ```
 
-## Descarga del código
+## Descarga de ejemplos
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
 [Ejemplos del RTC](https://drive.google.com/drive/folders/1EHoXhwTg31xQmAzV5kKiH4j0Wmi5bjY9)

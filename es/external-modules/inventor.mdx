@@ -1,30 +1,32 @@
 ---
 title: "Inventor"
-description: "Dale movimiento a tu kode dot con motores"
+description: "Conecta motores DC, un servomotor y sensores para crear tu propio robot."
 icon: "robot"
 ---
 
 **Módulo:** Basic <Icon icon="seedling" iconType="solid" />
 
 # Características
+Con este módulo puedes conectar **motores a tu kode dot y hacer robots como un coche siguelineas.** 
 
-Con este módulo puedes conectar motores a tu kode dot y hacer robots como un coche siguelineas. Se le pueden conectar lo siguiente:
+Puedes conectar lo siguiente:
 
 - 2x motores DC o 1x motor paso a paso
 - 1x servomotor
 - 4x GPIOs para sensores
 - 1x bus de I2C
 
-No es necesario usar una fuente externa de alimentación ya que todo se alimenta desde el kode dot.
+No es necesario usar una fuente externa de alimentación ya que **todo se alimenta desde el kode dot.**
 
-Los motores DC tienen que ser de 5V y están limitados por hardware a una corriente de 700mA por motor. Así, como el kode dot puede suministrar hasta 2A, quedan 600mA para conectar un servomotor.
+Los **motores DC tienen que ser de 5V y están limitados por hardware a una corriente de 700mA por motor.** Así, como el kode dot puede suministrar hasta 2A, quedan **600mA para conectar un servomotor.**
 
-Los motores se controlan por PWM y se puede medir la corriente que esta consumiendo cada motor para tener una estimación de su torque.
+Los **motores DC se controlan por PWM** y se puede medir la corriente que esta consumiendo cada motor para tener una estimación de su torque.
 
-![Módulo Inventor](/images/external-modules/inventor.png)
+<Frame>
+  <img width="400" src="/images/external-modules/inventor.png" />
+</Frame>
 
 ## Esquema de conexión
-
 El driver que controla los motores está conectado de la siguiente manera:
 
 | Driver  | ESP32-S3 |
@@ -37,11 +39,11 @@ El driver que controla los motores está conectado de la siguiente manera:
 | AIPROPI | GPIO37   |
 | BIPROPI | GPIO36   |
 
-<Info> AIPROPI y BIPROPI sirven para medir la corriente que está consumiendo cada motor. Para más información consulta el Datasheet del driver.</Info>
+<Tip> AIPROPI y BIPROPI sirven para medir la corriente que está consumiendo cada motor. Para más información consulta el datasheet del driver.</Tip>
 
-## Código de ejemplo
-Conecta dos motores DC a los conectores y con este código verás como primero aceleran, luego mantienen la velocidad máxima y finalmente desaceleran.
-```cpp Inventor_test.ino lines icon="microchip"
+## Ejemplo de código
+Conecta **dos motores DC a los conectores** y con este código verás como primero aceleran, luego mantienen la velocidad máxima y finalmente desaceleran.
+```cpp motors_test.ino lines icon="microchip"
 /* Definición de pines para el control de dos motores (A y B) usando un puente H de fast-decay:
  * PIN_xIN1 controla la señal PWM (velocidad), PIN_xIN2 se mantiene LOW para modo fast-decay (frenado rápido)
  */
@@ -109,7 +111,7 @@ void loop() {
     ledcWrite(CHANNEL_B, v);
     delay(RAMP_TIME / 255);
   }
-
+ 
   /* ========================================================================
    * 4) Asegurar parada: escribe 0 PWM y queda detenido en fast-decay
    * ======================================================================== */
@@ -120,7 +122,7 @@ void loop() {
 }
 ```
 
-## Descarga del código
+## Descarga de ejemplos
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
 [Ejemplos de código del módulo Inventor](https://drive.google.com/drive/folders/1wom3hU-bjWmbpT9DnZFzFtpL3cr-7Qzg)

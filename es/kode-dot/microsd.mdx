@@ -1,40 +1,37 @@
 ---
 title: "MicroSD"
-description: "Lee y escribe datos en la microSD"
+description: "Descubre el uso de la microSD, su programación y porqué es tan importante."
 icon: "sd-card"
 ---
 
 # Características
+La tarjeta microSD es una de las **partes esenciales para el funcionamiento del kode dot.** En ella se guardan las aplicaciones, los datos de configuración y los archivos de usuario.
 
-La tarjeta microSD es una de las partes esenciales en el funcionamiento del kode dot. En ella se guardan las aplicaciones, los datos de configuración y los archivos de usuario.
+Además, para los **proyectos y aplicaciones** que se desarrollen en kodeOS, es la **forma más sencilla de guardar los datos que se generen.**
 
 ## Esquema de conexión
+La microSD se conecta al ESP32-S3 mediante **SDIO, en modo 1-bit.** Así, se usa el periférico **SD/MMC Host** que tiene el ESP32-S3 **dedicado para leer y escribir en la microSD.** 
 
-La microSD se conecta al ESP32-S3 mediante SDIO, en modo 1-bit. Así, se puede usar el periférico SD/MMC Host que tiene el ESP32-S3 dedicado para leer y escribir en la microSD. La conexión entre la microSD y el ESP32-S3 es la siguiente:
+La conexión entre la microSD y el ESP32-S3 es la siguiente:
 
 | MicroSD       | ESP32-S3 |
 | ------------- | -------- |
 | Command       | GPIO5    |
 | Clock         | GPIO6    |
 | Data          | GPIO7    |
-| Card Detected | P14      |
+| Card Detected | EXP14    |
 
-<Info>
-  El pin de Card Detected está conectado al pin 14 del expansor de pines. Ve a [Expansor de pines](/es/kode-dot/io-expander) para más información.
-</Info>
+<Note>El pin de Card Detected está conectado al EXP14 del expansor de pines. Ve a [Expansor de pines](/es/kode-dot/io-expander) para más información.</Note>
 
 ## Librerías recomendadas
-
 ### Arduino
-
 - [SD_MMC](https://github.com/espressif/arduino-esp32/tree/master/libraries/SD_MMC)
 
 ### ESP-IDF
-
 No requiere librerías adicionales.
 
-## Código de ejemplo
-Este código hará un test de la microSD en este orden:
+## Ejemplo de código
+Este código hará un **test de la microSD en este orden:**
 
 1. Listar directorios
 2. Crear un directorio
@@ -49,7 +46,7 @@ Este código hará un test de la microSD en este orden:
 11. Leer un archivo
 12. Test de rendimiento de lectura y escritura
 
-```cpp
+```cpp microsd_test.ino lines icon="microchip"
 #include "FS.h"
 #include "SD_MMC.h"
 
@@ -282,8 +279,7 @@ void loop() {
 }
 ```
 
-## Descarga del código
-
+## Descarga de ejemplos
 Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
 [Ejemplos de microSD](https://drive.google.com/drive/folders/1fMG1BzAr6a9Gi88daPVNe0bdkRSY8TKe)
