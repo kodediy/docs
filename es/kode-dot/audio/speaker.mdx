@@ -35,78 +35,73 @@ El altavoz está conectado al ESP32-S3 de la siguiente manera:
 Este código **reproduce el tono que especifiques en la variable `frequency`.**
 
 ```cpp speaker_tone.ino lines icon="microchip"
-#include <Arduino.h>
+/**
+ * Genera un tono cuadrado por I2S (48 kHz, 32-bit, mono) y habilita el amplificador vía expansor I/O.
+ * El tono se guarda en flujo I2S continuo; el expansor activa la etapa de audio.
+ * Usa pines personalizados para I2S y para el expansor TCA95XX_16BIT.
+*/
+/* ───────── KODE | docs.kode.diy ───────── */
+
 #include <ESP_I2S.h>
 #include <esp_io_expander.hpp>
 
-/* Configuración del expansor de pines */
-#define CHIP_NAME       TCA95XX_16BIT
+/* Configuración de pines del expansor */
 #define I2C_SCL_PIN     (47)
 #define I2C_SDA_PIN     (48)
-#define EXP_INT_PIN     (18)
 #define I2C_ADDR        (0x20)
 
-/* Pines para la interfaz I2S */
-const uint8_t I2S_SCK   = 38;  // Reloj serial (SCK)
+/* Pines de la interfaz I2S */
+const uint8_t I2S_SCK   = 38;  // Reloj serie (SCK)
 const uint8_t I2S_WS    = 45;  // Word Select / LRCLK
-const uint8_t I2S_DOUT  = 46;  // Datos de salida (SD)
+const uint8_t I2S_DOUT  = 46;  // Salida de datos (SD)
 
 /* Parámetros de la señal de audio */
-const int frequency   = 440;    // Frecuencia de la onda cuadrada en Hz
+const int frequency   = 300;    // Frecuencia de la onda cuadrada en Hz
 const int amplitude   = 500;    // Amplitud de la onda cuadrada
-const int sampleRate  = 16000;  // Frecuencia de muestreo en Hz
 
-/* Formato de datos y modo I2S */
-i2s_data_bit_width_t bps = I2S_DATA_BIT_WIDTH_32BIT;  // Bits por muestra
-i2s_mode_t mode           = I2S_MODE_STD;            // Modo estándar
-i2s_slot_mode_t slot      = I2S_SLOT_MODE_MONO;       // Mono
-
-/* Cálculo de medio periodo de la onda */
-const int halfWavelength = (sampleRate / frequency);
-
-/* Variables de estado de la onda */
-int32_t sample = amplitude;  // Valor de la muestra actual
+/* Variables de estado para generación de señal */
+int32_t sample = amplitude;  // Muestra actual
 int count = 0;               // Contador de muestras
 
 /* Instancias globales */
-I2SClass i2s;                // Objeto I2S
+I2SClass i2s;                // Objeto interfaz I2S
 esp_expander::Base *expander = nullptr;  // Puntero al expansor
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("I2S tono simple");
+  Serial.println("Simple I2S tone");
 
-  /* Configurar los pines I2S (MCLK no usado: -1) */
+  /* Configura los pines de I2S (sin MCLK: pasar -1) */
   i2s.setPins(I2S_SCK, I2S_WS, I2S_DOUT, -1);
 
-  /* Iniciar I2S con los parámetros definidos */
-  if (!i2s.begin(mode, sampleRate, bps, slot, I2S_STD_SLOT_LEFT)) {
-    Serial.println("Error al inicializar I2S!");
-    while (1);  // Detener si falla
+  /* Inicializa I2S: modo estándar, 48 kHz, 32 bits, mono, ranura izquierda */
+  if (!i2s.begin(I2S_MODE_STD, 48000, I2S_DATA_BIT_WIDTH_32BIT,
+                 I2S_SLOT_MODE_MONO, I2S_STD_SLOT_LEFT)) {
+    Serial.println("Failed to initialize I2S!");
+    while (1);  // Detener en caso de fallo
   }
-  Serial.println("Bus I2S inicializado.");
+  Serial.println("I2S bus initialized.");
 
-  /* Inicializa el expansor */
+  /* Inicializa el expansor de E/S */
   expander = new esp_expander::TCA95XX_16BIT(I2C_SCL_PIN, I2C_SDA_PIN, I2C_ADDR);
   expander->init();
   expander->begin();
 
-  /* Configurar el pin 3 del expansor como salida para habilitar el amplificador */
+  /* Configura el pin 3 del expansor como salida para habilitar el amplificador */
   expander->pinMode(3, OUTPUT);
-  expander->digitalWrite(3, HIGH); /* Activar amplificador */
+  expander->digitalWrite(3, HIGH); /* Habilita el amplificador */
 }
 
 void loop() {
-  /* Cada medio periodo, invertir la fase de la onda */
-  if (count % halfWavelength == 0) {
+  /* Conmuta el signo cada media longitud de onda para crear una cuadrada */
+  if (count % (48000 / frequency) == 0) {
     sample = -sample;
   }
 
-  /* Escribir la muestra en ambos canales (mono duplicado) */
-  i2s.write(sample); // Canal derecho
+  /* Escribe la muestra (mono) */
   i2s.write(sample); // Canal izquierdo
 
-  /* Incrementar contador de muestras */
+  /* Incrementa el contador de muestras */
   count++;
 }
 ```
