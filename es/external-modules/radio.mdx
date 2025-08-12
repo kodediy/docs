@@ -9,6 +9,8 @@ icon: "tower-broadcast"
 # Características
 Con este módulo puedes desde **comunicarte con LoRa hasta ubicarte con GNSS.** Integra un módulo LoRa E80-900M2213S (LR1121) de Ebyte y un módulo GNSS MAX-M10S de U-Blox.
 
+Estamos trabajando en la integración con **Meshtastic**.
+
 <Frame>
   <img width="400" src="/images/external-modules/radio/radio.png" />
 </Frame>
@@ -18,3 +20,44 @@ Con este módulo puedes desde **comunicarte con LoRa hasta ubicarte con GNSS.** 
 <Frame>
   <img src="/images/external-modules/radio/radio-kodedot.png" />
 </Frame>
+
+
+## Esquema de conexión
+### Módulo LoRa
+El módulo Ebyte E80-900M2213S está conectado al ESP32-S3 de la siguiente manera:
+
+| E80-900M2213S | ESP32-S3 |
+| ------------- | -------- |
+| MISO          | GPIO41   |
+| MOSI          | GPIO40   |
+| SCK           | GPIO39   |
+| NSS (CS)      | GPIO3    |
+| BUSY          | GPIO13   |
+| LR_NRESET     | GPIO2    |
+| DIO9          | GPIO12   |
+| DIO8          | GPIO1    |
+| DIO7          | GPIO11   |
+
+### Módulo GNSS
+El módulo GNSS MAX-M10S está conectado al ESP32-S3 de la siguiente manera:
+
+| MAX-M10S  | ESP32-S3 |
+| --------- | -------- |
+| TXD       | GPIO44   |
+| RXD       | GPIO43   |
+| SCL       | GPIO47   |
+| SDA       | GPIO48   |
+
+## Ejemplos de código
+### Comunicación con LoRa
+```cpp lora_test.ino lines icon="microchip"
+
+```
+
+### Ubicación con GNSS
+Para usar el módulo GNSS, recomendamos usar la librería [SparkFun u-blox GNSS](https://github.com/sparkfun/SparkFun_u-blox_GNSS_v3)
+
+Este código es un ejemplo de cómo usar el módulo GNSS por I2C.
+```cpp gnss_test_I2C.ino lines icon="microchip"
+
+```

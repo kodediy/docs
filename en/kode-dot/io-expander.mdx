@@ -55,66 +55,90 @@ Most of the signals are interrupt signals of the different integrated circuits o
 With this code you can test the operation of the expander of pins. When you press the **down button,** a message will be printed on the **serial monitor.**
 
 ```cpp expander_test.ino lines icon="microchip"	
-#include <esp_io_expander.hpp>
+/**
+ * Reads and displays the status of signals connected to a TCA95XX_16BIT I/O expander via I2C.
+ * Configures pins as inputs or outputs and updates the reading every second.
+ * Shows each pin's name and state on the serial monitor.
+ */
+/* ───────── KODE | docs.kode.diy ───────── */
 
-/* Expander configuration */
-#define CHIP_NAME       TCA95XX_16BIT
-#define I2C_SCL_PIN     (47)
-#define I2C_SDA_PIN     (48)
-#define EXP_INT_PIN     (18)
-#define I2C_ADDR        (0x20)
+#include <esp_io_expander.hpp> /* Library to control I/O expanders on ESP32 */
 
-/* Button connection on the expander */
-#define BUTTON_DOWN     9  /* Expander pin for the "down" button */
+#define I2C_SCL_PIN     (47)   /* I2C bus SCL pin */
+#define I2C_SDA_PIN     (48)   /* I2C bus SDA pin */
+#define I2C_ADDR        (0x20) /* I2C address of the expander */
 
-/* Expander instance */
-esp_expander::Base *expander = nullptr;
+esp_expander::Base *expander = nullptr; /* Pointer to expander object */
 
-/* Flag indicating an interrupt has occurred */
-volatile bool expanderInterrupted = false;
-
-/* ISR: mark the interrupt flag (no I2C calls) */
-void IRAM_ATTR handleExpanderIRQ() {
-  expanderInterrupted = true;
-}
+/* Descriptive signal names */
+const char* signalNames[14] = {
+  "Magnetometer - INT",        // EXP0
+  "RTC - INTB",                // EXP1
+  "RTC - INTA",                // EXP2
+  "Battery Indicator - GPOUT", // EXP5
+  "Pad - Up",                  // EXP6
+  "Pad - Left",                // EXP7
+  "Pad - Down",                // EXP8
+  "Button - Down",             // EXP9
+  "PMIC - INT",                // EXP10
+  "Pad - Right",               // EXP11
+  "IMU - INT2",                // EXP12
+  "IMU - INT1",                // EXP13
+  "microSD - CD",              // EXP14
+  "Display - TP INT"           // EXP15
+};
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println("Expander interrupt test start.");
+  Serial.begin(115200); /* Starts serial communication at 115200 baud */
+  Serial.println("Expander polling test start.");
 
-  /* Initialize the expander */
+  /* Initializes the expander at the configured I2C address */
   expander = new esp_expander::TCA95XX_16BIT(I2C_SCL_PIN, I2C_SDA_PIN, I2C_ADDR);
   expander->init();
   expander->begin();
 
-  /* Configure BUTTON_DOWN as input */
-  expander->pinMode(BUTTON_DOWN, INPUT);
+  /* Sets pins 3 and 4 as outputs */
+  expander->multiPinMode(IO_EXPANDER_PIN_NUM_3 | IO_EXPANDER_PIN_NUM_4, OUTPUT);
 
-  /* Configure the ESP32 interrupt pin with internal pull-up */
-  pinMode(EXP_INT_PIN, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(EXP_INT_PIN),
-                  handleExpanderIRQ, FALLING);
+  /* Sets all other pins as inputs */
+  expander->multiPinMode(IO_EXPANDER_PIN_NUM_0 | IO_EXPANDER_PIN_NUM_1 | IO_EXPANDER_PIN_NUM_2 |
+                         IO_EXPANDER_PIN_NUM_5 | IO_EXPANDER_PIN_NUM_6 | IO_EXPANDER_PIN_NUM_7 |
+                         IO_EXPANDER_PIN_NUM_8 | IO_EXPANDER_PIN_NUM_9 | IO_EXPANDER_PIN_NUM_10 |
+                         IO_EXPANDER_PIN_NUM_11 | IO_EXPANDER_PIN_NUM_12 | IO_EXPANDER_PIN_NUM_13 |
+                         IO_EXPANDER_PIN_NUM_14 | IO_EXPANDER_PIN_NUM_15, INPUT);
 
-  Serial.println("Setup complete. Waiting for BUTTON_DOWN...");
+  /* Sets controlled outputs to LOW */
+  expander->digitalWrite(IO_EXPANDER_PIN_NUM_3, LOW); /* Amplifier - SD */
+  expander->digitalWrite(IO_EXPANDER_PIN_NUM_4, LOW); /* Power Supply - 3V3 peripherals */
 }
 
+int level[14] = {0}; /* Input states */
+
 void loop() {
-  /* Wait until an interrupt is flagged */
-  if (!expanderInterrupted) {
-    delay(10);
-    return;
+  /* Reads the state of each input pin on the expander */
+  level[0] = expander->digitalRead(0);
+  level[1] = expander->digitalRead(1);
+  level[2] = expander->digitalRead(2);
+  level[3] = expander->digitalRead(5);
+  level[4] = expander->digitalRead(6);
+  level[5] = expander->digitalRead(7);
+  level[6] = expander->digitalRead(8);
+  level[7] = expander->digitalRead(9);
+  level[8] = expander->digitalRead(10);
+  level[9] = expander->digitalRead(11);
+  level[10] = expander->digitalRead(12);
+  level[11] = expander->digitalRead(13);
+  level[12] = expander->digitalRead(14);
+  level[13] = expander->digitalRead(15);
+
+  /* Displays the status of each signal on the serial monitor */
+  Serial.println("=== Pin Status ===");
+  for (int i = 0; i < 14; i++) {
+    Serial.printf("EXP%02d: %d - %s\n", i, level[i], signalNames[i]);
   }
+  Serial.println();
 
-  /* Clear the interrupt flag */
-  expanderInterrupted = false;
-
-  /* If BUTTON_DOWN is pressed (LOW), print the message */
-  if (expander->digitalRead(BUTTON_DOWN) == LOW) {
-    Serial.println("Button down pressed, expander interrupt detected!");
-  }
-
-  /* Short delay for debouncing */
-  delay(50);
+  delay(1000); /* Waits 1 second before the next read */
 }
 ```
 

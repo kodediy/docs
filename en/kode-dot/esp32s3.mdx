@@ -53,93 +53,31 @@ To enter the kode dot in BOOT mode, while holding the **top button,** the kode d
 ## Example code
 With this code you can get the **MAC address** of the different interfaces of the ESP32-S3.
 
-```cpp esp32s3_mac.ino lines icon="microchip"
-#include "esp_mac.h"
+```cpp esp32s3_info.ino lines icon="microchip"
+/**
+ * Displays ESP32-S3 microcontroller information via serial port.
+ * Includes model, revision, number of cores, and Chip ID.
+ * Prints the data every 3 seconds.
+ */
+/* ───────── KODE | docs.kode.diy ───────── */
 
 void setup() {
-  Serial.begin(115200);
-
-  Serial.println("Interface\t\t\t\t\t\tMAC address (6 bytes, 4 universally administered, default)");
-
-  /*
-    Gets and prints the default MAC address of the Wi-Fi station
-    using esp_efuse_mac_get_default
-  */
-  Serial.print("Wi-Fi Station (using 'esp_efuse_mac_get_default')\t");
-  Serial.println(getDefaultMacAddress());
-
-  /*
-    Reads and prints the MAC address of the Wi-Fi station
-    using esp_read_mac
-  */
-  Serial.print("WiFi Station (using 'esp_read_mac')\t\t\t");
-  Serial.println(getInterfaceMacAddress(ESP_MAC_WIFI_STA));
-
-  /*
-    Reads and prints the MAC address of the Wi-Fi Soft-AP
-    using esp_read_mac
-  */
-  Serial.print("WiFi Soft-AP (using 'esp_read_mac')\t\t\t");
-  Serial.println(getInterfaceMacAddress(ESP_MAC_WIFI_SOFTAP));
-
-  /*
-    Reads and prints the MAC address of the Bluetooth
-    using esp_read_mac
-  */
-  Serial.print("Bluetooth (using 'esp_read_mac')\t\t\t");
-  Serial.println(getInterfaceMacAddress(ESP_MAC_BT));
-
-  /*
-    Reads and prints the MAC address of the Ethernet
-    using esp_read_mac
-  */
-  Serial.print("Ethernet (using 'esp_read_mac')\t\t\t\t");
-  Serial.println(getInterfaceMacAddress(ESP_MAC_ETH));
+  Serial.begin(115200); /* Starts serial communication at 115200 baud */
 }
 
 void loop() {
-  /* Nothing is done in the main loop */
-}
+  /* Prints ESP32 chip model and revision */
+  Serial.printf("ESP32 Chip model = %s Rev %d\n", ESP.getChipModel(), ESP.getChipRevision());
+  
+  /* Prints the number of cores in the chip */
+  Serial.printf("This chip has %d cores\n", ESP.getChipCores());
+  
+  /* Prints the chip's unique identifier */
+  Serial.print("Chip ID: "); 
+  Serial.println(ESP.getEfuseMac()); 
 
-/*
-  Function to get the default MAC address
-  (stored in efuses)
-*/
-String getDefaultMacAddress() {
-  String mac = "";
-  unsigned char mac_base[6] = {0};
-
-  /* Try to read the default MAC address from efuse */
-  if (esp_efuse_mac_get_default(mac_base) == ESP_OK) {
-    /* Buffer to format the MAC as XX:XX:XX:XX:XX:XX */
-    char buffer[18];
-    sprintf(buffer, "%02X:%02X:%02X:%02X:%02X:%02X",
-            mac_base[0], mac_base[1], mac_base[2],
-            mac_base[3], mac_base[4], mac_base[5]);
-    mac = buffer;  /* convert to String */
-  }
-
-  return mac;
-}
-
-/*
-  Function to read the MAC address of a specific interface
-*/
-String getInterfaceMacAddress(esp_mac_type_t interface) {
-  String mac = "";
-  unsigned char mac_base[6] = {0};
-
-  /* Read the MAC using esp_read_mac for the indicated interface */
-  if (esp_read_mac(mac_base, interface) == ESP_OK) {
-    /* Buffer to format the MAC */
-    char buffer[18];
-    sprintf(buffer, "%02X:%02X:%02X:%02X:%02X:%02X",
-            mac_base[0], mac_base[1], mac_base[2],
-            mac_base[3], mac_base[4], mac_base[5]);
-    mac = buffer;  /* convert to String */
-  }
-
-  return mac;
+  /* Waits 3 seconds before repeating */
+  delay(3000); 
 }
 ```
 
