@@ -65,30 +65,36 @@ The magnetometer is connected in the same way to the I2C bus using these connect
 This code shows the measurement range of the sensors and the sampling frequency. It also shows the temperature, acceleration and angular velocity.
 
 ```cpp imu_test.ino lines icon="microchip"
+/**
+ * Initializes and reads an LSM6DSOX IMU over I2C on ESP32-S3, printing accel, gyro, and temperature.
+ * Prints configured ranges and data rates, then outputs readings every 1 second over Serial.
+ * Uses custom I2C pins (GPIO48/47) and the Adafruit_LSM6DSOX library.
+*/
+/* ───────── KODE | docs.kode.diy ───────── */
+
 #include <Adafruit_LSM6DSOX.h>  /* Library for the LSM6DSOX sensor */
 #include <Wire.h>               /* I2C communication library */
 
 /* Configurable I2C pins */
-#define I2C_SDA 48            /* SDA pin on ESP32-S3 */
-#define I2C_SCL 47            /* SCL pin on ESP32-S3 */
-#define I2C_FREQ 400000L      /* I2C bus frequency (400 kHz) */
+#define I2C_SDA 48            /* SDA pin */
+#define I2C_SCL 47            /* SCL pin */
 
 /* IMU sensor instance and I2C bus object */
 Adafruit_LSM6DSOX imu;
-TwoWire I2CBus = TwoWire(0);
 
 void setup(void) {
   /* Initialize serial port for debugging */
   Serial.begin(115200);
   while (!Serial);
 
-  /* Initialize I2C bus with specified pins and frequency */
-  I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+  /* Initialize the I2C bus with the specified pins */
+  Wire.begin(I2C_SDA, I2C_SCL);
 
   Serial.println("LSM6DSOX test");
 
-  /* Attempt to initialize the sensor at I2C address 0x6A */
-  if (!imu.begin_I2C(0x6A, &I2CBus)) {
+  /* Attempt to initialize the sensor at the default I2C address (0x6A).
+     Note: some boards use 0x6B depending on SA0. */
+  if (!imu.begin_I2C()) {
     Serial.println("Failed to find LSM6DSOX chip");
     while (1) {
       delay(10);  /* Infinite loop if initialization fails */
@@ -193,27 +199,30 @@ void loop() {
   Serial.println(" radians/s");
 
   Serial.println();
-  delay(100);  /* Small delay between readings */
+  delay(1000);  /* Small delay between readings */
 }
 ```
 
 ### 3-axis magnetometer
-This code turns the kode dot into a compass, showing where the north is.
+This code shows the magnetic vector in micro-Teslas (uT).
 	
 ```cpp mag_test.ino lines icon="microchip"
+/**
+ * Initializes and reads the LIS2MDL magnetometer over I2C on an ESP32-S3.
+ * Prints sensor details on startup, then outputs the magnetic vector (uT) every second.
+ * Uses custom I2C pins (GPIO48/47) and the Adafruit_LIS2MDL library.
+*/
+/* ───────── KODE | docs.kode.diy ───────── */
+
 #include <Wire.h>
-#include <Adafruit_Sensor.h>
 #include <Adafruit_LIS2MDL.h>
 
-/* Configurable I2C pins and frequency */
-#define I2C_SDA 48            /* SDA pin on ESP32-S3 */
-#define I2C_SCL 47            /* SCL pin on ESP32-S3 */
-#define I2C_FREQ 400000L      /* I2C bus frequency (400 kHz) */
+/* Configurable I2C pins */
+#define I2C_SDA 48            /* SDA pin */
+#define I2C_SCL 47            /* SCL pin */
 
 /* Magnetometer instance with unique ID */
 Adafruit_LIS2MDL mag = Adafruit_LIS2MDL(12345);
-/* I2C bus object (port 0) */
-TwoWire I2CBus = TwoWire(0);
 
 void setup(void) {
   /* Initialize serial port for debug output */
@@ -222,45 +231,44 @@ void setup(void) {
     /* wait for serial */
   }
 
-  /* Initialize I2C bus with selected SDA, SCL pins and frequency */
-  I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+  /* Initialize I2C bus with selected SDA, SCL pins */
+  Wire.begin(I2C_SDA, I2C_SCL);
 
   Serial.println("Magnetometer Test");
   Serial.println();
 
   /* Attempt to initialize the LIS2MDL sensor at I2C address 0x1E */
-  if (!mag.begin(0x1E, &I2CBus)) {
+  if (!mag.begin()) {
     /* Sensor not detected: print error and halt */
     Serial.println("Ooops, no LIS2MDL detected ... Check your wiring!");
     while (1) {
-      delay(10);  /* infinite loop on failure */
+      delay(10);  /* Infinite loop on failure */
     }
   }
+
+  /* Display some basic information on this sensor */
+  mag.printSensorDetails();
 }
 
 void loop(void) {
-  /* Create a sensor event to hold magnetometer data */
+  /* Get a new sensor event */
   sensors_event_t event;
-  /* Retrieve the latest magnetic field data */
   mag.getEvent(&event);
 
-  /* Constant for converting radians to degrees */
-  const float Pi = 3.14159;
-
-  /* Calculate heading angle from Y and X magnetic components */
-  float heading = atan2(event.magnetic.y, event.magnetic.x) * 180 / Pi;
-
-  /* Normalize heading to range 0-360 degrees */
-  if (heading < 0) {
-    heading += 360;  /* adjust negative angles */
-  }
-
-  /* Print the compass heading */
-  Serial.print("Compass Heading: ");
-  Serial.println(heading);
+  /* Display the results (magnetic vector values are in micro-Tesla (uT)) */
+  Serial.print("X: ");
+  Serial.print(event.magnetic.x);
+  Serial.print("  ");
+  Serial.print("Y: ");
+  Serial.print(event.magnetic.y);
+  Serial.print("  ");
+  Serial.print("Z: ");
+  Serial.print(event.magnetic.z);
+  Serial.print("  ");
+  Serial.println("uT");
 
   /* Delay before next reading */
-  delay(500);
+  delay(1000);
 }
 ```
 ## Download examples

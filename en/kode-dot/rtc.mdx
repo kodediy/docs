@@ -33,74 +33,7 @@ The external clock is connected to the I2C of the ESP32-S3 using these connectio
 This code configures the RTC with a specific date and time and then prints the current time every second.
 
 ```cpp rtc_test.ino lines icon="microchip"
-#include <AnalogRTCLibrary.h>
-#include <Wire.h>
-
-/* I2C bus configuration: SDA, SCL pins, and frequency */
-#define I2C_SDA 48           /* SDA pin on ESP32-S3 */
-#define I2C_SCL 47           /* SCL pin on ESP32-S3 */
-#define I2C_FREQ 400000L     /* I2C bus frequency (400 kHz) */
-
-/* Initialize I2C bus with specified pins and frequency */
-Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
-
-/* RTC instance for MAX31329 at default I2C address */
-MAX31329 rtc(&Wire, MAX31329_I2C_ADDRESS);
-
-/* Structure to hold RTC date and time */
-struct tm rtc_ctime;
-
-/* Function to read and print current RTC time */
-void print_time(void) {
-    char buf[40];
-
-    /* Get current time from RTC */
-    int ret = rtc.get_time(&rtc_ctime);
-    if (ret) {
-        Serial.println("get_time failed!"); /* Error reading RTC time */
-        return;
-    }
-
-    /* Format date and time into a string */
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &rtc_ctime);
-    Serial.println(buf); /* Print formatted time */
-}
-
-void setup() {
-    int ret;
-
-    /* Initialize serial port for debugging */
-    Serial.begin(115200);
-    Serial.println("---------------------");
-    Serial.println("RTC use case example:");
-    Serial.println("RTC will be set to a specific value then read every second");
-    Serial.println();
-
-    /* Initialize the RTC module */
-    rtc.begin();
-    /* Set a fixed initial date and time: 2024-11-24 15:10:00 */
-    rtc_ctime.tm_year = 124; /* Years since 1900: 2024 - 1900 */
-    rtc_ctime.tm_mon  = 10;  /* Month (0-11): November */
-    rtc_ctime.tm_mday = 24;  /* Day of the month (1-31) */
-    rtc_ctime.tm_hour = 15;  /* Hour (0-23) */
-    rtc_ctime.tm_min  = 10;  /* Minutes (0-59) */
-    rtc_ctime.tm_sec  = 0;   /* Seconds (0-61) */
-    /* Non-critical fields for set_time */
-    rtc_ctime.tm_yday  = 0;  /* Day of the year (0-365) */
-    rtc_ctime.tm_wday  = 0;  /* Day of the week (0-6) */
-    rtc_ctime.tm_isdst = 0;  /* Daylight Savings flag */
-
-    /* Apply configured time to the RTC */
-    ret = rtc.set_time(&rtc_ctime);
-    if (ret) {
-        Serial.println("Set time failed!"); /* Error setting RTC time */
-    }
-}
-
-void loop() {
-    delay(1000); /* Wait 1 second between readings */
-    print_time(); /* Read and print current RTC time */
-}
+TBD
 ```
 
 ## Descarga de ejemplos

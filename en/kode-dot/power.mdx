@@ -110,79 +110,71 @@ This regulator can be **activated or deactivated** to power the peripherals of t
 - [PMIC_BQ25896](https://github.com/sqmsmu/PMIC_BQ25896)
 
 #### Fuel Gauge
-- TBD pero workaround [SparkFun_BQ27441_Arduino_Library](https://github.com/sparkfun/SparkFun_BQ27441_Arduino_Library)
+- [kode_bq27220](https://github.com/kodediy/kode_bq27220)
 
 ### ESP-IDF
 #### Power Management Integrated Circuit (PMIC)
 - [kode_bq25896](https://components.espressif.com/components/kodediy/kode_bq25896)
 
 #### Fuel Gauge
-- TBD
+- [kode_bq27220](https://components.espressif.com/components/kodediy/kode_bq27220/versions/1.0.0)
 
 ## Example code
 #### Power Management Integrated Circuit (PMIC)
 With this code you can see the parameters that the PMIC returns from the battery and the power supply.
 ```cpp pmic_test.ino lines icon="microchip"
+/**
+ * Example usage of the PMIC BQ25896 on ESP32-S3 via I²C.
+ * Initializes the battery charger/power manager, displays system parameters,
+ * and updates readings and status every second.
+ */
+/* ───────── KODE | docs.kode.diy ───────── */
+
 #include "PMIC_BQ25896.h"
 #include <Wire.h>
 
-/* I2C bus configuration: SDA, SCL pins, and frequency */
-#define I2C_SDA 48           /* SDA pin on ESP32-S3 */
-#define I2C_SCL 47           /* SCL pin on ESP32-S3 */
-#define I2C_FREQ 400000L     /* I2C bus frequency (400 kHz) */
+/* I²C bus configuration: SDA, SCL pins */
+#define I2C_SDA 48           /* SDA pin */
+#define I2C_SCL 47           /* SCL pin */
 
-/* Instantiate PMIC BQ25896 driver and I2C bus object */
+/* BQ25896 driver instance */
 PMIC_BQ25896 bq25896;
-TwoWire I2CBus = TwoWire(0);
 
 void setup() {
-  /* Initialize serial port for debug output */
+  /* Initialize serial port for debugging */
   Serial.begin(115200);
   while (!Serial) {
     /* Wait for serial connection */
   }
 
-  /* Initialize I2C bus with specified pins and frequency */
-  I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+  /* Initialize I²C bus with specified pins */
+  Wire.begin(I2C_SDA, I2C_SCL);
 
   Serial.println("BQ25896 Power Management and Battery Charger Example");
 
-  /* Initialize the BQ25896 device over I2C */
-  bq25896.begin(&I2CBus);
+  /* Initialize the BQ25896 over I²C */
+  bq25896.begin();
   delay(500);  /* Allow device to power up */
 
   /* Check device connectivity */
   if (!bq25896.isConnected()) {
     Serial.println("BQ25896 not found! Check connection and power");
     while (1) {
-      /* Halt execution if device not found */
+      /* Halt execution if device is not found */
     }
   } else {
     Serial.println("BQ25896 found successfully.");
   }
-
-  Serial.println("Resetting BQ25896");
-  /* Reset all registers to default values */
-  bq25896.reset();
-  delay(1000);
-
-  /* Disable hardware ILIM pin and configure ADC conversion */
-  bq25896.setEN_ILIM(false);       /* Disable ILIM pin */
-  bq25896.setCONV_START(true);     /* Single-shot ADC conversion */
-  bq25896.setWATCHDOG(0);          /* Disable watchdog timer */
-
-  /* Configure charge current to 2000 mA */
-  bq25896.setICHG(2000);
 }
 
 void loop() {
   Serial.println("BQ25896 System Parameters");
 
-  /* Print input current limit pin status */
+  /* Input current limit pin status */
   Serial.print("ILIM PIN : ");
   Serial.println(String(bq25896.getILIM_reg().en_ilim));
 
-  /* Read and print various system parameters */
+  /* System and charging parameters */
   Serial.print("IINLIM       : "); Serial.println(String(bq25896.getIINLIM()) + " mA");
   Serial.print("VINDPM_OS    : "); Serial.println(String(bq25896.getVINDPM_OS()) + " mV");
   Serial.print("SYS_MIN      : "); Serial.println(String(bq25896.getSYS_MIN()) + " mV");
@@ -201,7 +193,7 @@ void loop() {
   Serial.print("VBUSV        : "); Serial.println(String(bq25896.getVBUSV()) + " mV");
   Serial.print("ICHGR        : "); Serial.println(String(bq25896.getICHGR()) + " mA");
 
-  /* Print fault status bits */
+  /* Fault status */
   Serial.print("Fault -> "); 
   Serial.print("NTC:" + String(bq25896.getFAULT_reg().ntc_fault));
   Serial.print(" ,BAT:" + String(bq25896.getFAULT_reg().bat_fault));
@@ -209,7 +201,7 @@ void loop() {
   Serial.print(" ,BOOST:" + String(bq25896.getFAULT_reg().boost_fault));
   Serial.println(" ,WATCHDOG:" + String(bq25896.getFAULT_reg().watchdog_fault));
 
-  /* Print charging status bits */
+  /* Charging status */
   Serial.print("Charging Status -> "); 
   Serial.print("CHG_EN:" + String(bq25896.getSYS_CTRL_reg().chg_config));
   Serial.print(" ,BATFET DIS:" + String(bq25896.getCTRL1_reg().batfet_dis));
@@ -223,6 +215,68 @@ void loop() {
   bq25896.setCONV_START(true);
 
   delay(1000); /* Update every second */
+}
+```
+
+#### Fuel Gauge
+With this code you can see the parameters that the fuel gauge returns from the battery.
+
+```cpp bq27220_test.ino lines icon="microchip"
+/**
+ * Example usage of the Texas Instruments BQ27220 battery fuel gauge.
+ * Reads state of charge, voltage, current, and temperature over I²C.
+ * Displays charging status and estimated time to full when charging.
+ */
+/* ───────── KODE | docs.kode.diy ───────── */
+
+#include <Wire.h>
+#include <BQ27220.h>
+
+/* I²C pin configuration for ESP32-S3 */
+#define SDA_PIN 48   /* SDA line */
+#define SCL_PIN 47   /* SCL line */
+
+/* Battery fuel gauge driver instance */
+BQ27220 gauge;
+
+void setup() {
+  /* Initialize serial port for debug output */
+  Serial.begin(115200);
+
+  /* Start I²C bus with custom SDA/SCL pins */
+  Wire.begin(SDA_PIN, SCL_PIN);
+
+  /* Initialize the BQ27220 fuel gauge */
+  if (!gauge.begin()) {
+    Serial.println("BQ27220 not found!");
+    while (1) delay(1000); /* Halt execution if not found */
+  }
+
+  Serial.println("BQ27220 ready.");
+}
+
+void loop() {
+  /* Read battery parameters */
+  int soc = gauge.readStateOfChargePercent();  // State of charge (%)
+  int mv  = gauge.readVoltageMillivolts();     // Voltage (mV)
+  int ma  = gauge.readCurrentMilliamps();      // Current (mA), positive = charging
+  float tC = gauge.readTemperatureCelsius();  // Temperature (°C)
+
+  /* Print basic battery information */
+  Serial.print("SOC= "); Serial.print(soc); Serial.print("%  ");
+  Serial.print("V= "); Serial.print(mv); Serial.print(" mV  ");
+  Serial.print("I= "); Serial.print(ma); Serial.print(" mA  ");
+  Serial.print("T= "); Serial.print(tC, 1); Serial.print(" °C");
+
+  /* If charging, show estimated time to full */
+  if (ma > 0) {
+    int ttf = gauge.readTimeToFullMinutes();
+    Serial.print("  TTF= "); Serial.print(ttf); Serial.print(" min");
+  }
+
+  Serial.println();
+
+  delay(1000); /* Update once per second */
 }
 ```
 

@@ -65,30 +65,36 @@ El magnetómetro está conectado de la misma manera al bus I2C usando estas cone
 Este código muestra el rango de medida de los sensores y la frecuencia de muestreo. También muestra la temperatura, la aceleración y la velocidad angular.
 
 ```cpp imu_test.ino lines icon="microchip"
-#include <Adafruit_LSM6DSOX.h>  /* Biblioteca para el sensor LSM6DSOX */
-#include <Wire.h>               /* Biblioteca para el bus I2C */
+/**
+ * Inicializa y lee una IMU LSM6DSOX por I2C en ESP32-S3, mostrando aceleración, giro y temperatura.
+ * Imprime rangos y data rates configurados y luego publica lecturas cada 1 segundo por el puerto serie.
+ * Usa pines I2C personalizados (GPIO48/47) y la librería Adafruit_LSM6DSOX.
+*/
+/* ───────── KODE | docs.kode.diy ───────── */
+
+#include <Adafruit_LSM6DSOX.h>  /* Librería para el sensor LSM6DSOX */
+#include <Wire.h>               /* Librería de comunicación I2C */
 
 /* Pines I2C configurables */
-#define I2C_SDA 48            /* Pin SDA del ESP32-S3 */
-#define I2C_SCL 47            /* Pin SCL del ESP32-S3 */
-#define I2C_FREQ 400000L      /* Frecuencia del bus I2C (400 kHz) */
+#define I2C_SDA 48            /* Pin SDA */
+#define I2C_SCL 47            /* Pin SCL */
 
 /* Instancia del sensor IMU y del bus I2C */
 Adafruit_LSM6DSOX imu;
-TwoWire I2CBus = TwoWire(0);
 
 void setup(void) {
   /* Inicializa el puerto serie para depuración */
   Serial.begin(115200);
   while (!Serial);
 
-  /* Configura el bus I2C con los pines y frecuencia deseados */
-  I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+  /* Inicializa el bus I2C con los pines especificados */
+  Wire.begin(I2C_SDA, I2C_SCL);
 
   Serial.println("LSM6DSOX test");
 
-  /* Intento de inicialización del sensor en la dirección I2C 0x6A */
-  if (!imu.begin_I2C(0x6A, &I2CBus)) {
+  /* Intenta inicializar el sensor en la dirección I2C por defecto (0x6A).
+     Nota: algunas placas usan 0x6B según el estado del pin SA0. */
+  if (!imu.begin_I2C()) {
     Serial.println("Failed to find LSM6DSOX chip");
     while (1) {
       delay(10);  /* Bucle infinito si falla la inicialización */
@@ -96,7 +102,7 @@ void setup(void) {
   }
   Serial.println("LSM6DSOX Found!");
 
-  /* Mostrar rango configurado del acelerómetro */
+  /* Muestra el rango configurado del acelerómetro */
   Serial.print("Accelerometer range set to: ");
   switch (imu.getAccelRange()) {
     case LSM6DS_ACCEL_RANGE_2_G:
@@ -109,7 +115,7 @@ void setup(void) {
       Serial.println("+-16G"); break;
   }
 
-  /* Mostrar rango configurado del giroscopio */
+  /* Muestra el rango configurado del giroscopio */
   Serial.print("Gyro range set to: ");
   switch (imu.getGyroRange()) {
     case LSM6DS_GYRO_RANGE_125_DPS:
@@ -123,11 +129,11 @@ void setup(void) {
     case LSM6DS_GYRO_RANGE_2000_DPS:
       Serial.println("2000 degrees/s"); break;
     case ISM330DHCX_GYRO_RANGE_4000_DPS:
-      /* Rango no soportado por DSOX */
+      /* Rango no soportado por el DSOX */
       break;
   }
 
-  /* Mostrar frecuencia de muestreo del acelerómetro */
+  /* Muestra el data rate configurado del acelerómetro */
   Serial.print("Accelerometer data rate set to: ");
   switch (imu.getAccelDataRate()) {
     case LSM6DS_RATE_SHUTDOWN:    Serial.println("0 Hz"); break;
@@ -143,7 +149,7 @@ void setup(void) {
     case LSM6DS_RATE_6_66K_HZ:    Serial.println("6.66 KHz"); break;
   }
 
-  /* Mostrar frecuencia de muestreo del giroscopio */
+  /* Muestra el data rate configurado del giroscopio */
   Serial.print("Gyro data rate set to: ");
   switch (imu.getGyroDataRate()) {
     case LSM6DS_RATE_SHUTDOWN:    Serial.println("0 Hz"); break;
@@ -161,106 +167,108 @@ void setup(void) {
 }
 
 void loop() {
-  /* Variables para almacenar los eventos del sensor */
+  /* Variables para los eventos del sensor */
   sensors_event_t accel;
   sensors_event_t gyro;
   sensors_event_t temp;
 
-  /* Obtiene datos de acelerómetro, giroscopio y temperatura */
+  /* Obtiene eventos de acelerómetro, giroscopio y temperatura */
   imu.getEvent(&accel, &gyro, &temp);
 
-  /* Mostrar temperatura en grados Celsius */
-  Serial.print("\t\tTemperature ");
+  /* Imprime temperatura en grados Celsius */
+  Serial.print("\t\tTemperature: ");
   Serial.print(temp.temperature);
   Serial.println(" deg C");
 
-  /* Mostrar aceleración en m/s^2 para cada eje */
+  /* Imprime aceleración en m/s^2 por eje */
   Serial.print("\t\tAccel X: ");
   Serial.print(accel.acceleration.x);
   Serial.print(" \tY: ");
   Serial.print(accel.acceleration.y);
   Serial.print(" \tZ: ");
   Serial.print(accel.acceleration.z);
-  Serial.println(" m/s^2 ");
+  Serial.println(" m/s^2");
 
-  /* Mostrar velocidad angular en rad/s para cada eje */
+  /* Imprime rotación del giroscopio en rad/s por eje */
   Serial.print("\t\tGyro X: ");
   Serial.print(gyro.gyro.x);
   Serial.print(" \tY: ");
   Serial.print(gyro.gyro.y);
   Serial.print(" \tZ: ");
   Serial.print(gyro.gyro.z);
-  Serial.println(" radians/s ");
+  Serial.println(" radians/s");
 
   Serial.println();
-  delay(100);  /* Pequeña pausa entre lecturas */
+  delay(1000);  /* Espera entre lecturas */
 }
 ```
 
 ### Magnetómetro de 3 ejes
-Este código convierte el kode dot en una brújula, mostrándo dónde está el norte.
+Este código muestra el vector magnético en micro-Teslas (uT).
 	
 ```cpp mag_test.ino lines icon="microchip"
+/**
+ * Inicializa y lee el magnetómetro LIS2MDL por I2C en un ESP32-S3.
+ * Imprime detalles del sensor al inicio y luego muestra el vector magnético (uT) cada segundo.
+ * Usa pines I2C personalizados (GPIO48/47) y la librería Adafruit_LIS2MDL.
+*/
+/* ───────── KODE | docs.kode.diy ───────── */
+
 #include <Wire.h>
-#include <Adafruit_Sensor.h>
 #include <Adafruit_LIS2MDL.h>
 
-/* Pines I2C configurables y frecuencia */
-#define I2C_SDA 48            /* Pin SDA en ESP32-S3 */
-#define I2C_SCL 47            /* Pin SCL en ESP32-S3 */
-#define I2C_FREQ 400000L      /* Frecuencia del bus I2C (400 kHz) */
+/* Pines I2C configurables */
+#define I2C_SDA 48            /* Pin SDA */
+#define I2C_SCL 47            /* Pin SCL */
 
 /* Instancia del magnetómetro con ID único */
 Adafruit_LIS2MDL mag = Adafruit_LIS2MDL(12345);
-/* Objeto del bus I2C (puerto 0) */
-TwoWire I2CBus = TwoWire(0);
 
 void setup(void) {
   /* Inicializa el puerto serie para depuración */
   Serial.begin(115200);
   while (!Serial) {
-    /* Espera a que el puerto serie esté listo */
+    /* espera al puerto serie */
   }
 
-  /* Inicializa el bus I2C con los pines SDA, SCL y frecuencia seleccionados */
-  I2CBus.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+  /* Inicializa el bus I2C con los pines seleccionados */
+  Wire.begin(I2C_SDA, I2C_SCL);
 
-  Serial.println("Prueba del magnetómetro");
+  Serial.println("Magnetometer Test");
   Serial.println();
 
   /* Intenta inicializar el sensor LIS2MDL en la dirección I2C 0x1E */
-  if (!mag.begin(0x1E, &I2CBus)) {
-    /* Sensor no detectado: muestra error y detiene la ejecución */
-    Serial.println("¡Error, no se detectó el LIS2MDL! Verifica el cableado.");
+  if (!mag.begin()) {
+    /* Sensor no detectado: muestra error y se detiene */
+    Serial.println("Ooops, no LIS2MDL detected ... Check your wiring!");
     while (1) {
-      delay(10);  /* Bucle infinito en caso de fallo */
+      delay(10);  /* Bucle infinito si falla */
     }
   }
+
+  /* Muestra información básica del sensor */
+  mag.printSensorDetails();
 }
 
 void loop(void) {
-  /* Estructura para almacenar el evento del magnetómetro */
+  /* Obtiene un nuevo evento del sensor */
   sensors_event_t event;
-  /* Recupera la última lectura del campo magnético */
   mag.getEvent(&event);
 
-  /* Constante para convertir radianes a grados */
-  const float Pi = 3.14159;
+  /* Muestra los resultados (valores magnéticos en micro-Teslas, uT) */
+  Serial.print("X: ");
+  Serial.print(event.magnetic.x);
+  Serial.print("  ");
+  Serial.print("Y: ");
+  Serial.print(event.magnetic.y);
+  Serial.print("  ");
+  Serial.print("Z: ");
+  Serial.print(event.magnetic.z);
+  Serial.print("  ");
+  Serial.println("uT");
 
-  /* Calcula el ángulo de rumbo a partir de los componentes Y y X */
-  float heading = atan2(event.magnetic.y, event.magnetic.x) * 180 / Pi;
-
-  /* Normaliza el ángulo al rango 0-360 grados */
-  if (heading < 0) {
-    heading += 360;  /* Ajusta ángulos negativos */
-  }
-
-  /* Muestra el rumbo de la brújula */
-  Serial.print("Rumbo de la brújula: ");
-  Serial.println(heading);
-
-  /* Pausa antes de la próxima lectura */
-  delay(500);
+  /* Espera entre lecturas */
+  delay(1000);
 }
 ```
 ## Descarga de ejemplos
