@@ -36,61 +36,64 @@ El led direccionable funciona mediante un sólo pin conectado al ESP32-S3.
 ## Ejemplo de código
 Este código ilumina el led direccionable haciendo un ciclo de colores: primero rojo, luego verde y por último azul.
 ```cpp rgb_cycle.ino lines icon="microchip"
-#include <Adafruit_NeoPixel.h>
+/**
+ * Controla un único NeoPixel conectado al GPIO 4, encendiéndolo en rojo, verde y azul.
+ * Cada color se mantiene encendido durante medio segundo y se apaga entre cambios.
+ * Usa la librería Adafruit_NeoPixel para el control de LEDs RGB.
+ */
+/* ───────── KODE | docs.kode.diy ───────── */
 
-#define NEOPIXEL_PIN   4                 /* Pin GPIO donde está conectado el NeoPixel */
-#define NUMPIXELS      1                 /* Número de NeoPixels conectados */
-#define PIXEL_FORMAT   (NEO_GRB + NEO_KHZ800)  /* Formato de color y tasa de datos */
+#include <Adafruit_NeoPixel.h> /* Librería para controlar tiras y LEDs NeoPixel */
 
-Adafruit_NeoPixel *pixels;            /* Puntero al objeto NeoPixel */
+#define NEOPIXEL_PIN   4                  /* Pin GPIO donde está conectado el NeoPixel */
+#define NUMPIXELS      1                  /* Número de NeoPixels conectados */
+#define PIXEL_FORMAT   (NEO_GRB + NEO_KHZ800) /* Formato de color y velocidad de datos */
 
-#define DELAYVAL       500               /* Retardo en milisegundos entre cambios */
+Adafruit_NeoPixel *pixels;                /* Puntero al objeto NeoPixel */
+
+#define DELAYVAL       500                /* Tiempo de espera entre cambios (ms) */
 
 void setup() {
-  /* Inicializa la comunicación serie para debug */
-  Serial.begin(115200);
+  Serial.begin(115200);                   /* Inicia la comunicación serie para depuración */
 
-  /* Crea dinámicamente el objeto NeoPixel con los parámetros definidos */
+  /* Crea el objeto NeoPixel con los parámetros definidos */
   pixels = new Adafruit_NeoPixel(NUMPIXELS, NEOPIXEL_PIN, PIXEL_FORMAT);
 
-  /* Inicializa el strip de NeoPixels */
-  pixels->begin();
-
-  /* Asegura que el LED comience apagado */
-  pixels->clear();
-  pixels->show();
+  pixels->begin();                        /* Inicializa el NeoPixel */
+  pixels->clear();                        /* Asegura que el LED empiece apagado */
+  pixels->show();                         /* Aplica el cambio */
 }
 
 void loop() {
-  /* Enciende el NeoPixel en rojo */
+  /* Enciende en rojo */
   pixels->setPixelColor(0, pixels->Color(150, 0, 0));
-  pixels->show();          /* Actualiza el LED */
-  delay(DELAYVAL);         /* Mantiene el color un tiempo */
+  pixels->show();
+  delay(DELAYVAL);
 
-  /* Apaga el NeoPixel */
+  /* Apaga */
   pixels->setPixelColor(0, pixels->Color(0, 0, 0));
-  pixels->show();          /* Actualiza el LED */
-  delay(DELAYVAL);         /* Espera antes de volver a encender */
+  pixels->show();
+  delay(DELAYVAL);
 
-  /* Enciende el NeoPixel en verde */
+  /* Enciende en verde */
   pixels->setPixelColor(0, pixels->Color(0, 150, 0));
-  pixels->show();          /* Actualiza el LED */
-  delay(DELAYVAL);         /* Mantiene el color un tiempo */
+  pixels->show();
+  delay(DELAYVAL);
 
-  /* Apaga el NeoPixel */
+  /* Apaga */
   pixels->setPixelColor(0, pixels->Color(0, 0, 0));
-  pixels->show();          /* Actualiza el LED */
-  delay(DELAYVAL);         /* Espera antes de volver a encender */
+  pixels->show();
+  delay(DELAYVAL);
 
-  /* Enciende el NeoPixel en azul */
+  /* Enciende en azul */
   pixels->setPixelColor(0, pixels->Color(0, 0, 150));
-  pixels->show();          /* Actualiza el LED */
-  delay(DELAYVAL);         /* Mantiene el color un tiempo */
+  pixels->show();
+  delay(DELAYVAL);
 
-  /* Apaga el NeoPixel */
+  /* Apaga */
   pixels->setPixelColor(0, pixels->Color(0, 0, 0));
-  pixels->show();          /* Actualiza el LED */
-  delay(DELAYVAL);         /* Espera antes de volver a encender */
+  pixels->show();
+  delay(DELAYVAL);
 }
 ```
 

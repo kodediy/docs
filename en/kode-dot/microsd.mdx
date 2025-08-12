@@ -47,6 +47,13 @@ This code will make a **test of the microSD in this order:**
 12. Test of reading and writing performance
 
 ```cpp microsd_test.ino lines icon="microchip"
+/**
+ * Manages an SD card in SD_MMC (1-bit) mode on ESP32-S3.
+ * Performs file operations (list, create, read, write, rename, delete) and measures performance.
+ * Uses custom pins and mounts the card at /sdcard.
+*/
+/* ───────── KODE | docs.kode.diy ───────── */
+
 #include "FS.h"
 #include "SD_MMC.h"
 
@@ -214,7 +221,7 @@ void testFileIO(fs::FS &fs, const char *path) {
     return;
   }
   start = millis();
-  /* Write 2048 blocks of 512 bytes */
+  /* Write 2048 blocks of 512 bytes (1 MiB) */
   for (size_t i = 0; i < 2048; i++) {
     file.write(buf, sizeof(buf));
   }
@@ -232,8 +239,8 @@ void setup() {
     return;
   }
 
-  /* Mount the SD card via SD_MMC */
-  if (!SD_MMC.begin()) {
+  /* Mount the SD card via SD_MMC (mount point and busWidth=1 for 1-bit) */
+  if (!SD_MMC.begin("/sdcard", 1)) {
     Serial.println("Card Mount Failed");
     return;
   }
@@ -274,7 +281,7 @@ void setup() {
 }
 
 void loop() {
-  /* Nothing to do in the main loop */
+  /* Nothing to do in the main loop; brief delay to yield CPU */
   delay(10);
 }
 ```

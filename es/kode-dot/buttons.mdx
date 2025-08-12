@@ -39,106 +39,111 @@ La conexión de los botones es la siguiente:
 Con este código puedes comprobar el **funcionamiento de los botones.** Conecta el kode dot al **monitor serie** y según qué botón pulses, verás un mensaje en el monitor.
 
 ```cpp buttons_check.ino lines icon="microchip"	
-#include <esp_io_expander.hpp>
+/**
+ * Detecta pulsaciones de botones conectados a un expansor I/O TCA95XX_16BIT y a un pin directo del ESP32-S3.
+ * Usa interrupciones para responder a eventos de pulsación sin necesidad de sondeo constante.
+ * Muestra en el monitor serie el botón detectado.
+ */
+/* ───────── KODE | docs.kode.diy ───────── */
 
- /* Configuración del expansor de pines */
+#include <esp_io_expander.hpp> /* Librería para controlar expansores de I/O en ESP32 */
+
+/* Configuración del expansor */
 #define CHIP_NAME         TCA95XX_16BIT
-#define I2C_SCL_PIN       (47)
-#define I2C_SDA_PIN       (48)
-#define EXP_INT_PIN       (18)
-#define I2C_ADDR          (0x20)
+#define I2C_SCL_PIN       (47)  /* Pin SCL del bus I2C */
+#define I2C_SDA_PIN       (48)  /* Pin SDA del bus I2C */
+#define EXP_INT_PIN       (18)  /* Pin de interrupción del expansor */
+#define I2C_ADDR          (0x20)/* Dirección I2C del expansor */
 
- /* Conexiones de los botones al expansor */
+/* Conexiones de botones en el expansor */
 #define PAD_UP            6
 #define PAD_LEFT          7
 #define PAD_DOWN          8
 #define PAD_RIGHT         11
 #define BUTTON_BOTTOM     9
 
- /* Botón conectado directamente al ESP32-S3 */
-#define BUTTON_UP_PIN     0    // GPIO0
+/* Botón conectado directamente al ESP32-S3 */
+#define BUTTON_UP_PIN     0    /* GPIO0 */
 
- /* Instancia del expansor */
+/* Instancia del expansor */
 esp_expander::Base *expander = nullptr;
 
- /* Flags para interrupciones pendientes */
-volatile bool expanderInterrupted    = false;
-volatile bool buttonUpInterrupted    = false;
+/* Banderas para interrupciones pendientes */
+volatile bool expanderInterrupted = false;
+volatile bool buttonUpInterrupted = false;
 
- /* ISR para la interrupción del expansor: solo marca el flag */
+/* ISR para interrupción del expansor */
 void IRAM_ATTR handleExpanderIRQ() {
   expanderInterrupted = true;
 }
 
- /* ISR para el botón conectado a GPIO0: solo marca el flag */
+/* ISR para el botón en GPIO0 */
 void IRAM_ATTR handleButtonUpIRQ() {
   buttonUpInterrupted = true;
 }
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Inicio del test de botones con interrupción");
+  Serial.println("Button interrupt test start");
 
   /* Inicializa el expansor */
   expander = new esp_expander::TCA95XX_16BIT(I2C_SCL_PIN, I2C_SDA_PIN, I2C_ADDR);
   expander->init();
   expander->begin();
 
-  /* Configura los pines del expansor como entradas */
-  expander->pinMode(PAD_UP,       INPUT);
-  expander->pinMode(PAD_LEFT,     INPUT);
-  expander->pinMode(PAD_DOWN,     INPUT);
-  expander->pinMode(PAD_RIGHT,    INPUT);
+  /* Configura pines del expansor como entradas */
+  expander->pinMode(PAD_UP,        INPUT);
+  expander->pinMode(PAD_LEFT,      INPUT);
+  expander->pinMode(PAD_DOWN,      INPUT);
+  expander->pinMode(PAD_RIGHT,     INPUT);
   expander->pinMode(BUTTON_BOTTOM, INPUT);
 
-  /* Configura el pin de interrupción del expansor con pull-up */
+  /* Configura pin de interrupción del expansor */
   pinMode(EXP_INT_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(EXP_INT_PIN),
                   handleExpanderIRQ, FALLING);
 
-  /* Configura el botón ARRIBA en GPIO0 con pull-up interno */
+  /* Configura botón directo en GPIO0 */
   pinMode(BUTTON_UP_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(BUTTON_UP_PIN),
                   handleButtonUpIRQ, FALLING);
 
-  Serial.println("Configuración completa. A la espera de pulsaciones...");
+  Serial.println("Setup complete. Waiting for button presses...");
 }
 
 void loop() {
-  /* Si no hay interrupciones pendienes, esperamos un poco */
+  /* Si no hay interrupciones pendientes, espera */
   if (!expanderInterrupted && !buttonUpInterrupted) {
     delay(10);
     return;
   }
 
-  /* Procesa el botón ARRIBA conectado a GPIO0 */
+  /* Gestiona botón directo */
   if (buttonUpInterrupted) {
-    buttonUpInterrupted = false;  // limpia el flag
-    Serial.println("→ BUTTON_UP (GPIO0) pulsado");
-    delay(50);                    // debounce sencillo
+    buttonUpInterrupted = false;
+    Serial.println("→ BUTTON_UP (GPIO0) pressed");
+    delay(50);
   }
 
-  /* Procesa los botones del expansor */
+  /* Gestiona botones del expansor */
   if (expanderInterrupted) {
-    expanderInterrupted = false;  // limpia el flag
-
+    expanderInterrupted = false;
     if (expander->digitalRead(PAD_UP) == LOW) {
-      Serial.println("→ PAD_UP pulsado");
+      Serial.println("→ PAD_UP pressed");
     }
     if (expander->digitalRead(PAD_LEFT) == LOW) {
-      Serial.println("→ PAD_LEFT pulsado");
+      Serial.println("→ PAD_LEFT pressed");
     }
     if (expander->digitalRead(PAD_DOWN) == LOW) {
-      Serial.println("→ PAD_DOWN pulsado");
+      Serial.println("→ PAD_DOWN pressed");
     }
     if (expander->digitalRead(BUTTON_BOTTOM) == LOW) {
-      Serial.println("→ BUTTON_BOTTOM pulsado");
+      Serial.println("→ BUTTON_BOTTOM pressed");
     }
     if (expander->digitalRead(PAD_RIGHT) == LOW) {
-      Serial.println("→ PAD_RIGHT pulsado");
+      Serial.println("→ PAD_RIGHT pressed");
     }
-
-    delay(50);  // debounce sencillo
+    delay(50);
   }
 }
 ```

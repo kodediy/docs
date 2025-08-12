@@ -39,14 +39,21 @@ The connection of the buttons is as follows:
 With this code you can check the **functionality of the buttons.** Connect the kode dot to the **serial monitor** and depending on which button you press, you will see a message in the monitor.
 
 ```cpp buttons_check.ino lines icon="microchip"	
-#include <esp_io_expander.hpp>
+/**
+ * Detects button presses from a TCA95XX_16BIT I/O expander and a direct ESP32-S3 pin.
+ * Uses interrupts to respond to button events without constant polling.
+ * Prints the detected button to the serial monitor.
+ */
+/* ───────── KODE | docs.kode.diy ───────── */
+
+#include <esp_io_expander.hpp> /* Library to control I/O expanders on ESP32 */
 
 /* Expander configuration */
 #define CHIP_NAME         TCA95XX_16BIT
-#define I2C_SCL_PIN       (47)
-#define I2C_SDA_PIN       (48)
-#define EXP_INT_PIN       (18)
-#define I2C_ADDR          (0x20)
+#define I2C_SCL_PIN       (47)  /* I2C bus SCL pin */
+#define I2C_SDA_PIN       (48)  /* I2C bus SDA pin */
+#define EXP_INT_PIN       (18)  /* Expander interrupt pin */
+#define I2C_ADDR          (0x20)/* Expander I2C address */
 
 /* Button connections on expander */
 #define PAD_UP            6
@@ -56,7 +63,7 @@ With this code you can check the **functionality of the buttons.** Connect the k
 #define BUTTON_BOTTOM     9
 
 /* Button connected directly to ESP32-S3 */
-#define BUTTON_UP_PIN     0    // GPIO0
+#define BUTTON_UP_PIN     0    /* GPIO0 */
 
 /* Expander instance */
 esp_expander::Base *expander = nullptr;
@@ -85,10 +92,10 @@ void setup() {
   expander->begin();
 
   /* Configure expander pins as inputs */
-  expander->pinMode(PAD_UP,       INPUT);
-  expander->pinMode(PAD_LEFT,     INPUT);
-  expander->pinMode(PAD_DOWN,     INPUT);
-  expander->pinMode(PAD_RIGHT,    INPUT);
+  expander->pinMode(PAD_UP,        INPUT);
+  expander->pinMode(PAD_LEFT,      INPUT);
+  expander->pinMode(PAD_DOWN,      INPUT);
+  expander->pinMode(PAD_RIGHT,     INPUT);
   expander->pinMode(BUTTON_BOTTOM, INPUT);
 
   /* Configure expander interrupt pin */
@@ -105,6 +112,7 @@ void setup() {
 }
 
 void loop() {
+  /* If there are no pending interrupts, wait */
   if (!expanderInterrupted && !buttonUpInterrupted) {
     delay(10);
     return;
@@ -138,7 +146,6 @@ void loop() {
     delay(50);
   }
 }
-ç
 ```
 
 ## Download examples
