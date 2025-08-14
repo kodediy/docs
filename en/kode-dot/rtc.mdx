@@ -24,7 +24,7 @@ The external clock is connected to the I2C of the ESP32-S3 using these connectio
 
 ## Recommended libraries
 ### Arduino
-- [AnalogRTCLibrary](https://github.com/analogdevicesinc/AnalogRTCLibrary)
+- [kode_MAX31329](https://github.com/kodediy/kode_MAX31329)
 
 ### ESP-IDF
 - TBD
@@ -33,7 +33,63 @@ The external clock is connected to the I2C of the ESP32-S3 using these connectio
 This code configures the RTC with a specific date and time and then prints the current time every second.
 
 ```cpp rtc_test.ino lines icon="microchip"
-TBD
+/**
+ * Demo básico de tiempo con RTC MAX31329: establece una hora inicial y lee/muestra la hora continuamente.
+ * Utiliza API fluida (rtc.t.year = 2024) para configurar la hora fácilmente en ESP32-S3.
+ * Imprime la hora formateada cada segundo en el monitor serie.
+ */
+/* ───────── KODE | docs.kode.diy ───────── */
+
+#include <kode_MAX31329.h>
+#include "Wire.h"
+
+MAX31329 rtc;
+
+/* Función auxiliar para leer y mostrar la hora actual desde el RTC */
+static void printTime()
+{
+	/* Leer hora del RTC en la estructura rtc.t */
+	if (!rtc.readTime()) {
+		Serial.println("Error al leer la hora (readTime failed)");
+		return;
+	}
+	
+	/* Formatear e imprimir la hora como YYYY-MM-DD HH:MM:SS */
+	Serial.printf("%04d-%02d-%02d %02d:%02d:%02d\n", 
+		rtc.t.year, rtc.t.month, rtc.t.day, 
+		rtc.t.hour, rtc.t.minute, rtc.t.second);
+}
+
+void setup()
+{
+	Serial.begin(115200);
+	Serial.println("Ejemplo de hora con MAX31329");
+	
+    Wire.begin(48,47);
+
+	/* Inicializar el RTC */
+	rtc.begin();
+
+	/* Establecer la hora inicial con la API fluida - 24 de noviembre de 2024 15:10:00 */
+	rtc.t.year = 2024;
+	rtc.t.month = 11;
+	rtc.t.day = 24;
+	rtc.t.hour = 15;
+	rtc.t.minute = 10;
+	rtc.t.second = 0;
+	rtc.t.dayOfWeek = 0; /* 0=Domingo, 1=Lunes, ..., 6=Sábado */
+	
+	/* Escribir la hora configurada en el hardware del RTC */
+	if (!rtc.writeTime()) {
+		Serial.println("Error al escribir la hora (writeTime failed)");
+	}
+}
+
+void loop()
+{
+	delay(1000);    /* Esperar 1 segundo entre lecturas */
+	printTime();    /* Mostrar hora actual */
+}
 ```
 
 ## Descarga de ejemplos

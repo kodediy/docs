@@ -46,15 +46,23 @@ Este ejemplo te permite configurar la cámara y ver en tiempo real lo que está 
 
 Cambia todo el código del CameraWebServer.ino por el siguiente y cambia las credenciales de la red WiFi por las tuyas:
 ```cpp CameraWebServer.ino lines icon="microchip"
+/**
+ * Ejemplo de servidor de cámara web con ESP32-S3 + módulo de cámara.
+ * Configura la cámara, se conecta a la red WiFi y sirve un stream MJPEG.
+ * URL de acceso: http://<IP_local> tras la conexión.
+ */
+/* ───────── KODE | docs.kode.diy ───────── */
+
 #include "esp_camera.h"
 #include <WiFi.h>
 
-// ===========================
-// Enter your WiFi credentials
-// ===========================
-const char *ssid = "**********";
-const char *password = "**********";
+/* ===========================
+   Credenciales WiFi
+   =========================== */
+const char *ssid = "**********";       /* Nombre de la red WiFi */
+const char *password = "**********";   /* Contraseña de la red WiFi */
 
+/* Declaración de funciones externas (implementadas en otros archivos) */
 void startCameraServer();
 void setupLedFlash();
 
@@ -63,51 +71,51 @@ void setup() {
   Serial.setDebugOutput(true);
   Serial.println();
 
+  /* ─── Configuración de pines y parámetros de la cámara ─── */
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
-  config.ledc_timer = LEDC_TIMER_0;
-  config.pin_d0 = 12;
-  config.pin_d1 = 11;
-  config.pin_d2 = 1;
-  config.pin_d3 = 2;
-  config.pin_d4 = 3;
-  config.pin_d5 = 39;
-  config.pin_d6 = 40;
-  config.pin_d7 = 41;
-  config.pin_xclk = -1;
-  config.pin_pclk = 13;
-  config.pin_vsync = 42;
-  config.pin_href = 43;
+  config.ledc_timer   = LEDC_TIMER_0;
+  config.pin_d0       = 12;
+  config.pin_d1       = 11;
+  config.pin_d2       = 1;
+  config.pin_d3       = 2;
+  config.pin_d4       = 3;
+  config.pin_d5       = 39;
+  config.pin_d6       = 40;
+  config.pin_d7       = 41;
+  config.pin_xclk     = -1;
+  config.pin_pclk     = 13;
+  config.pin_vsync    = 42;
+  config.pin_href     = 43;
   config.pin_sccb_sda = 48;
   config.pin_sccb_scl = 47;
-  config.pin_pwdn = -1;
-  config.pin_reset = 44;
-  config.xclk_freq_hz = 20000000;
-  config.frame_size = FRAMESIZE_UXGA;
-  config.pixel_format = PIXFORMAT_JPEG;  // for streaming
-  //config.pixel_format = PIXFORMAT_RGB565; // for face detection/recognition
-  config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
-  config.fb_location = CAMERA_FB_IN_PSRAM;
-  config.jpeg_quality = 12;
-  config.fb_count = 1;
+  config.pin_pwdn     = -1;
+  config.pin_reset    = 44;
+  config.xclk_freq_hz = 20000000;   /* Frecuencia XCLK */
+  config.frame_size   = FRAMESIZE_UXGA;    /* Resolución inicial */
+  config.pixel_format = PIXFORMAT_JPEG;    /* Formato para streaming */
+  //config.pixel_format = PIXFORMAT_RGB565; // Opción para detección facial
+  config.grab_mode    = CAMERA_GRAB_WHEN_EMPTY;
+  config.fb_location  = CAMERA_FB_IN_PSRAM;
+  config.jpeg_quality = 12;   /* Calidad JPEG (menor número = mejor calidad) */
+  config.fb_count     = 1;
 
-  // if PSRAM IC present, init with UXGA resolution and higher JPEG quality
-  //                      for larger pre-allocated frame buffer.
+  /* Ajustar configuración si hay PSRAM disponible */
   if (config.pixel_format == PIXFORMAT_JPEG) {
     if (psramFound()) {
       config.jpeg_quality = 10;
-      config.fb_count = 2;
-      config.grab_mode = CAMERA_GRAB_LATEST;
+      config.fb_count     = 2;
+      config.grab_mode    = CAMERA_GRAB_LATEST;
     } else {
-      // Limit the frame size when PSRAM is not available
-      config.frame_size = FRAMESIZE_SVGA;
-      config.fb_location = CAMERA_FB_IN_DRAM;
+      /* Si no hay PSRAM, reducir resolución para no agotar RAM */
+      config.frame_size   = FRAMESIZE_SVGA;
+      config.fb_location  = CAMERA_FB_IN_DRAM;
     }
   } else {
-    // Best option for face detection/recognition
+    /* Ajuste para detección/ reconocimiento facial */
     config.frame_size = FRAMESIZE_240X240;
 #if CONFIG_IDF_TARGET_ESP32S3
-    config.fb_count = 2;
+    config.fb_count   = 2;
 #endif
   }
 
@@ -116,46 +124,48 @@ void setup() {
   pinMode(14, INPUT_PULLUP);
 #endif
 
-  // camera init
+  /* ─── Inicialización de la cámara ─── */
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
-    Serial.printf("Camera init failed with error 0x%x", err);
+    Serial.printf("Error al iniciar la cámara: 0x%x", err);
     return;
   }
 
+  /* Obtener acceso al sensor para ajustes adicionales */
   sensor_t *s = esp_camera_sensor_get();
-  // initial sensors are flipped vertically and colors are a bit saturated
 
-  // drop down frame size for higher initial frame rate
+  /* Reducir tamaño de frame para aumentar la velocidad inicial */
   if (config.pixel_format == PIXFORMAT_JPEG) {
     s->set_framesize(s, FRAMESIZE_QVGA);
   }
   
+  /* Voltear imagen verticalmente */
   s->set_vflip(s, 1);
 
+  /* ─── Conexión WiFi ─── */
   WiFi.begin(ssid, password);
-  WiFi.setSleep(false);
+  WiFi.setSleep(false); /* Evitar suspensión de WiFi */
 
-  Serial.print("WiFi connecting");
+  Serial.print("Conectando a WiFi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("");
-  Serial.println("WiFi connected");
+  Serial.println("\nWiFi conectado");
 
+  /* ─── Iniciar servidor de cámara ─── */
   startCameraServer();
 
-  Serial.print("Camera Ready! Use 'http://");
-  Serial.print(WiFi.localIP());
-  Serial.println("' to connect");
+  Serial.print("Cámara lista. Accede a: http://");
+  Serial.println(WiFi.localIP());
 }
 
 void loop() {
-  // Do nothing. Everything is done in another task by the web server
+  /* El servidor web gestiona el streaming; bucle vacío */
   delay(10000);
 }
 ```
+## Descarga de ejemplos
+Puedes probar los códigos de ejemplo mediante el IDE de Arduino o el IDE de ESP-IDF o descargar los códigos en nuestro drive:
 
-
-
+[Ejemplos de código del módulo Camera](https://drive.google.com/drive/folders/1wom3hU-bjWmbpT9DnZFzFtpL3cr-7Qzg)
