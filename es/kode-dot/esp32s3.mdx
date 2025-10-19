@@ -1,6 +1,6 @@
 ---
 title: "ESP32-S3"
-description:  "Conoce el microprocesador que le da vida al kode dot y su control de estados."
+description:  "Conoce el microprocesador que le da vida al Kode Dot y su control de estados."
 icon: "microchip"
 ---
 
@@ -15,7 +15,7 @@ En la siguiente imagen se puede ver el **diagrama funcional del ESP32-S3** con t
   <img width="600"  src="/images/kode-dot/esp32s3/funtionalblock.png" />
 </Frame>
 
-Además de su potencia y versatilidad, lo hemos integrado en el kode dot ampliando sus capacidades con **32MB de flash** y **8MB de PSRAM.** Así, hace honor a su estatus de ser el **mejor dispositivo maker del mercado** y ejecutar programas mucho más grandes y complejos.
+Además de su potencia y versatilidad, lo hemos integrado en el Kode Dot ampliando sus capacidades con **32MB de flash** y **8MB de PSRAM.** Así, hace honor a su estatus de ser el **mejor dispositivo maker del mercado** y ejecutar programas mucho más grandes y complejos.
 
 | Característica    | Descripción |
 | ---------------- | ----------- |
@@ -23,32 +23,32 @@ Además de su potencia y versatilidad, lo hemos integrado en el kode dot amplian
 | PSRAM | Memoria interna de **8MB por Octalbus** |
 
 ## Antena
-Dentro del kode dot hemos incorporado una antena de **2.4GHz** en la PCB. Con esta antena vas a poder usar el **WiFi** y el **Bluetooth LE** del ESP32-S3, además de **ESP-NOW** y otros protocolos de comunicación que funcionen en esta banda de frecuencia.
+Dentro del Kode Dot hemos incorporado una antena de **2.4GHz** en la PCB. Con esta antena vas a poder usar el **WiFi** y el **Bluetooth LE** del ESP32-S3, además de **ESP-NOW** y otros protocolos de comunicación que funcionen en esta banda de frecuencia.
 
 ## Programación
-**Programar el kode dot se hace como cualquier otra placa basada en el ESP32-S3.** Conectalo diréctamente a tu ordenador mediante el cable USB-C y empieza a subir tus códigos.
+**Programar el Kode Dot se hace como cualquier otra placa basada en el ESP32-S3.** Conectalo diréctamente a tu ordenador mediante el cable USB-C y empieza a subir tus códigos.
 
 <Note>En el apartado [Aplicaciones](/es/kodeOS/apps) se explica en detalle cómo subir código y crear aplicaciones.</Note>
 
 Internamente, las **lineas de datos del USB-C** están conectadas a los pines **GPIO19 y GPIO20** para usar el periférico interno de **USB-Serial**.
 
-Con el USB-C, también tienes la opción de usar el periférico **USB Serial/JTAG** interno que incorpora el ESP32-S3 para **flashear y debuggear el kode dot.**
+Con el USB-C, también tienes la opción de usar el periférico **USB Serial/JTAG** interno que incorpora el ESP32-S3 para **flashear y debuggear el Kode Dot.**
 
-Para los más avanzados, se pueden usar los pines **GPIO39, GPIO40, GPIO41 y GPIO42** del **conector superior del kode dot** para debuggear un programa usando una **interfaz externa de JTAG.**
+Para los más avanzados, se pueden usar los pines **GPIO39, GPIO40, GPIO41 y GPIO42** del **conector superior del Kode Dot** para debuggear un programa usando una **interfaz externa de JTAG.**
 
 ## Control de estados
-El control de los estados de **BOOT** y **RESET** del ESP32-S3 se realiza mediante unas sencillas combinaciones con los **botones del kode dot.**
+El control de los estados de **BOOT** y **RESET** del ESP32-S3 se realiza mediante unas sencillas combinaciones con los **botones del Kode Dot.**
 
 ### RESET
-Para resetear el kode dot, se debe pulsar el **botón izquierdo del pad** a la vez que se pulsa el **botón de abajo.** Esto es útil para estos casos: 
+Para resetear el Kode Dot, se debe pulsar el **botón izquierdo del pad** a la vez que se pulsa el **botón de abajo.** Esto es útil para estos casos: 
 
-- Cuando se ha **flasheado** un programa y el kode dot se queda **bloqueado.**
+- Cuando se ha **flasheado** un programa y el Kode Dot se queda **bloqueado.**
 - Para **salir de una aplicación** y volver al menú principal.
 
 ### BOOT
-Para que el kode dot entre en modo BOOT, mientras se mantiene el **botón de arriba,** se debe resetear el kode dot siguiendo la combinación del RESET. 
+Para que el Kode Dot entre en modo BOOT, mientras se mantiene el **botón de arriba,** se debe resetear el Kode Dot siguiendo la combinación del RESET. 
 
-<Info>Es probable que no tengas que usar este proceso ya que si el código que subes al kode dot bloquea o hace reiniciar al ESP32-S3, el kode dot volverá al menú principal automáticamente.</Info>
+<Info>Es probable que no tengas que usar este proceso ya que si el código que subes al Kode Dot bloquea o hace reiniciar al ESP32-S3, el Kode Dot volverá al menú principal automáticamente.</Info>
 
 ## Ejemplo de código
 Con este código puedes obtener la **dirección MAC** de las diferentes interfaces del ESP32-S3.

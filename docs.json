@@ -13,9 +13,8 @@
     "dark": "/logo/dark.png"
   },
   "favicon": "/favicon.png",
-  "font": {
-    "family": "Inter",
-    "source": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  "fonts": {
+    "family": "Lato"
   },
   "redirects": [
     {
@@ -37,7 +36,7 @@
                 "pages": ["en/introduction", "en/faq"]
               },
               {
-                "group": "kode dot",
+                "group": "Kode Dot",
                 "pages": [
                   "en/kode-dot/quickstart",
                   "en/kode-dot/esp32s3",
@@ -99,7 +98,7 @@
                 "pages": ["es/introduction", "es/faq"]
               },
               {
-                "group": "kode dot",
+                "group": "Kode Dot",
                 "pages": [
                   "es/kode-dot/quickstart",
                   "es/kode-dot/esp32s3",

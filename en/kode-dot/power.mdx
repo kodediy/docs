@@ -4,10 +4,10 @@ description: "The power system in electronics is the most important part because
 icon: "power-off"
 ---
 
-<Warning>Read this section carefully to avoid damaging the kode dot.</Warning>
+<Warning>Read this section carefully to avoid damaging the Kode Dot.</Warning>
 
 ## Features
-The kode dot integrates a **complex and sophisticated power system, but at the same time robust, modular and easy to use.** It can be powered in three ways: from the 500mAh battery, from the USB-C or through the external connectors.
+The Kode Dot integrates a **complex and sophisticated power system, but at the same time robust, modular and easy to use.** It can be powered in three ways: from the 500mAh battery, from the USB-C or through the external connectors.
 
 The system is formed by these components:
 
@@ -39,7 +39,7 @@ So we can know the following data from the battery:
 In addition, **it warns us about possible problems such as overcurrents, short circuits, overcurrents, etc.**
 
 ### 3V3 regulator for internal components
-This is the **main voltage regulator of the kode dot** and supports up to **1A of current.** It is responsible for stabilizing the voltage to 3V3 and powering these components:
+This is the **main voltage regulator of the Kode Dot** and supports up to **1A of current.** It is responsible for stabilizing the voltage to 3V3 and powering these components:
 
 - ESP32-S3
 - IO expander
@@ -49,16 +49,16 @@ This is the **main voltage regulator of the kode dot** and supports up to **1A o
 - 6-axis IMU
 - 3-axis magnetometer
 
-So, when the kode dot enters **suspend mode**, this regulator is responsible for **maintaining the voltage on the ESP32-S3 and the internal components.**
+So, when the Kode Dot enters **suspend mode**, this regulator is responsible for **maintaining the voltage on the ESP32-S3 and the internal components.**
 
 ### 3V3 regulator for peripherals
-This regulator, which supports up to **2A of current**, can be **activated or deactivated** to power the following peripherals of the kode dot:
+This regulator, which supports up to **2A of current**, can be **activated or deactivated** to power the following peripherals of the Kode Dot:
 
 - Screen
 - microSD
 - 3V3 bus of the upper connector
 
-When the kode dot is in **suspend mode**, this regulator is deactivated and disconnects the power to the peripherals.
+When the Kode Dot is in **suspend mode**, this regulator is deactivated and disconnects the power to the peripherals.
 
 ### 3V3 regulator for the internal RTC of the ESP32-S3
 This regulator is responsible for **powering the internal RTC of the ESP32-S3.**
@@ -77,9 +77,9 @@ The PMIC is connected to the I2C bus using these connections:
 <Tip>The PMIC has the address 0x6B on the I2C bus.</Tip>
 <Note>The interrupt pin is connected to the [IO expander](/en/kode-dot/io-expander).</Note>
 
-The **5V and 2A bus that the PMIC generates is connected to the upper connector and the back of the kode dot.** If the USB-C is connected, the power of the 5V bus comes from this. If not, the power of the 5V bus comes from the battery. 
+The **5V and 2A bus that the PMIC generates is connected to the upper connector and the back of the Kode Dot.** If the USB-C is connected, the power of the 5V bus comes from this. If not, the power of the 5V bus comes from the battery. 
 
-In addition, a **external 5V power supply** can be connected through one of the external connectors to charge the kode dot.
+In addition, a **external 5V power supply** can be connected through one of the external connectors to charge the Kode Dot.
 
 <Warning>**Do not connect an external 5V power supply while the USB-C is connected.**</Warning>
 
@@ -96,7 +96,7 @@ The fuel gauge is connected to the I2C bus using these connections:
 <Note>The GPOUT pin is connected to the [IO expander](/en/kode-dot/io-expander).</Note>
 
 ### 3V3 regulator for peripherals
-This regulator can be **activated or deactivated** to power the peripherals of the kode dot. By **default it is activated, to deactivate it set the following pin to LOW:**
+This regulator can be **activated or deactivated** to power the peripherals of the Kode Dot. By **default it is activated, to deactivate it set the following pin to LOW:**
 
 | 3V3 regulator | ESP32-S3 |
 | ------------- | -------- |

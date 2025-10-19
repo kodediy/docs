@@ -1,15 +1,15 @@
 ---
 title: "Inicio rápido"
-description: "Guía rápida para comprender el kode dot y empezar con las aplicaciones."
+description: "Guía rápida para comprender el Kode Dot y empezar con las aplicaciones."
 icon: "stairs"
 ---
 
-# Qué es el kode dot
-El kode dot es el **mejor dispositivo maker del mercado.** Se trata de un dispositivo **todo en uno, de tamaño de bolsillo y con capacidad de IA,** que te permite aprender a programar electrónica y sistemas embebidos mientras **construyes y haces realidad tus ideas.**
+# Qué es el Kode Dot
+El Kode Dot es el **mejor dispositivo maker del mercado.** Se trata de un dispositivo **todo en uno, de tamaño de bolsillo y con capacidad de IA,** que te permite aprender a programar electrónica y sistemas embebidos mientras **construyes y haces realidad tus ideas.**
 
 Integra el **hardware más avanzado y lo combina con kodeOS**, nuestro sistema operativo de código abierto, que te permite **guardar tu código en aplicaciones y compartirlas con la comunidad.**
 
-Las principales características técnicas del kode dot son:
+Las principales características técnicas del Kode Dot son:
 
 | Característica    | Descripción |
 | ----------------- | ----------- |
@@ -23,29 +23,29 @@ Las principales características técnicas del kode dot son:
 | Conectividad      | WiFi - Bluetooth - ESP-NOW - **2.4GHz** |
 | Conectores        | **USB-C** - **Superior de 20 pines** - **Trasero magnético** |
 
-<Frame caption="Parte frontal y trasera del kode dot">
+<Frame caption="Parte frontal y trasera del Kode Dot">
   <img width="600"  src="/images/kode-dot/quickstart/kode-dot-render.png" />
 </Frame>
 
 ## Qué hay en la caja
-Cuando compres el kode dot, en la caja te llegarán:
+Cuando compres el Kode Dot, en la caja te llegarán:
 
-- 1x **kode dot**
+- 1x **Kode Dot**
 - 1x **cable de carga y programación**
 - 3x **pegatinas**
 - 1x **manual de inicio rápido**
 
-<Frame caption="kode dot y extras">
+<Frame caption="Kode Dot y extras">
   <img width="600"  src="/images/kode-dot/quickstart/inside-box.png" />
 </Frame>
 
-## Cómo encender el kode dot
+## Cómo encender el Kode Dot
 
-Nada más sacar el kode dot de la caja, **pulsa el botón de abajo a la derecha durante 2 segundos para encenderlo.**
+Nada más sacar el Kode Dot de la caja, **pulsa el botón de abajo a la derecha durante 2 segundos para encenderlo.**
 
 No tienes que preocuparte de apagarlo ya que **automáticamente** detectará cuando no lo estás usando y entrará en **modo suspensión.**
 
-<Tip>Si no vas a usar tu kode dot durante un **largo peridodo de tiempo**, puedes pulsar el botón de abajo a la derecha durante **5 segundos** para apagarlo por completo.</Tip>
+<Tip>Si no vas a usar tu Kode Dot durante un **largo peridodo de tiempo**, puedes pulsar el botón de abajo a la derecha durante **5 segundos** para apagarlo por completo.</Tip>
 
 ## Lanza tu primera aplicación
 
@@ -62,27 +62,61 @@ Prueba a lanzar tu primera aplicación siguiendo estos pasos:
     En esta pantalla verás el **título de la aplicación y una pequeña descripción.** Confirma que quieres lanzar la aplicación **pulsando "YES".**
   </Step>
   <Step title="Disfruta del juego">
-    Tu **kode dot se reiniciará** y ya podrás **empezar a jugar al mítico Snake.**
+    Tu **Kode Dot se reiniciará** y ya podrás **empezar a jugar al mítico Snake.**
   </Step>
 </Steps>
 
 <Tip>Para salir de la aplicación, pulsa el botón de abajo a la derecha a la vez que el pad izquierdo.</Tip>
 
 ## Crea tu primera aplicación
-Subir tu código y convertirlo en una aplicación es muy sencillo, vamos a poner de ejemplo cómo se hace con Arduino IDE:
+
+### Preparar Entorno
+Subir tu código y convertirlo en una aplicación es muy sencillo, vamos a poner de ejemplo cómo se hace con Arduino IDE.
 
 <Steps>
-  <Step title="Selecciona el kode dot">
-    En el menú de **Arduino IDE**, selecciona *Tools > Board > kode > kode dot*.
+  <Step title="Instala Arduino IDE">
+    Entra en el siguiente [enlace](https://www.arduino.cc/en/software/) y descarga e instala el IDE de Arduino.
   </Step>
-  <Step title="Hola mundo!">
-    Abre el ejemplo de **"Hello World"** en Arduino IDE en *File > Examples > kode > Hello World*.
+  <Step title="Instala las placas de ESP32">
+    Abre Arduino IDE y en el *Administrador de placas* busca e instala las placas de **ESP32**.
+    ![Administrador de placas](/images/kode-dot/quickstart/board-manager.png)
   </Step>
-  <Step title="Conecta tu kode dot y sube el código">
-    Desliza el **dedo hacia la derecha** en el kode dot para entrar en el **menú de subir código**. Al conectar tu kode dot al ordenador, en el Arduino IDE te saldrá en la **lista de dispositivos** y dándole al botón de **"Upload"** se subirá el código.
+  <Step title="Selecciona el Kode Dot como placa">
+    Selecciona el Kode Dot como placa en "Tools > Board > esp32 > Kode Dot".
+    ![Selecciona Kode Dot](/images/kode-dot/quickstart/kode-dot-board.png)
+  </Step>
+</Steps>
+
+### Sube tu código y crea la aplicación
+<Steps>
+  <Step title="Copia el siguiente código de ejemplo">
+    Copia este código de ejemplo en el Arduino IDE. Este código imprime información del chip ESP32-S3 en el monitor serie cada 3 segundos.
+    ```cpp esp32s3_info.ino lines icon="microchip"
+    void setup() {
+      Serial.begin(115200); /* Inicia la comunicación serie a 115200 baudios */
+    }
+
+    void loop() {
+      /* Imprime modelo y revisión del chip ESP32 */
+      Serial.printf("ESP32 Chip model = %s Rev %d\n", ESP.getChipModel(), ESP.getChipRevision());
+
+      /* Imprime la cantidad de núcleos del chip */
+      Serial.printf("This chip has %d cores\n", ESP.getChipCores());
+
+      /* Imprime el identificador único del chip */
+      Serial.print("Chip ID: "); 
+      Serial.println(ESP.getEfuseMac()); 
+
+      /* Espera 3 segundos antes de repetir */
+      delay(3000); 
+    }
+    ```
+  </Step>
+  <Step title="Conecta tu Kode Dot y sube el código">
+    Desliza el **dedo hacia la derecha** en el Kode Dot para entrar en el **menú de subir código**. Al conectar tu Kode Dot al ordenador, en el Arduino IDE te saldrá en la **lista de dispositivos** y dándole al botón de **"Upload"** se subirá el código.
   </Step>
   <Step title="Crea la aplicación">
-    Ahora en el **menú de subir código del kode dot**, te saldrá la opción de **ejecutar el código que acabas de subir o crear una aplicación.** Selecciona la opción de **"Create App"** y guardala en la categoría de **"General"**.
+    Ahora en el **menú de subir código del Kode Dot**, te saldrá la opción de **ejecutar el código que acabas de subir o crear una aplicación.** Selecciona la opción de **"Create App"**. Por defecto, se guardará en la categoría de **"General"**.
   </Step>
   <Step title="Comprueba la aplicación">
     Ve al menú de aplicaciones, entra en la categoría de **"General"** y ya te **aparecerá tu aplicación recién creada** lista para ser lanzada.

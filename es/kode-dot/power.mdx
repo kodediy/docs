@@ -4,10 +4,10 @@ description: "El sistema de alimentación en electrónica es la parte más impor
 icon: "power-off"
 ---
 
-<Warning>Lee detenidamente esta sección para no dañar el kode dot.</Warning>
+<Warning>Lee detenidamente esta sección para no dañar el Kode Dot.</Warning>
 
 ## Características
-El kode dot integra un **sistema de alimentación complejo y sofisticado, pero a la vez robusto, modular y fácil de usar.** Se puede alimentar de tres maneras: de la batería de 500mAh, del USB-C o a través de los conectores externos.
+El Kode Dot integra un **sistema de alimentación complejo y sofisticado, pero a la vez robusto, modular y fácil de usar.** Se puede alimentar de tres maneras: de la batería de 500mAh, del USB-C o a través de los conectores externos.
 
 El sistema está formado por estos componentes:
 
@@ -39,7 +39,7 @@ Así podemos conocer los siguientes datos de la batería:
 Además, **nos avisa ante posibles problemas como sobrecargas, cortocircuitos, sobrecorrientes, etc.**
 
 ### Regulador de 3V3 para los integrados internos
-Este es el **principal regulador de tensión del kode dot** y soporta hasta **1A de corriente.** Se encarga de estabilizar la tensión a 3V3 y alimenta estos integrados:
+Este es el **principal regulador de tensión del Kode Dot** y soporta hasta **1A de corriente.** Se encarga de estabilizar la tensión a 3V3 y alimenta estos integrados:
 
 - ESP32-S3
 - Expansor de pines
@@ -49,16 +49,16 @@ Este es el **principal regulador de tensión del kode dot** y soporta hasta **1A
 - IMU de 6 ejes
 - Magnetómetro de 3 ejes
 
-Así, cuando el kode dot entre en **estado de suspensión**, este regulador se encarga de **mantener la tensión en el ESP32-S3 y a los integrados internos.**
+Así, cuando el Kode Dot entre en **estado de suspensión**, este regulador se encarga de **mantener la tensión en el ESP32-S3 y a los integrados internos.**
 
 ### Regulador de 3V3 para los periféricos
-Este regulador, que soporta hasta **2A de corriente**, se puede **activar o desactivar** para darle alimentación a los siguientes periféricos del kode dot:
+Este regulador, que soporta hasta **2A de corriente**, se puede **activar o desactivar** para darle alimentación a los siguientes periféricos del Kode Dot:
 
 - Pantalla
 - microSD
 - Bus 3V3 del conector superior
 
-Cuando el kode dot está en **modo suspensión**, este regulador se desactiva y desconecta la alimentación de los periféricos.
+Cuando el Kode Dot está en **modo suspensión**, este regulador se desactiva y desconecta la alimentación de los periféricos.
 
 ### Regulador para el RTC interno del ESP32-S3
 Este regulador se encarga de darle **alimentación al RTC interno del ESP32-S3.**
@@ -77,9 +77,9 @@ El PMIC está conectado al bus I2C usando estas conexiones:
 <Tip>El PMIC tiene la dirección 0x6B en el bus I2C.</Tip>
 <Note>El pin de interrupción está conectado al [expansor de pines](/es/kode-dot/io-expander).</Note>
 
-El **bus de 5V y 2A que genera el PMIC está conectado al conector superior y al trasero del kode dot.** Si el USB-C está conectado, la potencia del bus de 5V proviene de este. Si no está conectado, la potencia del bus de 5V proviene de la batería. 
+El **bus de 5V y 2A que genera el PMIC está conectado al conector superior y al trasero del Kode Dot.** Si el USB-C está conectado, la potencia del bus de 5V proviene de este. Si no está conectado, la potencia del bus de 5V proviene de la batería. 
 
-Además, se puede conectar por uno de los conectores externos una **fuente externa de alimentación de 5V** para cargar el kode dot.
+Además, se puede conectar por uno de los conectores externos una **fuente externa de alimentación de 5V** para cargar el Kode Dot.
 
 <Warning>**No conectes una fuente externa de 5V a la vez que está conectado el USB-C.**</Warning>
 
@@ -96,7 +96,7 @@ El fuel gauge está conectado al bus I2C usando estas conexiones:
 <Note>El pin de GPOUT está conectado al [expansor de pines](/es/kode-dot/io-expander).</Note>
 
 ### Regulador de 3V3 para los periféricos
-Este regulador se puede **activar o desactivar** para darle alimentación a los periféricos del kode dot. Por **defecto está activado, para desactivarlo pon el siguiente pin en LOW:**
+Este regulador se puede **activar o desactivar** para darle alimentación a los periféricos del Kode Dot. Por **defecto está activado, para desactivarlo pon el siguiente pin en LOW:**
 
 | Regulador 3V3 | ESP32-S3 |
 | ------------- | -------- |
