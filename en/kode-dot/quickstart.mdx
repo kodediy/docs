@@ -12,20 +12,23 @@ It integrates the most advanced hardware and combines it with kodeOS, our open-s
 
 The main technical features of the Kode Dot are:
 
-| Feature    | Description |
-| ----------------- | ----------- |
-| Microcontroller  | **ESP32-S3** - 32MB of flash and 8 MB of PSRAM |
-| Screen           | AMOLED 2.13" |
-| Led              | RGB Directional |
-| Buttons          | 4 buttons pad + 2 buttons |
-| Audio            | **Microphone and speaker** |
-| Storage          | microSD |
-| IMU              | **IMU** of 6 axes + **magnetometer** of 3 axes |
-| Connectivity     | WiFi - Bluetooth - ESP-NOW - **2.4GHz** |
-| Connectors       | **USB-C** - **Top 20 pins** - **Back magnetic** |
+| Feature         | Description                                     |
+| --------------- | ----------------------------------------------- |
+| Microcontroller | **ESP32-S3** - 32MB of flash and 8 MB of PSRAM  |
+| Screen          | AMOLED 2.13"                                    |
+| Led             | RGB Directional                                 |
+| Buttons         | 4 buttons pad + 2 buttons                       |
+| Audio           | **Microphone and speaker**                      |
+| Storage         | microSD                                         |
+| IMU             | **IMU** of 6 axes + **magnetometer** of 3 axes  |
+| Connectivity    | WiFi - Bluetooth - ESP-NOW - **2.4GHz**         |
+| Connectors      | **USB-C** - **Top 20 pins** - **Back magnetic** |
 
 <Frame caption="Front and back of the Kode Dot">
-  <img width="600"  src="/images/kode-dot/quickstart/kode-dot-render.png" />
+  <img
+    width="600"
+    src="/images/kode-dot/quickstart/kode-dot-render.png"
+  />
 </Frame>
 
 ## What's in the box
@@ -38,7 +41,10 @@ When you buy the Kode Dot, you will receive:
 - 1x **quick start manual**
 
 <Frame caption="Kode Dot and extras">
-  <img width="600"  src="/images/kode-dot/quickstart/inside-box.png" />
+  <img
+    width="600"
+    src="/images/kode-dot/quickstart/inside-box.png"
+  />
 </Frame>
 
 ## How to turn on the Kode Dot
@@ -47,7 +53,9 @@ Just take the Kode Dot out of the box, **press the button on the bottom right fo
 
 You don't have to worry about turning it off because it will automatically detect when you're not using it and enter **suspend mode.**
 
-<Tip>If you're not going to use your Kode Dot for a **long period of time**, you can press the button on the bottom right for **5 seconds** to turn it off completely.</Tip>
+<Tip>
+  If you're not going to use your Kode Dot for a **long period of time**, you can press the button on the bottom right for **5 seconds** to turn it off completely.
+</Tip>
 
 ## Launch your first application
 
@@ -68,11 +76,14 @@ Follow these steps to launch your first application:
   </Step>
 </Steps>
 
-<Tip>To exit the application, press the button on the bottom right at the same time as the left pad.</Tip>
+<Tip>
+  To exit the application, press the button on the bottom right at the same time as the left pad.
+</Tip>
 
 ## Create your first application
 
 ### Prepare the environment
+
 Uploading your code and turning it into an application is very simple. Let's look at an example of how to do this with Arduino IDE.
 
 <Steps>
@@ -80,42 +91,42 @@ Uploading your code and turning it into an application is very simple. Let's loo
     Go to the following [link](https://www.arduino.cc/en/software/) and download and install the Arduino IDE.
   </Step>
   <Step title="Install ESP32 boards">
-    Open Arduino IDE and in the *Board Manager* search for and install the **ESP32** boards.
-    ![Board Manager](/images/kode-dot/quickstart/board-manager.png)
+    Open Arduino IDE and in the _Board Manager_ search for and install the **ESP32** boards. <img src="/images/kode-dot/quickstart/board-manager.png" alt="Board Manager" />
   </Step>
   <Step title="Select the Kode Dot as the board">
-    Select the Kode Dot as the board in "Tools > Board > esp32 > Kode Dot".
-    ![Select Kode Dot](/images/kode-dot/quickstart/kode-dot-board.png)
+    Select the Kode Dot as the board in "Tools \> Board \> esp32 \> Kode Dot". <img src="/images/kode-dot/quickstart/kode-dot-board.png" alt="Select Kode Dot" />
   </Step>
 </Steps>
 
 ### Upload your code and create the application
+
 <Steps>
-  <Step title="Copia el siguiente código de ejemplo">
+  <Step title="Copy the following sample code">
     Copy this sample code into the Arduino IDE. This code prints information from the ESP32-S3 chip to the serial monitor every 3 seconds.
-    ```cpp esp32s3_info.ino lines icon="microchip"
+
+    ```cpp esp32s3_info.ino icon=microchip lines
     void setup() {
       Serial.begin(115200); /* Start serial communication at 115200 baud */
     }
-
+    
     void loop() {
       /* Print model and revision of the ESP32 chip */
       Serial.printf("ESP32 Chip model = %s Rev %d\n", ESP.getChipModel(), ESP.getChipRevision());
-
+    
       /* Print the number of cores of the chip */
       Serial.printf("This chip has %d cores\n", ESP.getChipCores());
-
+    
       /* Print the unique identifier of the chip */
       Serial.print("Chip ID: "); 
       Serial.println(ESP.getEfuseMac()); 
-
+    
       /* Wait 3 seconds before repeating */
       delay(3000); 
     }
     ```
   </Step>
   <Step title="Connect your Kode Dot and upload the code">
-    Swipe your **finger to the right** on the Kode Dot to enter the **upload code menu.** When you connect your Kode Dot to your computer, it will appear in the **device list** in the Arduino IDE. Click the **Upload** button to upload the code.  
+    Swipe your **finger to the right** on the Kode Dot to enter the **upload code menu.** When you connect your Kode Dot to your computer, it will appear in the **device list** in the Arduino IDE. Click the **Upload** button to upload the code.
   </Step>
   <Step title="Create the application">
     Now in the **upload code menu of the Kode Dot**, you will see the option to **execute the code you just uploaded or create an application.** Select the option of **"Create App"** and save it in the category of **"General"**.
