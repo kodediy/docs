@@ -1,0 +1,230 @@
+---
+title: Display
+summary: LVGL display + low-level LCD panel + brightness/backlight control. 
+
+---
+
+# Display
+
+LVGL display + low-level LCD panel + brightness/backlight control. 
+
+## Functions
+
+|                | Name           |
+| -------------- | -------------- |
+| lv_display_t * | **[kode_display_start](/en/kode-bsp/group__kode__bsp__display#function-kode-display-start)**(void )<br>Start LVGL with the default display configuration and return the display handle.  |
+| lv_display_t * | **[kode_display_start_with_config](/en/kode-bsp/group__kode__bsp__display#function-kode-display-start-with-config)**(const bsp_display_cfg_t * cfg)<br>Start LVGL with a custom display configuration.  |
+| void | **[kode_display_stop](/en/kode-bsp/group__kode__bsp__display#function-kode-display-stop)**(lv_display_t * display)<br>Stop the LVGL display started with [kode_display_start()](/en/kode-bsp/group__kode__bsp__display#function-kode-display-start).  |
+| lv_indev_t * | **[kode_display_get_input_dev](/en/kode-bsp/group__kode__bsp__display#function-kode-display-get-input-dev)**(void )<br>Get the LVGL input device for the on-board touch panel.  |
+| bool | **[kode_display_lock](/en/kode-bsp/group__kode__bsp__display#function-kode-display-lock)**(uint32_t timeout_ms)<br>Take the LVGL mutex before issuing LVGL calls from another task.  |
+| void | **[kode_display_unlock](/en/kode-bsp/group__kode__bsp__display#function-kode-display-unlock)**(void )<br>Release the LVGL mutex taken by [kode_display_lock()](/en/kode-bsp/group__kode__bsp__display#function-kode-display-lock).  |
+| void | **[kode_display_rotate](/en/kode-bsp/group__kode__bsp__display#function-kode-display-rotate)**(lv_display_t * disp, lv_disp_rotation_t rotation)<br>Rotate the LVGL display.  |
+| esp_err_t | **[kode_display_new](/en/kode-bsp/group__kode__bsp__display#function-kode-display-new)**(const bsp_display_config_t * config, esp_lcd_panel_handle_t * ret_panel, esp_lcd_panel_io_handle_t * ret_io)<br>Create a raw LCD panel (no LVGL).  |
+| esp_err_t | **[kode_display_new_with_handles](/en/kode-bsp/group__kode__bsp__display#function-kode-display-new-with-handles)**(const bsp_display_config_t * config, bsp_lcd_handles_t * ret_handles)<br>Create a raw LCD panel and return a struct of handles.  |
+| void | **[kode_display_delete](/en/kode-bsp/group__kode__bsp__display#function-kode-display-delete)**(void )<br>Tear down the panel created by [kode_display_new()](/en/kode-bsp/group__kode__bsp__display#function-kode-display-new).  |
+| esp_err_t | **[kode_display_brightness_init](/en/kode-bsp/group__kode__bsp__display#function-kode-display-brightness-init)**(void )<br>Initialize the LEDC channel that drives the LCD backlight.  |
+| esp_err_t | **[kode_display_brightness_deinit](/en/kode-bsp/group__kode__bsp__display#function-kode-display-brightness-deinit)**(void )<br>Release the LEDC channel that drives the LCD backlight.  |
+| esp_err_t | **[kode_display_brightness_set](/en/kode-bsp/group__kode__bsp__display#function-kode-display-brightness-set)**(int brightness_percent)<br>Set the LCD backlight brightness.  |
+| esp_err_t | **[kode_display_backlight_on](/en/kode-bsp/group__kode__bsp__display#function-kode-display-backlight-on)**(void )<br>Turn the LCD backlight fully on.  |
+| esp_err_t | **[kode_display_backlight_off](/en/kode-bsp/group__kode__bsp__display#function-kode-display-backlight-off)**(void )<br>Turn the LCD backlight fully off.  |
+
+
+## Functions Documentation
+
+### function kode_display_start
+
+```
+static inline lv_display_t * kode_display_start(
+    void 
+)
+```
+
+Start LVGL with the default display configuration and return the display handle. 
+
+### function kode_display_start_with_config
+
+```
+static inline lv_display_t * kode_display_start_with_config(
+    const bsp_display_cfg_t * cfg
+)
+```
+
+Start LVGL with a custom display configuration. 
+
+**Parameters**: 
+
+  * **cfg** Display configuration. 
+
+
+### function kode_display_stop
+
+```
+static inline void kode_display_stop(
+    lv_display_t * display
+)
+```
+
+Stop the LVGL display started with [kode_display_start()](/en/kode-bsp/group__kode__bsp__display#function-kode-display-start). 
+
+### function kode_display_get_input_dev
+
+```
+static inline lv_indev_t * kode_display_get_input_dev(
+    void 
+)
+```
+
+Get the LVGL input device for the on-board touch panel. 
+
+### function kode_display_lock
+
+```
+static inline bool kode_display_lock(
+    uint32_t timeout_ms
+)
+```
+
+Take the LVGL mutex before issuing LVGL calls from another task. 
+
+**Parameters**: 
+
+  * **timeout_ms** Block at most this long. 
+
+
+**Return**: true if the mutex was acquired. 
+
+### function kode_display_unlock
+
+```
+static inline void kode_display_unlock(
+    void 
+)
+```
+
+Release the LVGL mutex taken by [kode_display_lock()](/en/kode-bsp/group__kode__bsp__display#function-kode-display-lock). 
+
+### function kode_display_rotate
+
+```
+static inline void kode_display_rotate(
+    lv_display_t * disp,
+    lv_disp_rotation_t rotation
+)
+```
+
+Rotate the LVGL display. 
+
+**Parameters**: 
+
+  * **disp** Display returned by [kode_display_start()](/en/kode-bsp/group__kode__bsp__display#function-kode-display-start). 
+  * **rotation** Target rotation (0/90/180/270). 
+
+
+### function kode_display_new
+
+```
+static inline esp_err_t kode_display_new(
+    const bsp_display_config_t * config,
+    esp_lcd_panel_handle_t * ret_panel,
+    esp_lcd_panel_io_handle_t * ret_io
+)
+```
+
+Create a raw LCD panel (no LVGL). 
+
+**Parameters**: 
+
+  * **config** Panel configuration. 
+  * **ret_panel** Panel handle. 
+  * **ret_io** Panel I/O handle. 
+
+
+### function kode_display_new_with_handles
+
+```
+static inline esp_err_t kode_display_new_with_handles(
+    const bsp_display_config_t * config,
+    bsp_lcd_handles_t * ret_handles
+)
+```
+
+Create a raw LCD panel and return a struct of handles. 
+
+**Parameters**: 
+
+  * **config** Panel configuration. 
+  * **ret_handles** Aggregated handles (panel + IO + touch + brightness). 
+
+
+### function kode_display_delete
+
+```
+static inline void kode_display_delete(
+    void 
+)
+```
+
+Tear down the panel created by [kode_display_new()](/en/kode-bsp/group__kode__bsp__display#function-kode-display-new). 
+
+### function kode_display_brightness_init
+
+```
+static inline esp_err_t kode_display_brightness_init(
+    void 
+)
+```
+
+Initialize the LEDC channel that drives the LCD backlight. 
+
+### function kode_display_brightness_deinit
+
+```
+static inline esp_err_t kode_display_brightness_deinit(
+    void 
+)
+```
+
+Release the LEDC channel that drives the LCD backlight. 
+
+### function kode_display_brightness_set
+
+```
+static inline esp_err_t kode_display_brightness_set(
+    int brightness_percent
+)
+```
+
+Set the LCD backlight brightness. 
+
+**Parameters**: 
+
+  * **brightness_percent** 0..100. 
+
+
+### function kode_display_backlight_on
+
+```
+static inline esp_err_t kode_display_backlight_on(
+    void 
+)
+```
+
+Turn the LCD backlight fully on. 
+
+### function kode_display_backlight_off
+
+```
+static inline esp_err_t kode_display_backlight_off(
+    void 
+)
+```
+
+Turn the LCD backlight fully off. 
+
+
+
+
+
+-------------------------------
+
+Updated on 2026-05-13 at 15:31:21 +0000

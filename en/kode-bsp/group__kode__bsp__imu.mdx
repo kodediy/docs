@@ -1,0 +1,113 @@
+---
+title: IMU
+summary: LSM6DSV16X 6-axis IMU (STEVAL-MKI227KA). 
+
+---
+
+# IMU
+
+LSM6DSV16X 6-axis IMU (STEVAL-MKI227KA). 
+
+## Functions
+
+|                | Name           |
+| -------------- | -------------- |
+| esp_err_t | **[kode_imu_bsp_init](/en/kode-bsp/group__kode__bsp__imu#function-kode-imu-bsp-init)**(void )<br>Initialize the IMU (SPI bus + sensor configuration).  |
+| esp_err_t | **[kode_imu_bsp_deinit](/en/kode-bsp/group__kode__bsp__imu#function-kode-imu-bsp-deinit)**(void )<br>Release the IMU and its SPI resources.  |
+| kode_val_result_t | **[kode_imu_bsp_run_validation](/en/kode-bsp/group__kode__bsp__imu#function-kode-imu-bsp-run-validation)**(kode_val_event_cb_t cb, void * user)<br>Run the IMU factory self-test (WHO_AM_I + accel + gyro self-test).  |
+| esp_err_t | **[kode_imu_bsp_read_accel_mg](/en/kode-bsp/group__kode__bsp__imu#function-kode-imu-bsp-read-accel-mg)**(float xyz_mg[3])<br>Read live accelerometer values in milli-g.  |
+| esp_err_t | **[kode_imu_bsp_read_gyro_mdps](/en/kode-bsp/group__kode__bsp__imu#function-kode-imu-bsp-read-gyro-mdps)**(float xyz_mdps[3])<br>Read live gyroscope values in milli-degrees per second.  |
+| esp_err_t | **[kode_imu_bsp_read_temp_c](/en/kode-bsp/group__kode__bsp__imu#function-kode-imu-bsp-read-temp-c)**(float * c)<br>Read the IMU internal temperature in degrees Celsius.  |
+
+
+## Functions Documentation
+
+### function kode_imu_bsp_init
+
+```
+static inline esp_err_t kode_imu_bsp_init(
+    void 
+)
+```
+
+Initialize the IMU (SPI bus + sensor configuration). 
+
+### function kode_imu_bsp_deinit
+
+```
+static inline esp_err_t kode_imu_bsp_deinit(
+    void 
+)
+```
+
+Release the IMU and its SPI resources. 
+
+### function kode_imu_bsp_run_validation
+
+```
+static inline kode_val_result_t kode_imu_bsp_run_validation(
+    kode_val_event_cb_t cb,
+    void * user
+)
+```
+
+Run the IMU factory self-test (WHO_AM_I + accel + gyro self-test). 
+
+**Parameters**: 
+
+  * **cb** Validation event callback (may be NULL). 
+  * **user** User pointer forwarded to `cb`. 
+
+
+### function kode_imu_bsp_read_accel_mg
+
+```
+static inline esp_err_t kode_imu_bsp_read_accel_mg(
+    float xyz_mg[3]
+)
+```
+
+Read live accelerometer values in milli-g. 
+
+**Parameters**: 
+
+  * **xyz_mg** 3-axis acceleration [mg]. 
+
+
+### function kode_imu_bsp_read_gyro_mdps
+
+```
+static inline esp_err_t kode_imu_bsp_read_gyro_mdps(
+    float xyz_mdps[3]
+)
+```
+
+Read live gyroscope values in milli-degrees per second. 
+
+**Parameters**: 
+
+  * **xyz_mdps** 3-axis angular rate [mdps]. 
+
+
+### function kode_imu_bsp_read_temp_c
+
+```
+static inline esp_err_t kode_imu_bsp_read_temp_c(
+    float * c
+)
+```
+
+Read the IMU internal temperature in degrees Celsius. 
+
+**Parameters**: 
+
+  * **c** Temperature [°C]. 
+
+
+
+
+
+
+-------------------------------
+
+Updated on 2026-05-13 at 15:31:21 +0000

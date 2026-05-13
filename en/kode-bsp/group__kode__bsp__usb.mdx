@@ -1,0 +1,54 @@
+---
+title: USB Host
+summary: USB host stack + VBUS power switch. 
+
+---
+
+# USB Host
+
+USB host stack + VBUS power switch. 
+
+## Functions
+
+|                | Name           |
+| -------------- | -------------- |
+| esp_err_t | **[kode_usb_host_start](/en/kode-bsp/group__kode__bsp__usb#function-kode-usb-host-start)**(bsp_usb_host_power_mode_t mode, bool limit_500mA)<br>Start the USB host stack and energize VBUS.  |
+| esp_err_t | **[kode_usb_host_stop](/en/kode-bsp/group__kode__bsp__usb#function-kode-usb-host-stop)**(void )<br>Stop the USB host stack and cut VBUS.  |
+
+
+## Functions Documentation
+
+### function kode_usb_host_start
+
+```
+static inline esp_err_t kode_usb_host_start(
+    bsp_usb_host_power_mode_t mode,
+    bool limit_500mA
+)
+```
+
+Start the USB host stack and energize VBUS. 
+
+**Parameters**: 
+
+  * **mode** VBUS power source (USB or external). 
+  * **limit_500mA** Enforce the 500 mA current limit. 
+
+
+### function kode_usb_host_stop
+
+```
+static inline esp_err_t kode_usb_host_stop(
+    void 
+)
+```
+
+Stop the USB host stack and cut VBUS. 
+
+
+
+
+
+-------------------------------
+
+Updated on 2026-05-13 at 15:31:21 +0000

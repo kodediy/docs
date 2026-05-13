@@ -1,0 +1,58 @@
+---
+title: I2C
+summary: System I2C bus shared by IMU, mag, codec, charger, fuel-gauge, haptic, LED driver and the I/O expander. 
+
+---
+
+# I2C
+
+System I2C bus shared by IMU, mag, codec, charger, fuel-gauge, haptic, LED driver and the I/O expander. 
+
+## Functions
+
+|                | Name           |
+| -------------- | -------------- |
+| esp_err_t | **[kode_i2c_init](/en/kode-bsp/group__kode__bsp__i2c#function-kode-i2c-init)**(void )<br>Initialize the system I2C master bus.  |
+| esp_err_t | **[kode_i2c_deinit](/en/kode-bsp/group__kode__bsp__i2c#function-kode-i2c-deinit)**(void )<br>Release the system I2C master bus.  |
+| i2c_master_bus_handle_t | **[kode_i2c_get_handle](/en/kode-bsp/group__kode__bsp__i2c#function-kode-i2c-get-handle)**(void )<br>Get the underlying I2C master bus handle.  |
+
+
+## Functions Documentation
+
+### function kode_i2c_init
+
+```
+static inline esp_err_t kode_i2c_init(
+    void 
+)
+```
+
+Initialize the system I2C master bus. 
+
+### function kode_i2c_deinit
+
+```
+static inline esp_err_t kode_i2c_deinit(
+    void 
+)
+```
+
+Release the system I2C master bus. 
+
+### function kode_i2c_get_handle
+
+```
+static inline i2c_master_bus_handle_t kode_i2c_get_handle(
+    void 
+)
+```
+
+Get the underlying I2C master bus handle. 
+
+
+
+
+
+-------------------------------
+
+Updated on 2026-05-13 at 15:31:21 +0000

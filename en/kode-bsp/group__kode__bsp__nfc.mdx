@@ -1,0 +1,189 @@
+---
+title: NFC reader
+summary: ST25R3916B-based NFC reader with Mifare Classic 1K support. 
+
+---
+
+# NFC reader
+
+ST25R3916B-based NFC reader with Mifare Classic 1K support. 
+
+## Classes
+
+|                | Name           |
+| -------------- | -------------- |
+| struct | **[bsp_nfc_card_t](/en/kode-bsp/structbsp__nfc__card__t)** <br>Descriptor of a Mifare Classic 1K card returned by the reader.  |
+
+## Functions
+
+|                | Name           |
+| -------------- | -------------- |
+| esp_err_t | **[kode_nfc_init](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-init)**(void )<br>Initialize the NFC reader: configure SPI, IRQ and bring up RFAL.  |
+| esp_err_t | **[kode_nfc_deinit](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-deinit)**(void )<br>Release all NFC resources (RFAL, SPI bus, IRQ).  |
+| esp_err_t | **[kode_nfc_read_ic_identity](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-read-ic-identity)**(uint8_t * out)<br>Read the ST25R3916B IC_IDENTITY register (SPI sanity check).  |
+| esp_err_t | **[kode_nfc_read_uid](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-read-uid)**([bsp_nfc_card_t](/en/kode-bsp/structbsp__nfc__card__t) * out)<br>Single-shot detect-and-select of a Mifare Classic 1K card.  |
+| esp_err_t | **[kode_nfc_mifare_auth_start](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-mifare-auth-start)**(uint8_t block, uint8_t key_type, uint8_t nonce_out[4])<br>Mifare Classic AUTH step 1 — request a nonce from the card.  |
+| esp_err_t | **[kode_nfc_mifare_auth](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-mifare-auth)**(uint8_t block, uint8_t key_type, const uint8_t key[6], const uint8_t uid[4])<br>Full Mifare Classic Crypto1 authentication for a given block.  |
+| esp_err_t | **[kode_nfc_mifare_read](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-mifare-read)**(uint8_t block, uint8_t data[16])<br>Encrypted read of a 16-byte block (requires prior auth).  |
+| esp_err_t | **[kode_nfc_mifare_write](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-mifare-write)**(uint8_t block, const uint8_t data[16])<br>Encrypted write of a 16-byte block (requires prior auth).  |
+| kode_val_result_t | **[kode_nfc_bsp_run_validation](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-bsp-run-validation)**(kode_val_event_cb_t cb, void * user)<br>Run the NFC factory self-test (requires a Mifare 1K card on the reader).  |
+
+
+## Functions Documentation
+
+### function kode_nfc_init
+
+```
+static inline esp_err_t kode_nfc_init(
+    void 
+)
+```
+
+Initialize the NFC reader: configure SPI, IRQ and bring up RFAL. 
+
+### function kode_nfc_deinit
+
+```
+static inline esp_err_t kode_nfc_deinit(
+    void 
+)
+```
+
+Release all NFC resources (RFAL, SPI bus, IRQ). 
+
+### function kode_nfc_read_ic_identity
+
+```
+static inline esp_err_t kode_nfc_read_ic_identity(
+    uint8_t * out
+)
+```
+
+Read the ST25R3916B IC_IDENTITY register (SPI sanity check). 
+
+**Parameters**: 
+
+  * **out** Identity byte (0x30..0x37 on supported silicon). 
+
+
+### function kode_nfc_read_uid
+
+```
+static inline esp_err_t kode_nfc_read_uid(
+    bsp_nfc_card_t * out
+)
+```
+
+Single-shot detect-and-select of a Mifare Classic 1K card. 
+
+**Parameters**: 
+
+  * **out** Card descriptor (UID, ATQA, SAK). 
+
+
+**Return**: ESP_OK on detect+select, ESP_ERR_TIMEOUT if no card present, ESP_ERR_NOT_SUPPORTED if the card is not Mifare Classic 1K. 
+
+### function kode_nfc_mifare_auth_start
+
+```
+static inline esp_err_t kode_nfc_mifare_auth_start(
+    uint8_t block,
+    uint8_t key_type,
+    uint8_t nonce_out[4]
+)
+```
+
+Mifare Classic AUTH step 1 — request a nonce from the card. 
+
+**Parameters**: 
+
+  * **block** Target block number (0..63). 
+  * **key_type** 0 = Key A (0x60), 1 = Key B (0x61). 
+  * **nonce_out** 4-byte nonce returned by the card. 
+
+
+Must be called immediately after [kode_nfc_read_uid()](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-read-uid) while the card is still in ACTIVE state.
+
+
+### function kode_nfc_mifare_auth
+
+```
+static inline esp_err_t kode_nfc_mifare_auth(
+    uint8_t block,
+    uint8_t key_type,
+    const uint8_t key[6],
+    const uint8_t uid[4]
+)
+```
+
+Full Mifare Classic Crypto1 authentication for a given block. 
+
+**Parameters**: 
+
+  * **block** Target block number. 
+  * **key_type** 0 = Key A, 1 = Key B. 
+  * **key** 6-byte sector key. 
+  * **uid** 4-byte UID returned by [kode_nfc_read_uid()](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-read-uid). 
+
+
+Must be called after [kode_nfc_read_uid()](/en/kode-bsp/group__kode__bsp__nfc#function-kode-nfc-read-uid). On success the Crypto1 stream cipher is set up and subsequent read/write operations on this block are accepted.
+
+
+### function kode_nfc_mifare_read
+
+```
+static inline esp_err_t kode_nfc_mifare_read(
+    uint8_t block,
+    uint8_t data[16]
+)
+```
+
+Encrypted read of a 16-byte block (requires prior auth). 
+
+**Parameters**: 
+
+  * **block** Target block number. 
+  * **data** 16-byte block payload. 
+
+
+### function kode_nfc_mifare_write
+
+```
+static inline esp_err_t kode_nfc_mifare_write(
+    uint8_t block,
+    const uint8_t data[16]
+)
+```
+
+Encrypted write of a 16-byte block (requires prior auth). 
+
+**Parameters**: 
+
+  * **block** Target block number. 
+  * **data** 16 bytes to write. 
+
+
+### function kode_nfc_bsp_run_validation
+
+```
+static inline kode_val_result_t kode_nfc_bsp_run_validation(
+    kode_val_event_cb_t cb,
+    void * user
+)
+```
+
+Run the NFC factory self-test (requires a Mifare 1K card on the reader). 
+
+**Parameters**: 
+
+  * **cb** Validation event callback (may be NULL). 
+  * **user** User pointer forwarded to `cb`. 
+
+
+
+
+
+
+-------------------------------
+
+Updated on 2026-05-13 at 15:31:21 +0000

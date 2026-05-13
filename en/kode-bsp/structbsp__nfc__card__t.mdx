@@ -1,0 +1,63 @@
+---
+title: bsp_nfc_card_t
+summary: Descriptor of a Mifare Classic 1K card returned by the reader. 
+
+---
+
+# bsp_nfc_card_t
+
+**Module:** **[NFC reader](/en/kode-bsp/group__kode__bsp__nfc)**
+
+
+
+Descriptor of a Mifare Classic 1K card returned by the reader. 
+
+
+`#include <bsp_nfc.h>`
+
+## Public Attributes
+
+|                | Name           |
+| -------------- | -------------- |
+| uint8_t[4] | **[uid](/en/kode-bsp/structbsp__nfc__card__t#variable-uid)** <br>4-byte Mifare 1K UID.  |
+| uint8_t | **[uid_len](/en/kode-bsp/structbsp__nfc__card__t#variable-uid-len)** <br>UID length in bytes (always 4 for Mifare 1K).  |
+| uint16_t | **[atqa](/en/kode-bsp/structbsp__nfc__card__t#variable-atqa)** <br>ATQA response (expected 0x0004).  |
+| uint8_t | **[sak](/en/kode-bsp/structbsp__nfc__card__t#variable-sak)** <br>SAK response (expected 0x08).  |
+
+## Public Attributes Documentation
+
+### variable uid
+
+```cpp
+uint8_t[4] uid;
+```
+
+4-byte Mifare 1K UID. 
+
+### variable uid_len
+
+```cpp
+uint8_t uid_len;
+```
+
+UID length in bytes (always 4 for Mifare 1K). 
+
+### variable atqa
+
+```cpp
+uint16_t atqa;
+```
+
+ATQA response (expected 0x0004). 
+
+### variable sak
+
+```cpp
+uint8_t sak;
+```
+
+SAK response (expected 0x08). 
+
+-------------------------------
+
+Updated on 2026-05-13 at 15:31:21 +0000

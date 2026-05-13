@@ -1,0 +1,162 @@
+---
+title: SD Card
+summary: SD/MMC and SDSPI card support. 
+
+---
+
+# SD Card
+
+SD/MMC and SDSPI card support. 
+
+## Functions
+
+|                | Name           |
+| -------------- | -------------- |
+| esp_err_t | **[kode_sdcard_mount](/en/kode-bsp/group__kode__bsp__sdcard#function-kode-sdcard-mount)**(void )<br>Mount the SD card with the default (SDMMC) configuration.  |
+| esp_err_t | **[kode_sdcard_unmount](/en/kode-bsp/group__kode__bsp__sdcard#function-kode-sdcard-unmount)**(void )<br>Unmount the SD card.  |
+| sdmmc_card_t * | **[kode_sdcard_get_handle](/en/kode-bsp/group__kode__bsp__sdcard#function-kode-sdcard-get-handle)**(void )<br>Get the mounted SD card handle.  |
+| void | **[kode_sdcard_get_sdmmc_host](/en/kode-bsp/group__kode__bsp__sdcard#function-kode-sdcard-get-sdmmc-host)**(const int slot, sdmmc_host_t * config)<br>Fill an sdmmc_host_t for the SDMMC interface.  |
+| void | **[kode_sdcard_get_sdspi_host](/en/kode-bsp/group__kode__bsp__sdcard#function-kode-sdcard-get-sdspi-host)**(const int slot, sdmmc_host_t * config)<br>Fill an sdmmc_host_t for the SDSPI interface.  |
+| void | **[kode_sdcard_sdmmc_get_slot](/en/kode-bsp/group__kode__bsp__sdcard#function-kode-sdcard-sdmmc-get-slot)**(const int slot, sdmmc_slot_config_t * config)<br>Fill an sdmmc_slot_config_t for the SDMMC interface.  |
+| void | **[kode_sdcard_sdspi_get_slot](/en/kode-bsp/group__kode__bsp__sdcard#function-kode-sdcard-sdspi-get-slot)**(const spi_host_device_t spi_host, sdspi_device_config_t * config)<br>Fill an sdspi_device_config_t for the SDSPI interface.  |
+| esp_err_t | **[kode_sdcard_sdmmc_mount](/en/kode-bsp/group__kode__bsp__sdcard#function-kode-sdcard-sdmmc-mount)**(bsp_sdcard_cfg_t * cfg)<br>Mount the SD card over SDMMC with a custom configuration.  |
+| esp_err_t | **[kode_sdcard_sdspi_mount](/en/kode-bsp/group__kode__bsp__sdcard#function-kode-sdcard-sdspi-mount)**(bsp_sdcard_cfg_t * cfg)<br>Mount the SD card over SDSPI with a custom configuration.  |
+
+
+## Functions Documentation
+
+### function kode_sdcard_mount
+
+```
+static inline esp_err_t kode_sdcard_mount(
+    void 
+)
+```
+
+Mount the SD card with the default (SDMMC) configuration. 
+
+### function kode_sdcard_unmount
+
+```
+static inline esp_err_t kode_sdcard_unmount(
+    void 
+)
+```
+
+Unmount the SD card. 
+
+### function kode_sdcard_get_handle
+
+```
+static inline sdmmc_card_t * kode_sdcard_get_handle(
+    void 
+)
+```
+
+Get the mounted SD card handle. 
+
+### function kode_sdcard_get_sdmmc_host
+
+```
+static inline void kode_sdcard_get_sdmmc_host(
+    const int slot,
+    sdmmc_host_t * config
+)
+```
+
+Fill an sdmmc_host_t for the SDMMC interface. 
+
+**Parameters**: 
+
+  * **slot** SDMMC slot index. 
+  * **config** Pre-populated host descriptor. 
+
+
+### function kode_sdcard_get_sdspi_host
+
+```
+static inline void kode_sdcard_get_sdspi_host(
+    const int slot,
+    sdmmc_host_t * config
+)
+```
+
+Fill an sdmmc_host_t for the SDSPI interface. 
+
+**Parameters**: 
+
+  * **slot** SDSPI slot index. 
+  * **config** Pre-populated host descriptor. 
+
+
+### function kode_sdcard_sdmmc_get_slot
+
+```
+static inline void kode_sdcard_sdmmc_get_slot(
+    const int slot,
+    sdmmc_slot_config_t * config
+)
+```
+
+Fill an sdmmc_slot_config_t for the SDMMC interface. 
+
+**Parameters**: 
+
+  * **slot** SDMMC slot index. 
+  * **config** Pre-populated slot descriptor. 
+
+
+### function kode_sdcard_sdspi_get_slot
+
+```
+static inline void kode_sdcard_sdspi_get_slot(
+    const spi_host_device_t spi_host,
+    sdspi_device_config_t * config
+)
+```
+
+Fill an sdspi_device_config_t for the SDSPI interface. 
+
+**Parameters**: 
+
+  * **spi_host** SPI host driving the SDSPI peripheral. 
+  * **config** Pre-populated device descriptor. 
+
+
+### function kode_sdcard_sdmmc_mount
+
+```
+static inline esp_err_t kode_sdcard_sdmmc_mount(
+    bsp_sdcard_cfg_t * cfg
+)
+```
+
+Mount the SD card over SDMMC with a custom configuration. 
+
+**Parameters**: 
+
+  * **cfg** Mount configuration. 
+
+
+### function kode_sdcard_sdspi_mount
+
+```
+static inline esp_err_t kode_sdcard_sdspi_mount(
+    bsp_sdcard_cfg_t * cfg
+)
+```
+
+Mount the SD card over SDSPI with a custom configuration. 
+
+**Parameters**: 
+
+  * **cfg** Mount configuration. 
+
+
+
+
+
+
+-------------------------------
+
+Updated on 2026-05-13 at 15:31:21 +0000

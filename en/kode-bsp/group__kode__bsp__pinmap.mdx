@@ -1,0 +1,229 @@
+---
+title: Kode PCB pin map
+summary: GPIO assignments for peripherals not exposed by the Espressif dev-board BSP. 
+
+---
+
+# Kode PCB pin map
+
+GPIO assignments for peripherals not exposed by the Espressif dev-board BSP.  [More...](#detailed-description)
+
+## Defines
+
+|                | Name           |
+| -------------- | -------------- |
+|  | **[KODE_NFC_SPI_HOST](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-nfc-spi-host)** <br>SPI host used by the NFC reader.  |
+|  | **[KODE_NFC_GPIO_SCK](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-nfc-gpio-sck)** <br>SPI clock.  |
+|  | **[KODE_NFC_GPIO_MOSI](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-nfc-gpio-mosi)** <br>SPI MOSI.  |
+|  | **[KODE_NFC_GPIO_MISO](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-nfc-gpio-miso)** <br>SPI MISO.  |
+|  | **[KODE_NFC_GPIO_CS](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-nfc-gpio-cs)** <br>SPI chip-select.  |
+|  | **[KODE_NFC_GPIO_IRQ](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-nfc-gpio-irq)** <br>ST25R3916B IRQ line.  |
+|  | **[KODE_NFC_SPI_CLOCK_HZ](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-nfc-spi-clock-hz)** <br>SPI clock in Hz.  |
+|  | **[KODE_IR_GPIO_TX](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-ir-gpio-tx)** <br>IR LED TX pin.  |
+|  | **[KODE_IR_GPIO_RX](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-ir-gpio-rx)** <br>IR receiver RX pin.  |
+|  | **[KODE_IMU_SPI_HOST](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-imu-spi-host)** <br>SPI host used by the IMU.  |
+|  | **[KODE_IMU_GPIO_SCK](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-imu-gpio-sck)** <br>SPI clock.  |
+|  | **[KODE_IMU_GPIO_MOSI](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-imu-gpio-mosi)** <br>SPI MOSI.  |
+|  | **[KODE_IMU_GPIO_MISO](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-imu-gpio-miso)** <br>SPI MISO.  |
+|  | **[KODE_IMU_GPIO_CS](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-imu-gpio-cs)** <br>SPI chip-select.  |
+|  | **[KODE_IMU_GPIO_INT1](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-imu-gpio-int1)** <br>INT1 line.  |
+|  | **[KODE_IMU_SPI_CLOCK_HZ](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-imu-spi-clock-hz)** <br>SPI clock in Hz.  |
+|  | **[KODE_MAG_SPI_HOST](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-mag-spi-host)** <br>SPI host used by the magnetometer.  |
+|  | **[KODE_MAG_GPIO_SCK](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-mag-gpio-sck)** <br>SPI clock.  |
+|  | **[KODE_MAG_GPIO_SDA](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-mag-gpio-sda)** <br>Bidirectional SPI data line.  |
+|  | **[KODE_MAG_GPIO_CS](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-mag-gpio-cs)** <br>SPI chip-select.  |
+|  | **[KODE_MAG_GPIO_DRDY](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-mag-gpio-drdy)** <br>DRDY (optional)  |
+|  | **[KODE_MAG_SPI_CLOCK_HZ](/en/kode-bsp/group__kode__bsp__pinmap#define-kode-mag-spi-clock-hz)** <br>SPI clock in Hz.  |
+
+## Detailed Description
+
+GPIO assignments for peripherals not exposed by the Espressif dev-board BSP. 
+
+These pins are NOT exposed by the Espressif BSP because the dev board does not carry these peripherals. They live here because every kode_* driver and every test must agree on a single mapping. The final Kode PCB will replace this pin map with its own. 
+
+
+
+
+## Macros Documentation
+
+### define KODE_NFC_SPI_HOST
+
+```
+#define KODE_NFC_SPI_HOST SPI2_HOST
+```
+
+SPI host used by the NFC reader. 
+
+### define KODE_NFC_GPIO_SCK
+
+```
+#define KODE_NFC_GPIO_SCK GPIO_NUM_21
+```
+
+SPI clock. 
+
+### define KODE_NFC_GPIO_MOSI
+
+```
+#define KODE_NFC_GPIO_MOSI GPIO_NUM_22
+```
+
+SPI MOSI. 
+
+### define KODE_NFC_GPIO_MISO
+
+```
+#define KODE_NFC_GPIO_MISO GPIO_NUM_32
+```
+
+SPI MISO. 
+
+### define KODE_NFC_GPIO_CS
+
+```
+#define KODE_NFC_GPIO_CS GPIO_NUM_33
+```
+
+SPI chip-select. 
+
+### define KODE_NFC_GPIO_IRQ
+
+```
+#define KODE_NFC_GPIO_IRQ GPIO_NUM_38
+```
+
+ST25R3916B IRQ line. 
+
+### define KODE_NFC_SPI_CLOCK_HZ
+
+```
+#define KODE_NFC_SPI_CLOCK_HZ (1 * 1000 * 1000)
+```
+
+SPI clock in Hz. 
+
+### define KODE_IR_GPIO_TX
+
+```
+#define KODE_IR_GPIO_TX GPIO_NUM_5
+```
+
+IR LED TX pin. 
+
+### define KODE_IR_GPIO_RX
+
+```
+#define KODE_IR_GPIO_RX GPIO_NUM_4
+```
+
+IR receiver RX pin. 
+
+### define KODE_IMU_SPI_HOST
+
+```
+#define KODE_IMU_SPI_HOST SPI3_HOST
+```
+
+SPI host used by the IMU. 
+
+### define KODE_IMU_GPIO_SCK
+
+```
+#define KODE_IMU_GPIO_SCK GPIO_NUM_21
+```
+
+SPI clock. 
+
+### define KODE_IMU_GPIO_MOSI
+
+```
+#define KODE_IMU_GPIO_MOSI GPIO_NUM_22
+```
+
+SPI MOSI. 
+
+### define KODE_IMU_GPIO_MISO
+
+```
+#define KODE_IMU_GPIO_MISO GPIO_NUM_32
+```
+
+SPI MISO. 
+
+### define KODE_IMU_GPIO_CS
+
+```
+#define KODE_IMU_GPIO_CS GPIO_NUM_33
+```
+
+SPI chip-select. 
+
+### define KODE_IMU_GPIO_INT1
+
+```
+#define KODE_IMU_GPIO_INT1 GPIO_NUM_38
+```
+
+INT1 line. 
+
+### define KODE_IMU_SPI_CLOCK_HZ
+
+```
+#define KODE_IMU_SPI_CLOCK_HZ (1 * 1000 * 1000)
+```
+
+SPI clock in Hz. 
+
+### define KODE_MAG_SPI_HOST
+
+```
+#define KODE_MAG_SPI_HOST SPI3_HOST
+```
+
+SPI host used by the magnetometer. 
+
+### define KODE_MAG_GPIO_SCK
+
+```
+#define KODE_MAG_GPIO_SCK GPIO_NUM_21
+```
+
+SPI clock. 
+
+### define KODE_MAG_GPIO_SDA
+
+```
+#define KODE_MAG_GPIO_SDA GPIO_NUM_22
+```
+
+Bidirectional SPI data line. 
+
+### define KODE_MAG_GPIO_CS
+
+```
+#define KODE_MAG_GPIO_CS GPIO_NUM_33
+```
+
+SPI chip-select. 
+
+### define KODE_MAG_GPIO_DRDY
+
+```
+#define KODE_MAG_GPIO_DRDY GPIO_NUM_38
+```
+
+DRDY (optional) 
+
+### define KODE_MAG_SPI_CLOCK_HZ
+
+```
+#define KODE_MAG_SPI_CLOCK_HZ (1 * 1000 * 1000)
+```
+
+SPI clock in Hz. 
+
+
+
+-------------------------------
+
+Updated on 2026-05-13 at 15:31:21 +0000

@@ -69,6 +69,24 @@
                 ]
               },
               {
+                "group": "Kode BSP",
+                "icon": "microchip",
+                "pages": [
+                  "en/kode-bsp/group__kode__bsp__nfc",
+                  "en/kode-bsp/group__kode__bsp__imu",
+                  "en/kode-bsp/group__kode__bsp__mag",
+                  "en/kode-bsp/group__kode__bsp__i2c",
+                  "en/kode-bsp/group__kode__bsp__audio",
+                  "en/kode-bsp/group__kode__bsp__spiffs",
+                  "en/kode-bsp/group__kode__bsp__sdcard",
+                  "en/kode-bsp/group__kode__bsp__display",
+                  "en/kode-bsp/group__kode__bsp__usb",
+                  "en/kode-bsp/group__kode__bsp__camera",
+                  "en/kode-bsp/group__kode__bsp__pinmap",
+                  "en/kode-bsp/structbsp__nfc__card__t"
+                ]
+              },
+              {
                 "group": "External Modules",
                 "pages": [
                   "en/external-modules/maker",
