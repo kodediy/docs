@@ -1,0 +1,63 @@
+---
+title: Audio
+summary: ES8311 codec (mono) + NS4150B PA + ZTS6211E electret mic. 
+
+---
+
+# Audio
+
+ES8311 codec (mono) + NS4150B PA + ZTS6211E electret mic. 
+
+## Functions
+
+|                | Name           |
+| -------------- | -------------- |
+| esp_err_t | **[kode_audio_init](/en/kode-bsp/group__kode__bsp__audio#function-kode-audio-init)**(const i2s_std_config_t * i2s_config)<br>Initialize the audio I2S bus.  |
+| esp_codec_dev_handle_t | **[kode_audio_codec_speaker_init](/en/kode-bsp/group__kode__bsp__audio#function-kode-audio-codec-speaker-init)**(void )<br>Open the speaker side of the codec and return its handle.  |
+| esp_codec_dev_handle_t | **[kode_audio_codec_microphone_init](/en/kode-bsp/group__kode__bsp__audio#function-kode-audio-codec-microphone-init)**(void )<br>Open the microphone side of the codec and return its handle.  |
+
+
+## Functions Documentation
+
+### function kode_audio_init
+
+```
+static inline esp_err_t kode_audio_init(
+    const i2s_std_config_t * i2s_config
+)
+```
+
+Initialize the audio I2S bus. 
+
+**Parameters**: 
+
+  * **i2s_config** Standard I2S configuration. 
+
+
+### function kode_audio_codec_speaker_init
+
+```
+static inline esp_codec_dev_handle_t kode_audio_codec_speaker_init(
+    void 
+)
+```
+
+Open the speaker side of the codec and return its handle. 
+
+### function kode_audio_codec_microphone_init
+
+```
+static inline esp_codec_dev_handle_t kode_audio_codec_microphone_init(
+    void 
+)
+```
+
+Open the microphone side of the codec and return its handle. 
+
+
+
+
+
+-------------------------------
+
+Updated on 2026-05-13 at 15:31:21 +0000

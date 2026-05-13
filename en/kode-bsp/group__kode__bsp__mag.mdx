@@ -1,0 +1,81 @@
+---
+title: Magnetometer
+summary: IIS2MDC 3-axis magnetometer (STEVAL-MKI181V1, SPI 3-wire). 
+
+---
+
+# Magnetometer
+
+IIS2MDC 3-axis magnetometer (STEVAL-MKI181V1, SPI 3-wire). 
+
+## Functions
+
+|                | Name           |
+| -------------- | -------------- |
+| esp_err_t | **[kode_mag_bsp_init](/en/kode-bsp/group__kode__bsp__mag#function-kode-mag-bsp-init)**(void )<br>Initialize the magnetometer (SPI 3-wire bus + sensor configuration).  |
+| esp_err_t | **[kode_mag_bsp_deinit](/en/kode-bsp/group__kode__bsp__mag#function-kode-mag-bsp-deinit)**(void )<br>Release the magnetometer and its SPI resources.  |
+| esp_err_t | **[kode_mag_bsp_who_am_i](/en/kode-bsp/group__kode__bsp__mag#function-kode-mag-bsp-who-am-i)**(uint8_t * out)<br>Read the IIS2MDC WHO_AM_I register (expected 0x40).  |
+| esp_err_t | **[kode_mag_bsp_read](/en/kode-bsp/group__kode__bsp__mag#function-kode-mag-bsp-read)**(float xyz_mG[3], float * temp_c)<br>Read a single magnetic-field sample and the on-die temperature.  |
+
+
+## Functions Documentation
+
+### function kode_mag_bsp_init
+
+```
+static inline esp_err_t kode_mag_bsp_init(
+    void 
+)
+```
+
+Initialize the magnetometer (SPI 3-wire bus + sensor configuration). 
+
+### function kode_mag_bsp_deinit
+
+```
+static inline esp_err_t kode_mag_bsp_deinit(
+    void 
+)
+```
+
+Release the magnetometer and its SPI resources. 
+
+### function kode_mag_bsp_who_am_i
+
+```
+static inline esp_err_t kode_mag_bsp_who_am_i(
+    uint8_t * out
+)
+```
+
+Read the IIS2MDC WHO_AM_I register (expected 0x40). 
+
+**Parameters**: 
+
+  * **out** WHO_AM_I value. 
+
+
+### function kode_mag_bsp_read
+
+```
+static inline esp_err_t kode_mag_bsp_read(
+    float xyz_mG[3],
+    float * temp_c
+)
+```
+
+Read a single magnetic-field sample and the on-die temperature. 
+
+**Parameters**: 
+
+  * **xyz_mG** 3-axis magnetic field [mG]. 
+  * **temp_c** Sensor temperature [°C], may be NULL. 
+
+
+
+
+
+
+-------------------------------
+
+Updated on 2026-05-13 at 15:31:21 +0000
